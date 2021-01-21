@@ -1,0 +1,98 @@
+struct SA // SA不需要清空
+{
+	int d[N][20];
+	int n, r;
+	int sa[N];
+	int rak[N * 2]; //开两倍
+	int tmp[N * 2];
+	int heig[N];
+	int cnt[N];
+	void radix_sort(int* rank, int* tp)
+	{
+		memset(cnt, 0, (sizeof cnt[0]) * (r + 10));
+		for (int i = 1; i <= n; i++)
+			cnt[rank[tp[i]]]++;
+		for (int i = 1; i <= r; i++)
+			cnt[i] += cnt[i - 1];
+		for (int i = n; i >= 1; i--)
+			sa[cnt[rank[tp[i]]]--] = tp[i];
+	}
+	void suffix(int mx)
+	{
+		int *rk = rak, *tp = tmp;
+		for (int i = 1; i <= n; i++) //rk[i]不能为0
+			rk[i] = str[i] + 1, tp[i] = i, tp[i + n] = rk[i + n] = 0;
+		r = mx + 1;
+		radix_sort(rk, tp);
+		for (int p = 0, l = 1, i; p < n; l <<= 1, r = p)
+		{
+			for (p = 0, i = n - l + 1; i <= n; i++)
+				tp[++p] = i;
+			for (int i = 1; i <= n; i++)
+				if (sa[i] > l)
+					p++, tp[p] = sa[i] - l;
+			radix_sort(rk, tp);
+			swap(rk, tp);
+			rk[sa[1]] = 1;
+			p = 1;
+			for (int i = 2; i <= n; i++)
+			{
+				if (tp[sa[i - 1]] != tp[sa[i]] || tp[sa[i] + l] != tp[sa[i - 1] + l])
+					p++;
+				rk[sa[i]] = p;
+			}
+		}
+		for (int i = 1; i <= n; i++)
+			rak[sa[i]] = i;
+		get_heig();
+	}
+	void get_heig()
+	{
+		int k = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			if (k)
+				k--;
+			int j = sa[rak[i] - 1];
+			while (str[i + k] == str[j + k])
+				k++;
+			heig[rak[i]] = k;
+		}
+	}
+	void RMQ()
+	{
+		for (int i = 1; i <= n; i++)
+			d[i][0] = heig[i];
+		int m = (int)(log(n * 1.0) / log(2.0));
+		for (int j = 1; j <= m; j++)
+		{
+			for (int i = 1; i + (1 << j) - 1 <= n; i++)
+			{
+				d[i][j] = min(d[i][j - 1], d[i + (1 << j - 1)][j - 1]);
+			}
+		}
+	}
+	int Log2(int x)
+	{
+		float fx;
+		unsigned long ix, exp;
+
+		fx = (float)x;
+		ix = *(unsigned long*)&fx;
+		exp = (ix >> 23) & 0xFF;
+
+		return exp - 127;
+	}
+	int ASK(int l, int r)
+	{
+		int k = Log2(r - l + 1);
+		return min(d[l][k], d[r - (1 << k) + 1][k]);
+	}
+	int calc(int l, int r)
+	{
+		l = rak[l], r = rak[r];  //直接查排名打注释
+		if (l > r)
+			swap(l, r);
+		return ASK(l + 1, r);
+	}
+}sa;
