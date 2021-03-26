@@ -1,0 +1,28 @@
+#include <bits/stdc++.h>
+using namespace std;
+int a[12];
+int b[12];
+int main(){
+	int n, k;
+	cin >> n >> k;
+	for (int i = 0; i < n; i++)
+		cin >> a[i], b[i] = i;
+	sort(b, b + n);
+	int cnt = 0;
+	do 
+	{
+		int flag = 0;
+		for (int i = 0; i < n - 1; i++)
+		{
+			if (abs(a[b[i]] - a[b[i + 1]]) > k)
+			{
+				flag = 1;
+				break;
+			}
+		}
+		if (!flag && abs(a[b[n - 1]] - a[b[0]]) <= k)
+			cnt++;
+	} while (next_permutation(b, b + n));
+	cout << cnt / n << endl;
+	return 0;
+}

@@ -1,0 +1,91 @@
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+const ll N = 1e5 + 10;
+#define break(x) { x; break; }
+#define continue(x) { x; continue;  }
+ll gcd(ll a, ll b)
+{
+	return b == 0 ? a : gcd(b, a % b);
+}
+struct node{
+	ll x, y;
+	bool operator<(const node &oth) const
+	{
+		return 1.0 * -y / x < 1.0 * -oth.y / oth.x;
+	}
+}a[N];
+struct node1{
+	ll x, y;
+	bool operator<(const node1 &oth) const
+	{
+		return 1.0 * x / y < 1.0 * oth.x / oth.y;
+	}
+	bool operator==(const node1 &oth) const
+	{
+		return x == oth.x && y == oth.y;
+	}
+};
+ll sum[N];
+ll tot[N];
+vector<node1>v;
+int main(){
+	ll t;
+	cin >> t;
+	while (t--)
+	{
+		memset(sum, 0, sizeof sum);
+		memset(tot, 0, sizeof tot);
+		v.clear();
+		ll flag = 0;
+		ll n, c;
+		cin >> n >> c;
+		for (ll i = 1; i <= n; i++)
+			scanf("%lld%lld", &a[i].x, &a[i].y);
+		sort(a + 1, a + n + 1);
+		for (ll i = 1; i <= n; i++)
+			sum[i] = sum[i - 1] + a[i].x, tot[i] = tot[i - 1] + a[i].y;
+		for (ll i = 1; i <= n + 1; i++) // i ×ó±ßµÄÇøÓò
+		{
+			ll fz = c - tot[i - 1] + (tot[n] - tot[i - 1]);
+			ll fm = sum[i - 1] - (sum[n] - sum[i - 1]);
+			ll d = gcd(fz, fm);
+			if (fz == 0 && fm == 0)
+				break(flag = 1);
+			if (i == 1 && 1.0 * fz / fm > 1.0 * -a[i].y / a[i].x)
+				continue;
+			else
+				if (i == n + 1 && 1.0 * fz / fm < 1.0 * -a[i - 1].y / a[i - 1].x)
+					continue;
+			else
+				if ((1.0 * fz / fm > 1.0 * -a[i].y / a[i].x || 1.0 * fz / fm < 1.0 * -a[i - 1].y / a[i - 1].x) && i >= 2 && i <= n)
+				continue;
+			fz /= d, fm /= d;
+			if (fm < 0)
+				fz = -fz, fm = -fm;
+			v.push_back({ fz, fm});
+		}
+		if (flag == 1)
+			cout << "-1" << endl;
+		else
+		{
+
+			if (v.size() == 0)
+				continue(cout << "0" << endl);
+			sort(v.begin(), v.end());
+			v.erase(unique(v.begin(), v.end()), v.end());
+			ll len = v.size();
+			cout << len << " ";
+			for (ll i = 0; i < len; i++)
+			{
+				if (v[i].x == 0)
+					v[i].y = 1;
+				if (i != len - 1)
+					cout << v[i].x << "/" << v[i].y << " ";
+				else
+					cout << v[i].x << "/" << v[i].y << endl;
+			}	
+		}
+	}
+	return 0;
+}

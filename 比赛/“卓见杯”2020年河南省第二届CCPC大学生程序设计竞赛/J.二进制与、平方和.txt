@@ -1,0 +1,200 @@
+2699: 二进制与、平方和
+时间限制: 3 Sec  内存限制: 512 MB
+提交: 58  解决: 10
+[状态] [讨论版] [提交] [命题人:admin]
+
+题目描述
+
+请你维护一个长度为 n 的非负整数序列 a1,a2,…,an，支持以下两种操作：
+
+第一种操作会将序列 al,al+1,…,ar 中的每个元素，修改为各自和 x 的"二进制与"（Bitwise binary AND）的值，其中 l,r,x 在每次操作时会给定；
+第二种操作会询问序列 al,al+1,…,ar 中所有元素的平方和模 998244353的值，即 ∑i=lrai2 模 998244353，其中 l,r在每次操作时会给定。
+总共有 q 次操作，请你在维护序列的过程中，输出第二种操作所询问的答案。注意需要取模。
+
+输入
+
+第一行，一个整数 n (1≤n≤3×105)，表示序列的长度。
+第二行，共 n 个整数 ai (0≤ai<224)，表示序列。
+第三行，一个整数 q (1≤q≤3×105)，表示询问的数量。
+接下来 q 行，每行表示一个操作，输入有两种格式：
+
+第一种操作的格式为 "1 l r x"，表示将序列中编号在区间  [l,r]  的所有元素，修改为和 x 二进制与操作后的值，其中  1≤l≤r≤n, 0≤x<224；
+第二种操作的格式为 "2 l r"，表示询问序列中编号在区间  [l,r]  的所有元素的平方和，模  998244353 的值，其中  1≤l≤r≤n。
+数据保证至少有一个第二种操作，即保证至少询问一次答案。
+
+输出
+
+每当遇到第二种操作时，输出询问的答案。注意需要取模。
+
+样例输入 Copy
+
+3
+13 31 28
+4
+2 1 3
+1 3 3 25
+1 1 2 18
+2 2 3
+样例输出 Copy
+
+1914
+900
+提示
+
+样例输入二
+5
+9 11 12 5 1
+7
+2 1 3
+1 3 3 0
+1 1 3 9
+1 4 5 13
+2 1 3
+1 4 5 14
+2 1 5
+
+
+样例输出二
+346
+162
+178
+
+
+样例输入三
+4
+16777215 16777215 16777215 16777214
+4
+2 2 2
+1 1 4 16777214
+2 1 4
+2 3 4
+
+
+样例输出三
+981185168
+795789897
+897017125
+
+
+"二进制与"（Bitwise binary AND）结果的第 i 个二进制位为 1，当且仅当两个操作数的第 i 位都为 1。
+
+思路：
+开一颗线段树，然后维护每个区间各个位上的0跟1的个数，考虑对于每个位置最多被修改24次，因为一共
+
+24位，如果当前为0后就不会再被修改了，如果当前位是1且与他AND的数字该位为1则也不需要修改。所以
+
+直接暴力更新叶子节点，递归的时候判断当前区间有没有向下递归的意义了，没有直接return。有意义就是说
+
+向下的子树中至少有一个点的值会被修改。不怎么写数据结构，此题时间复杂度不是很会证明。。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 3e5 + 10;
+const int INF = 0x3f3f3f3f;
+const int mod = 998244353;
+typedef long long ll;
+int a[N];
+int c[4 * N];
+int cnt[4 * N][24];
+int lzy[4 * N];
+#define ls ((x) << 1)
+#define rs ((x) << 1 | 1)
+#define mid ((L) + (R) >> 1)
+void push_up(int x)
+{
+	c[x] = (c[ls] + c[rs]) % mod;
+	for (int i = 0; i < 24; i++)
+		cnt[x][i] = cnt[ls][i] + cnt[rs][i];
+}
+void build(int x, int L, int R)
+{
+	if (L == R)
+	{
+		for (int i = 0; i < 24; i++)
+			cnt[x][i] = ((a[L] >> i) & 1);
+		c[x] = 1LL * a[L] * a[L] % mod;
+		return;
+	}
+	build(ls, L, mid);
+	build(rs, mid + 1, R);
+	push_up(x);
+}
+void update(int x, int L, int R, int ql, int qr, int val)
+{
+	if (ql > qr)
+		return;
+	if (L == R)
+	{
+		int sum = 0;
+		for (int i = 0; i < 24; i++)
+		{
+			if (((val >> i) & 1 == 1) && cnt[x][i])
+				sum |= (1 << i);
+			else
+				cnt[x][i] = 0;
+		}
+		c[x] = 1LL * sum * sum % mod;
+		return;
+	}
+	if (ql <= L && qr >= R)
+	{
+		int flag = 1;
+		for (int i = 0; i < 24; i++)
+		{
+			if (cnt[x][i] && ((val >> i) & 1) == 0)
+			{
+				flag = 0;
+				break;
+			}
+		}
+		if (flag)
+			return;
+	}
+	if (ql <= mid)
+		update(ls, L, mid, ql, qr, val);
+	if (qr > mid)
+		update(rs, mid + 1, R, ql, qr, val);
+	push_up(x);
+}
+int query(int x, int L, int R, int ql, int qr)
+{
+	if (ql <= L && qr >= R)
+		return c[x];
+	ll res = 0;
+	if (ql <= mid)
+		res += query(ls, L, mid, ql, qr), res %= mod;
+	if (qr > mid)
+		res += query(rs, mid + 1, R, ql, qr), res %= mod;
+	return res;
+}
+ 
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	scanf("%d", &n);
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &a[i]);
+	build(1, 1, n);
+	int q;
+	scanf("%d", &q);
+	while (q--)
+	{
+		int op;
+		scanf("%d", &op);
+		if (op == 1)
+		{
+			int L, R, x;
+			scanf("%d%d%d", &L, &R, &x); 
+			update(1, 1, n, L, R, x);
+		}
+		else
+		{
+			int L, R;
+			scanf("%d%d", &L, &R);
+			printf("%d\n", query(1, 1, n, L, R));
+		}
+	}
+	return 0;
+}

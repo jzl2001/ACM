@@ -1,0 +1,311 @@
+LATTICE is learning Digital Electronic Technology. He is talented, so he understood all those pieces of knowledge in 
+10
+−
+9
+ second. In the next 
+10
+−
+9
+ second, he built a data decoding device that decodes data encoded with his special binary coding rule to meaningful words.
+
+His coding rule is called "prefix code", a type of code system (typically a variable-length code) distinguished by its possession of the "prefix property", which requires that there is no whole code word in the system that is a prefix (initial segment) of any other code word in the system. Note that his code is composed of only 
+0
+ and 
+1
+.
+
+LATTICE's device only receives data that perfectly matches LATTICE's rules, in other words, people who send message to LATTICE will always obey his coding rule. However, in the process of receiving data, there are errors that cannot avoid, so LATTICE uses parity check to detect error bytes, after every 
+8
+-bit data there is 
+1
+ bit called parity bit, which should be '0' if there are odd number of '1's in the previous 
+8
+ bits and should be '1' if there are even number of '1's. If the parity bit does not meet the fact, then the whole 
+9
+ bits (including the parity bit) should be considered as invalid data and ignored. Data without parity bit is also considered as invalid data. Parity bits will be deleted after the parity check.
+
+For example, consider the given data "101010101010101010101010", it should be divided into 
+3
+ parts:"101010101","010101010" and "101010". For the first part, there are 
+4
+ '1's in the first 
+8
+ bits, and parity bit is '1', so this part passed the check. For the second part, there are 
+4
+ '1's and parity bit is '0', so this part failed the check. For the third part, it has less than 
+9
+ bits so it contains no parity bit, so this part also failed the check. The data after parity check is "10101010", which is the first 
+8
+ bits of first part.
+
+Data passed the parity check will go into a process that decodes LATTICE's code. The process is described in the following example: consider a situation that, "010" represents 'A' and "1011" represents 'B', if the data after parity check is "01010110101011010010", it can be divided into "010"+"1011"+"010"+"1011"+"010"+"010", which means "ABABAA" . LATTICE's device is so exquisite that it can decode all visible characters in the ASCII table .
+
+LATTICE is famous for his Talk show, some reporters have sneaked into his mansion, they stole the data LATTICE to decode in hexadecimal, the coding rule consists of 
+N
+ pairs of corresponding relations from a bit string 
+S
+i
+ to an ASCII code 
+C
+i
+, and the message length 
+M
+, they want to peek his privacy so they come to you to write a program that decodes messages that LATTICE receives.
+
+Input
+The first line an integer 
+T
+ 
+(
+T
+<
+35
+)
+ represents the number of test cases.
+
+Every test case starts with one line containing two integers, 
+M
+ 
+(
+0
+<
+M
+≤
+100000
+)
+, the number of original characters, and 
+N
+ 
+(
+1
+≤
+N
+≤
+256
+)
+, then 
+N
+ lines, every line contains an integer 
+C
+i
+, and a string 
+S
+i
+(
+0
+<
+|
+S
+i
+|
+≤
+10
+)
+, means that 
+S
+i
+ represents 
+C
+i
+, the ASCII code to a visible character and 
+S
+i
+ only contains '0' or '1' and there are no two numbers 
+i
+ and 
+j
+ that 
+S
+i
+ is prefix of 
+S
+j
+.
+
+Then one line contains data that is going to be received in hexadecimal. 
+(
+0
+<
+|
+d
+a
+t
+a
+|
+<
+200000
+)
+.
+
+Output
+For each test case, output the decoded message in a new line, the length of the decoded message should be the same with the length of original characters, which means you can stop decoding having outputted 
+M
+ characters. Input guarantees that it will have no less than 
+M
+ valid characters and all given ASCII codes represent visible characters.
+
+Hint
+Lattice's encoding rule for test case 
+2
+:
+
+ASCII code	character	lattice's code
+49
+1
+0001
+50
+2
+01001
+51
+3
+011
+the device takes this input in hex
+
+14DB24722698
+input in binary
+
+0001 0100 1101 1011 0010 0100 0111 0010 0010 0110 1001 1000
+formatted into 
+6
+ lines, each line contains 
+8
+ data bits and one parity bit
+
+00010100 1
+10110110 0
+10010001 1
+10010001 0
+01101001 1
+000
+parity check of the third line and the last line failed, so ignore those two lines.parity bits should also be ignored.
+
+00010100
+10110110
+10010001
+01101001
+arrange those bits by the rules informed
+
+0001 01001 011 011 01001 0001 011 01001
+output the result
+
+12332132
+Sample Input
+2
+15 9
+32 0100
+33 11
+100 1011
+101 0110
+104 1010
+108 00
+111 100
+114 0111
+119 0101
+A6Fd021171c562Fde1
+8 3
+49 0001
+50 01001
+51 011
+14DB24722698
+Sample Output
+hello world!!!!
+12332132
+Sponsor
+
+给出一串16进制数字，先翻译成二进制代码
+九位一取，最后一位数字为奇偶校验码
+如果前八位数字1的个数为奇数，这一位要求0
+如果是偶数，最后一位要求1
+如果不合法不取，取完之后直接取前缀码对应输出。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int get(char s)
+{
+	if (s >= '0' && s <= '9')
+		return s - '0';
+	if (s >= 'A' && s <= 'Z')
+		s += 32;
+	return 10 + s - 'a';
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		unordered_map<string, char>mp;
+		int n, k;
+		cin >> n >> k;
+		for (int i = 1; i <= k; i++)
+		{
+			string s;
+			int n;
+			cin >> n >> s;
+			mp[s] = char(n);
+		}
+		string ans, z;
+		cin >> z;
+		int len = z.size();
+		for (int i = 0; i < len; i++)
+		{
+			int num = get(z[i]);
+			for (int j = 3; j >= 0; j--)
+			{
+				ans.push_back('0' + bool(num & (1 << j)));
+			}
+		}
+		//cout << ans << endl;
+		string fi;
+		int cnt = 0;
+		for (int i = 0; i < ans.size(); i += 9)
+		{
+			int flag = 0;
+			for (int j = 0; j < 9 && i + j < ans.size(); j++)
+			{
+				flag ^= (ans[i + j] - '0');
+			}
+			if (flag)
+			{
+				for (int j = 0; j < 8 && i + j < ans.size(); j++)
+				{
+					fi.push_back(ans[i + j]);
+				}
+			}
+		}
+		string now;
+		for (int i = 0; i < fi.size() && cnt < n; i++)
+		{
+			now.push_back(fi[i]);
+			if (mp.find(now) == mp.end())
+				continue;
+			cnt++;
+			putchar(mp[now]);
+			now.clear();
+		}
+		putchar('\n');
+	}
+	return TIME;
+}

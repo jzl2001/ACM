@@ -1,0 +1,136 @@
+https://nanti.jisuanke.com/t/45651
+There are many different streams in Viking rock movement. Old Icelandic granite rock, Middle Danish dusty Viking rock, Late Finngail dark green rock, Fjord boulder avalanche rock, and many others, a complete list of all popular streams would overflow this page many times.
+
+The Scandinavian Ministry of Higher Education studies various ways the streams influence each other. They are currently planning a huge experiment, when a number of suitably chosen volunteers will be distributed over an archipelago of uninhabited small islands, and the researchers want to observe the mutual influence of their rock styles and preferences over a relatively long period of time.
+
+The inhabitants on one island will always influence each other. Some pairs of the islands are situated close enough for their inhabitants to influence each other, while the distances between other pairs prevent any direct influence. In the latter case, the inhabitants of such islands may still influence each other, but only indirectly, if there are one or more other islands that are inhabited and relay the influence.
+
+There are several proposals on the distribution of the volunteers among the islands. For each of these distributions, the Ministry would like to know the number of independent groups of inhabitants that will form in the archipelago. Two groups of island inhabitants, each occupying one or more islands, are considered independent, if there is no possibility of their mutual influence, not even in the indirect way.
+
+Help the Ministry to evaluate their proposals.
+
+Input Specification
+
+The first input line contains three integers, N, E, P (1 ≤ N ≤ 10^5, 0 ≤ E ≤ 10^5, 1 ≤ P ≤ 10^5)N,E,P(1≤N≤10 
+5
+ ,0≤E≤10 
+5
+ ,1≤P≤10 
+5
+ ).
+
+NN is the number of islands in the archipelago, EE is the number of pairs of islands that allow direct influence, and PP is the number of proposals to be evaluated. The islands are labeled from 11 to NN.
+
+The next EE lines specify the pairs of islands that allow direct mutual influence. Each of these lines contains two integers AA and BB denoting the labels of two different islands. No pair of islands occurs more than once.
+
+Each of the next PP lines describes one proposal. Each line starts with a number of islands inhabited under that proposal M (1 ≤ M ≤ N)M(1≤M≤N) and then contains pairwise distinct labels of MM inhabited islands. No other island will be inhabited under the respective proposal.
+
+The sum of the sizes of all proposals (all numbers MM) does not exceed 10^510 
+5
+  .
+
+Output Specification
+
+For each proposal, print a line with the number of independent groups that will form in the archipelago.
+
+输出时每行末尾的多余空格，不影响答案正确性
+
+样例输入1复制
+4 4 3
+1 2
+3 1
+1 4
+3 4
+3 2 3 4
+1 1
+4 1 2 3 4
+样例输出1复制
+2
+1
+1
+样例输入2复制
+5 1 1
+1 2
+5 5 4 3 2 1
+样例输出2复制
+4
+题意：给出一个图
+q次询问，每次给出k个点
+询问由k个点组成的图含有的联通块个数。
+思路：询问总和是1e5，每次询问直接求的复杂度是k个点组成的图边数。
+边数为1e5，则sqrt个点可包含1e5个点，每次询问sqrt个点，最坏询问复杂度n*sqrt
+#pragma GCC optimize(2)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef long double ld;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ld eps = 1e-10;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+vector<int>G[N];
+int vis[N];
+int a[N];
+void dfs(int x)
+{
+	vis[x] = 1;
+	for (auto &i : G[x])
+	{
+		if (vis[i])
+			continue;
+		dfs(i);
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, e, p;
+	cin >> n >> e >> p;
+	for (int i = 1; i <= e; i++)
+	{
+		int u, v;
+		scanf("%d%d", &u, &v);
+		G[u].push_back(v);
+		G[v].push_back(u);
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		vis[i] = 1;
+	}
+	while (p--)
+	{
+		int k;
+		scanf("%d", &k);
+		for (int i = 1; i <= k; i++)
+		{
+			scanf("%d", &a[i]);
+			vis[a[i]] = 0;
+		}
+		int tot = 0;
+		for (int i = 1; i <= k; i++)
+		{
+			if (!vis[a[i]])
+			{
+				tot++;
+				dfs(a[i]);
+			}
+		}
+		for (int j = 1; j <= k; j++)
+		{
+			vis[a[j]] = 1;
+		}
+		printf("%d\n", tot);
+	}
+	return TIME;
+}

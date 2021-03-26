@@ -1,0 +1,86 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define sz(a) ((int)(a).size())
+typedef long long ll;
+#define me(a, b) (memset(a, b, sizeof a))
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+const double PI = acos(-1);
+const int N = 4e5 + 10;
+ 
+string a[N];
+int x[N];
+int y[N];
+vector<int>v1, v2;
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		v1.clear();
+		v2.clear();
+		int n, m;
+		cin >> n >> m;
+		int u = 0, v = 0, sum1 = INF, sum2 = INF;
+		for (int i = 0; i < n; i++)
+			cin >> a[i], x[i] = 0;
+		for (int j = 0; j < m; j++)
+			y[j] = 0;
+		for (int i = 0; i < n; i++)
+		{
+			int sum = 0;
+			for (int j = 0; j < m; j++)
+			{
+				if (a[i][j] == '.')
+					sum++;
+			}
+			x[i] = sum;
+				sum1 = min(sum1, sum);
+		}
+		for (int i = 0; i < n; i++)
+			if (x[i] == sum1)
+				v1.push_back(i);
+		for (int i = 0; i < m; i++)
+		{
+			int sum = 0;
+			for (int j = 0; j < n; j++)
+			{
+				if (a[j][i] == '.')
+					sum++;
+			}
+			y[i] = sum;
+			sum2 = min(sum2, sum);
+		}
+		for (int i = 0; i < m; i++)
+			if (y[i] == sum2)
+				v2.push_back(i);
+		if (sum1 == 0 && sum2 == 0)
+			cout << 0 << endl;
+		else
+		{
+			if (sum1 == 0 || sum2 == 0)
+				cout << sum1 + sum2 << endl;
+			else
+			{
+				int len1 = sz(v1);
+				int len2 = sz(v2);
+				for (int i = 0; i < len1; i++)
+				{
+					for (int j = 0; j < len2; j++)
+					{
+						//cout << v1[i] << " " << v2[j] << endl;
+						if (a[v1[i]][v2[j]] == '.')
+						{
+							cout << sum1 + sum2 - 1 << endl;
+							goto brk;
+						}
+							
+					}
+				}
+				cout << sum1 + sum2 << endl;
+			}
+		}
+	brk:;
+	}
+	return 0;
+}

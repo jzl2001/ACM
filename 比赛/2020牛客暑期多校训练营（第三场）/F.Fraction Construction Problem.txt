@@ -1,0 +1,178 @@
+https://ac.nowcoder.com/acm/contest/5668/F
+题意：给出a，b。
+已知c / d - e / f = a / b
+求出一组正整数c，d，e，f满足上式且d，f<b，1 <= c, e <= 4e12。
+设d * f = b，原式可得c * f - e * d = a
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef unsigned long long ull;
+typedef long long ll;
+const int N = 2e6 + 10;
+const int mod = 998244353;
+ll gcd(ll a, ll b)
+{
+	return b == 0 ? a : gcd(b, a % b);
+}
+ll exgcd(ll a, ll b, ll &x, ll &y)
+{
+	if (b == 0)
+	{
+		x = 1;
+		y = 0;
+		return a;
+	}
+	ll d = exgcd(b, a % b, x, y);
+	ll t = x;
+	x = y;
+	y = t - (a / b) * y;
+	return d;
+}
+bool calc(ll a, ll b, ll c, ll& x, ll& y)
+{
+	ll d = exgcd(a, b, x, y);
+	if (c % d)
+		return 0;
+	ll k = c / d;
+	x *= k;
+	y *= k;
+	assert(abs(x) >= 1 && abs(x) <= 4000000000000);
+	assert(abs(y) >= 1 && abs(y) <= 4000000000000);	
+	return 1;
+}
+int vis[N], cnt[N];//cnt 质因子个数
+int tot;
+struct node
+{
+	int f, d;
+}z[N];
+void pre()
+{
+	for (int i = 2; i < N; i++)
+	{
+		if (vis[i])
+			continue;
+		cnt[i]++;
+		for (int j = 2 * i; j < N; j += i)
+		{
+			if (!vis[j])
+			{
+				vis[j] = 1;
+				int u = i;
+				int v = j / i;
+				while (v % i == 0)
+					v /= i, u *= i;
+				z[j] = { u, v };
+			}
+			cnt[j]++;
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	pre();
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll a, b;
+		cin >> a >> b;
+		ll g = gcd(a, b);
+		if (g != 1) //避免cnt[b]<=1，但是仍能计算。
+		{
+			printf("%lld %lld %lld %lld\n", a / g + 1, b / g, 1LL, b / g);
+			continue;
+		}
+		ll f, d;
+		if (cnt[b] <= 1)
+		{
+			puts("-1 -1 -1 -1");
+			continue;
+		}
+		f = z[b].f, d = z[b].d;
+		ll c, e;
+		if (calc(f, d, a, c, e))
+		{
+			if (c > 0)
+			{
+				printf("%lld %lld %lld %lld\n", c, d, -e, f);
+				assert(c >= 1 && d >= 1 && -e >= 1 && f >= 1);
+			}
+			else
+			{
+				printf("%lld %lld %lld %lld\n", e, f, -c, d);
+				assert(-c >= 1 && d >= 1 && e >= 1 && f >= 1);
+			}
+		}
+		else
+		{
+			puts("-1 -1 -1 -1");	
+		}
+	}
+	return TIME;
+}
+链接：https://ac.nowcoder.com/acm/contest/5668/F
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+Special Judge, 64bit IO Format: %lld
+题目描述 
+There are t queries.
+
+In each query, you are given two positive integers a and b (a, b \le 2 \times 10^6a,b≤2×10 
+6
+ ).
+
+Please print a line consists of four positive integers c,d,e,f satisfying the following constraints:
+
+    • \frac{c}{d} - \frac{e}{f} = \frac{a}{b} 
+d
+c
+​	
+ − 
+f
+e
+​	
+ = 
+b
+a
+​	
+ 
+    • d < b and f < b
+    • 1 \le c,e \le 4 \times 10^{12}1≤c,e≤4×10 
+12
+ 
+
+If there are multiple solutions, you can print anyone.
+
+If there are no solution, please print "-1 -1 -1 -1" in this line.
+输入描述:
+The first line contains one integer t (1 \le t \le 10^51≤t≤10 
+5
+ ) --- the number of test cases.
+
+The only line of each test case contains two integers a and b (1 \le a, b \le 2 \times 10^61≤a,b≤2×10 
+6
+ ).
+输出描述:
+For each test case print four integers --- c,d,e,f. If there are no solution, c,d,e,f should all be -1.
+示例1
+输入
+复制
+3
+4 1
+1 6
+37 111
+输出
+复制
+-1 -1 -1 -1
+1 2 1 3
+145 87 104 78

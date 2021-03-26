@@ -1,0 +1,96 @@
+给定一个全部由小写英文字母组成的字符串，允许你至多删掉其中 3 个字符，结果可能有多少种不同的字符串？
+
+输入格式：
+输入在一行中给出全部由小写英文字母组成的、长度在区间 [4, 10
+​6
+​​ ] 内的字符串。
+
+输出格式：
+在一行中输出至多删掉其中 3 个字符后不同字符串的个数。
+
+输入样例：
+ababcc
+输出样例：
+25
+提示：
+
+删掉 0 个字符得到 "ababcc"。
+
+删掉 1 个字符得到 "babcc", "aabcc", "abbcc", "abacc" 和 "ababc"。
+
+删掉 2 个字符得到 "abcc", "bbcc", "bacc", "babc", "aacc", "aabc", "abbc", "abac" 和 "abab"。
+
+删掉 3 个字符得到 "abc", "bcc", "acc", "bbc", "bac", "bab", "aac", "aab", "abb" 和 "aba"。
+
+作者
+曹鹏
+单位
+Google
+代码长度限制
+16 KB
+时间限制
+400 ms
+内存限制//aacc
+64 MB
+//abcecasdebc
+设d[i][j]表示前i个字母，去掉j个字符的方案数。
+如果不考虑重复,d[i][j] = d[i - 1][j - 1] + d[i - 1][j]
+但是删除相同字符时中间这段去掉之后，生成的新的字符串是相同的。
+比如abcecasdebc
+    abc     ebc
+	abce     bc
+所以向前找到第一个相同的字符，然后减去其方案数
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll d[N][4];
+char s[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	scanf("%s", s + 1);
+	int len = strlen(s + 1); //aba
+	d[0][0] = 1;
+	for (int i = 1; i <= len; i++)
+	{
+		for (int j = 0; j <= 3; j++)
+		{
+			if (i < j)
+				continue;
+			d[i][j] += d[i - 1][j];
+			if (j)
+				d[i][j] += d[i - 1][j - 1];
+			for (int k = i - 1; j - (i - k) >= 0 && k >= 1; k--)
+			{
+				if (s[k] == s[i])
+				{
+					d[i][j] -= d[k - 1][j - (i - k)];
+					break;
+				}
+			}
+		}
+	}
+	cout << d[len][0] + d[len][1] + d[len][2] + d[len][3] << endl;
+	return TIME;
+}

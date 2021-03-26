@@ -1,0 +1,125 @@
+链接：https://ac.nowcoder.com/acm/contest/5678/E
+来源：牛客网
+
+无敌阿姨
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+X 学校最近计划安排宿管阿姨帮每个宿舍的人晒被子，为了提高效率雇佣了一个无敌阿姨，已知无敌阿姨晒被子的方式如下：
+1、进入当前有被子的最低层拿尽可能多的被子，每拿走 1 床被子体力值减 1；
+2、如果当前层的被子被拿完且此时的体力值大于 k ，消耗 k 点体力值进入到上层楼；
+3、在当前层拿尽可能多的被子，每拿走 1 床被子体力值减 1 ，重复步骤 2；
+4、如果体力耗尽或者此时的体力小于等于 k ，将被子拿出去放到晾衣架，体力恢复为初始体力值；
+PS：阿姨在没有取得被子之前上楼不消耗体力。
+先给出楼的层数 n ，阿姨的体力值 m ，阿姨抱着被子上楼的体力消耗值 k ，每层的被子数 a_ia 
+i
+​	
+  ，问阿姨需要几次能够把所有被子拿出去？
+输入描述:
+输入包含多组数据，第一行包含一个数字 T(1 \le T \le 10)T(1≤T≤10)，表示测试数据组数。接下来是T组数据，
+每组数据第一行为三个整数 n,m,k(1 \le n,m,k \le 100)n,m,k(1≤n,m,k≤100)分别表示楼的层数，阿姨的体力值以及抱着被子上楼的体力消耗值。
+第二行 n 个整数 a_1,a_2,a_3,...,a_n(1 \le a_i \le 100)a 
+1
+​	
+ ,a 
+2
+​	
+ ,a 
+3
+​	
+ ,...,a 
+n
+​	
+ (1≤a 
+i
+​	
+ ≤100) 表示每层的被子数。
+输出描述:
+每组数据输出包含一个整数，表示阿姨把所有的被子都拿出去需要的次数。
+示例1
+输入
+复制
+1
+4 5 1
+1 1 2 4
+输出
+复制
+3
+说明
+第一次阿姨先从第一层拿一床被子，再上到第二层拿1床被子，再上到第三层拿一床被子，其中拿被子消耗体力为3，上楼消耗体力为2；第二次阿姨先从第三层拿一床被子，再上到第四层拿三床被子，其中拿被子消耗体力为4，上楼消耗体力为1；第三次阿姨直接从第四层拿一床被子消耗体力为1，全部为拿被子消耗的体力。
+#pragma GCC optimize(2)
+#pragma GCC optimize(3)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+
+int a[110];
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m, k;
+		cin >> n >> m >> k;
+		for (int i = 1; i <= n; i++)
+		{
+			cin >> a[i];
+		}
+		int en, flag;
+		en = m, flag = 0;
+		int ans = 0;
+		while (true)
+		{
+			int f = 0;
+			if (!flag)
+				en = m;
+			for (int i = 1; i <= n; i++)
+			{
+				if (!a[i])
+					continue;
+				f = 1;
+				if (a[i] <= en)
+				{
+					en -= a[i];
+					a[i] = 0;
+				}
+				else
+				{
+					a[i] -= en;
+					break;
+					flag = 0;
+				}
+				if (en >= k)
+					en -= k;
+				else
+				{
+					flag = 0;
+					break;
+				}
+			}
+			if (!f)
+				break;
+			ans++;
+		}
+		cout << ans << endl;
+	}
+	return TIME;
+}

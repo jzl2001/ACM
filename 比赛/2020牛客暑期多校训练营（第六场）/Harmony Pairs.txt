@@ -1,0 +1,84 @@
+链接：https://ac.nowcoder.com/acm/contest/8100/H
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+Roundgod is obsessive about numbers. Let S(x)S(x) be the sum of the digits of xx in decimal notation, (A,B)(A,B) is a harmony pair if and only if S(A)>S(B)S(A)>S(B). Roundgod is given NN, and she wants to count the number of harmony pairs (A,B)(A,B) modulo 10^9+710 
+9
+ +7 satisfying 0\le A\le B\le N0≤A≤B≤N.
+输入描述:
+The only line of input contains one integer N\  (1\le N\le 10^{100} )N (1≤N≤10 
+100
+ ).
+输出描述:
+Output one integer indicating the answer.
+示例1
+输入
+复制
+100
+输出
+复制
+967
+
+题意询问有多少数对满足数位S(A) > S(B)并且A<=B。
+数位dp，状态记录A,B数位差值以及大小关系。
+#include <bits/stdc++.h>
+#include <unordered_map>
+
+using namespace std;
+typedef long long ll;
+const int N = 5e5 + 10;
+const int mod = 1e9 + 7;
+
+char s[N];
+unordered_map<int, ll>d[110][2][2][3];
+ll dfs(int x, int lima, int limb, int dif, int g) // 0:A>B 1:A<B 2:A=B
+{
+	if (x == 0)
+		return dif > 0 && g;
+	if (~d[x][lima][limb][g][dif])
+		return d[x][lima][limb][g][dif];
+	ll sum = 0;
+	int up1 = lima ? s[x] - '0' : 9;
+	int up2 = limb ? s[x] - '0' : 9;
+	for (int i = 0; i <= up1; i++)
+	{
+		for (int j = 0; j <= up2; j++)
+		{
+			int b = g;
+			if (g == 2 && i != j)
+				b = i < j;
+			sum = (sum + dfs(x - 1, lima && i == up1, limb && j == up2, dif + i - j, b)) % mod;
+		}
+	}
+	return d[x][lima][limb][g][dif] = sum;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\input.txt", "r", stdin);
+#endif
+	scanf("%s", s + 1);
+	int len = strlen(s + 1);
+	reverse(s + 1, s + len + 1);
+	for (int i = 0; i <= len; i++)
+	{
+		for (int lima = 0; lima <= 1; lima++)
+		{
+			for (int limb = 0; limb <= 1; limb++)
+			{
+				for (int g = 0; g <= 2; g++)
+				{
+					for (int dif = -len * 9; dif <= len * 9; dif++)
+					{
+						d[i][lima][limb][g][dif] = -1;
+					}
+				}
+			}
+		}
+	}
+	cout << dfs(len, 1, 1, 0, 2) << endl;
+	return 0;
+}

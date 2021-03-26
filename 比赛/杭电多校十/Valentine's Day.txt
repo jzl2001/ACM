@@ -1,0 +1,60 @@
+/*
+问选几个物品，成功的概率最大
+设俩物品成功概率x, y
+x * (1 - y) + y * (1 - x) = x + y - 2 * x * y
+若概率大于0.5 则 x - 0.? y
+若概率小于0.5 则 x + 0.?y
+所以有大于0.5直接输出， 否则尽量取大
+*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+ll mod = 1e9 + 7;
+ll fpow(ll a, ll b) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e4 + 10;
+double a[N];
+bool cmp(double a, double b)
+{
+	return a > b;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int flag = 0;
+		int n;
+		cin >> n;
+		for (int i = 1; i <= n; i++)
+			scanf("%lf", &a[i]);
+		sort(a + 1, a + n + 1, cmp);
+		if (a[1] >= 0.5)
+			printf("%.6f\n", a[1]);
+		else
+		{
+			double pr = 0;
+			double ans = 0;
+			double lc = 1;
+			for (int i = 1; i <= n; i++)
+			{
+				ans = (1 - a[i]) * ans + lc * a[i];
+				lc *= (1.0 - a[i]);
+				pr = max(pr, ans);
+			}
+			printf("%.6f\n", pr);
+		}
+	}
+	return 0;
+}

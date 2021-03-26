@@ -1,0 +1,62 @@
+/*
+十进制矩阵快速幂
+*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int N = 1e6 + 10;
+ll A, B, x0, x1;
+ll m;
+char s[N];
+struct M{
+	ll m[2][2];
+	M() 
+	{
+		memset(m, 0, sizeof m);
+	}
+};
+M mul(M a, M b)
+{
+	M ans;
+	for (ll i = 0; i < 2; i++)
+		for (ll j = 0; j < 2; j++)
+		{
+			for (ll k = 0; k < 2; k++)
+				ans.m[i][j] = (ans.m[i][j] + a.m[i][k] * b.m[k][j] % m) % m;
+		}
+	return ans;
+}
+void fpow(ll n)
+{
+	M a, b;
+	a.m[0][0] = A;
+	a.m[0][1] = B;
+	a.m[1][0] = 1;
+	b.m[0][0] = b.m[1][1] = 1;
+	while (n >= 0)
+	{
+		ll cnt = s[n] - '0';
+		M now = a;
+		for (int i = 1; i <= cnt; i++)
+			b = mul(b, a);	
+		M c[2];
+		a = mul(a, a); // 2
+		c[0] = mul(a, a); // 4
+		c[1] = mul(c[0], c[0]); // 8
+		a = mul(a, c[1]);
+		n--;
+	}
+	M ans;
+	ans.m[0][0] = x1;
+	ans.m[1][0] = x0;
+	ans = mul(b, ans);
+	cout << ans.m[1][0] << endl;
+}
+int main(){
+	cin >> x0 >> x1 >> A >> B;
+	scanf("%s", s);
+	cin >> m;
+	ll len = strlen(s);
+	fpow(len - 1);
+	return 0;
+}

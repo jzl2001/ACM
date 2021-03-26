@@ -1,0 +1,89 @@
+/*
+考虑时间倒流，看作一个完整的排列按照一定顺序依次删除每个数，然后每次需要计算
+LIS 的长度。
+首先在 O(n log n) 的时间内求出 LIS，并找到一个 LIS。当删除 x 时，如果 x 不在之前找
+到的那个 LIS 中，那么显然 LIS 的长度是不会变化的，否则暴力重新计算出新的 LIS 即可。
+因为数据随机，因此 LIS 的期望长度是 O(
+√
+n)，删除的 x 位于 LIS 中的概率是 √
+1
+n，也就
+是说期望删除 O(
+√
+n) 个数才会修改 LIS，那么 LIS 变化的次数不会很多。
+期望时间复杂度为 O(n
+√
+n log n)。
+*/
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 5e4 + 10;
+#define sc(a) { scanf("%d", &a); }
+int d[N];
+int a[N];
+int lis[N];
+int b[N];
+int cuse[N]; // record can use num
+bool vis[N]; // record LIS num
+int record[N]; // location in LIS
+int ans[N];
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(a, 0, sizeof a);
+		memset(b, 0, sizeof b);
+		memset(d, 0x3f, sizeof d);
+		int n;
+		scanf("%d", &n);
+		for (int i = 1; i <= n; i++)
+			sc(a[i]); 
+		for (int i = 1; i <= n; i++)
+			sc(b[i]);
+		for (int i = 1; i <= n; i++)
+		{
+			vis[i] = 0;
+			int j = lower_bound(d + 1, d + n + 1, a[i]) - d;
+			d[j] = a[i];
+			record[i] = j;
+		}
+		int len = lower_bound(d + 1, d + n + 1, 0x3f3f3f3f) - d - 1;
+		int cnt = len; // now lis rank
+		for (int i = n; i >= 1; i--)
+			if (record[i] == cnt)
+				vis[a[i]] = 1, cnt--; // a[i] in lis
+		int y = 0;
+		for (int k = n; k >= 1; k--)
+		{
+			if (vis[a[b[k + 1]]] == 0) // this number not in this lis
+				ans[++y] = len, a[b[k + 1]] = 0; // no sense
+			else   // otherwise calc again
+			{
+				a[b[k + 1]] = 0;
+				for (int i = 1; i <= n; i++)
+					d[i] = 0x3f3f3f3f, record[i] = 0, vis[i] = 0;
+				for (int i = 1; i <= n; i++)
+				{
+					if (!a[i])
+						continue;
+					int j = lower_bound(d + 1, d + n + 1, a[i]) - d;
+					d[j] = a[i];
+					record[i] = j;
+				}
+				len = lower_bound(d + 1, d + n + 1, 0x3f3f3f3f) - d - 1;
+				int cnt = len; // now lis rank
+				for (int i = n; i >= 1; i--)
+					if (record[i] == cnt)
+						vis[a[i]] = 1, cnt--;
+				ans[++y] = len;
+			}
+		}
+		for (int i = y; i >= 1; i--)
+			if (i != 1)
+				cout << ans[i] << " ";
+			else
+				cout << ans[i] << endl;
+	}
+	return 0;
+}

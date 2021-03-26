@@ -1,0 +1,69 @@
+7-1 A - Krypton
+In the future several years, you will surely remember that you once participated in a special China Collegiate Programming Contest. Due to COVID-19, all parties had paid a lot of effort to eventually hold a rare online programming contest. As a problem writer, I would also like to express my sincere gratitude to the organizing committee, all the contestants and others who have worked hard in this process. I also sincerely wish you good results in this special contest and a special and sweat memory in the future.
+
+Maybe several years later, you may recall that ...
+
+Once there was a mobile game, where there was a virtual currency called coupon that could only be purchased by RMB. Kelo found that relying on his liver alone cannot make him stronger, so he decided to purchase some coupons. When he opened the recharge page, he found that this game had seven recharge columns, and was holding an activity called First Recharge Reward. If it was the first time a recharge column was chosen, some additional coupons would be given to the player as a reward. A player might receive several rewards if he chose several different recharge columns. A column could be chosen for arbitrary times, but there would be no additional reward except for the first time it was chosen. Here is a table describing the price, amount of coupons in normal case and additional first recharge rewards of each column.
+
+Price (RMB yuan)	Normal amount (coupons)	First recharge reward (coupons)
+1	10	8
+6	60	18
+28	280	28
+88	880	58
+198	1980	128
+328	3280	198
+648	6480	388
+Kelo had recently earned n yuan by writing problems for China Collegiate Programming Contest. He decided to recharge all these n yuan to the game, and hoped to get as many coupons as possible with these hard-earned money.
+
+Input
+The only line contains an only integer n (1≤n≤2000).
+
+Output
+Print the maximum amount of coupons Kelo might get.
+
+Example
+Input 1
+
+100
+Output 1
+
+1084
+Input 2
+
+198
+Output 2
+
+2108
+
+题意：给出n个物品，第一次购买会有额外奖励，询问n个钱最多买几个物品。
+思路：二进制枚举，购买了哪些物品，然后把第一次奖励加上。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 5e5 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+int a[] = { 8, 18, 28, 58, 128, 198, 388 };
+int p[] = { 1, 6, 28, 88, 198, 328, 648 };
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	int ans = 0;
+	for (int i = 0; i < (1 << 7); i++)
+	{
+		int tot = n, sum = 0;
+		for (int j = 0; j < 7; j++)
+		{
+			if ((i >> j) & 1)
+				sum += a[j] + p[j] * 10, tot -= p[j];
+		}
+		if (tot >= 0)
+			ans = max(ans, sum + tot * 10);
+	}
+	cout << ans << endl;
+	return 0;
+}

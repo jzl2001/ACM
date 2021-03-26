@@ -1,0 +1,69 @@
+#include<iostream>
+#include<string>
+#include<set>
+#include<stdio.h>
+#include<map>
+using namespace std;
+string a[410], b[510];
+int main(){
+	int n;
+	while (cin >> n)
+	{
+		set<string>s;
+		map<string, int>mp;
+		for (int i = 1; i <= n; i++)
+			cin >> a[i];
+		int m;
+		cin >> m;
+		for (int i = 1; i <= m; i++)
+			cin >> b[i], mp[b[i]] = 2;
+		for (int i = 1; i <= n; i++)
+		{
+			int len = a[i].length();
+			string node;
+			int x = a[i].find('=');
+			for (int j = 0; j <= x; j++)
+			{
+				if (a[i][j] != '+' && a[i][j] != '=')
+				{
+					node.push_back(a[i][j]);
+				}
+				else
+				{
+					
+					if (mp[node] == 0)
+						goto brk;
+					else
+						node.clear();
+				}
+			}
+			node.clear();
+			for (int j = x + 1; j <= len; j++)
+			{
+				if (a[i][j] != '+' && j != len)
+				{
+					node.push_back(a[i][j]);
+				}
+				else
+				{
+					if (mp[node] != 2)
+					mp[node] = 1;
+					s.insert(node);
+					node.clear();
+				}
+				
+			}
+			node.clear();
+			brk:;
+		}
+		set<string>ans;
+	//	cout << s.size() << endl;
+		for (auto i = s.begin(); i != s.end(); i++)
+			if (mp[*i] != 2)
+				ans.insert(*i);
+		cout << ans.size() << endl;
+		for (auto i = ans.begin(); i != ans.end(); i++)
+			cout << *i << endl;
+	}
+	return 0;
+}

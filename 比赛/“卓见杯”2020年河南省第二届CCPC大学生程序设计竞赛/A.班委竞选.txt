@@ -1,0 +1,84 @@
+题目描述
+
+某班级中有 n 位学生，学号为 1,2,…,n。现在班级中正在举行 m 个班干部职位的竞选，职位用 1,2,…,m 编号。学号为 i 的同学竞选的职位为 ci，获得 ti 票。最终每个职位选择票数最高的同学上任，若存在多个同学票数一致，则选择学号最小的同学上任。
+现在给你唱票结果，请你告诉班主任最终的班干部名单。
+
+输入
+
+第一行包含两个整数 n, m (1≤n≤51, 1≤m≤12, m≤n)，含义见题目描述。
+接下来 n 行，第 i 行包含两个整数 ci, ti (1≤ci≤m, 1≤ti≤n)，含义见题目描述。
+数据保证每个职位至少有一位同学参与竞选。
+
+输出
+
+输出一行，包含 m 个整数。第 i 个整数表示担任第 i 个班干部职位的同学学号。
+
+样例输入 Copy
+
+5 2
+1 2
+2 1
+2 1
+1 1
+2 2
+样例输出 Copy
+
+1 5
+提示
+
+样例输入二
+12 8
+8 12
+6 8
+2 6
+1 8
+1 7
+2 9
+3 12
+4 9
+5 1
+6 12
+7 6
+8 8
+样例输出二
+4 6 7 8 9 10 11 1
+第一个样例中，第 1 个岗位有学号 1 和学号 4 两个同学竞选，获得的票数分别为 2 和 1，第 1 个岗位由获得票数最多的学号 1 同学来担任；第 2 个岗位有学号 2, 3 和 5 三个同学竞选，获得的票数分别为 1, 1 和 2，第 2 个岗位由获得票数最多的学号 5 同学来担任。
+
+思路：
+直接排序就可以了，签到题。
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+ 
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const int N = 5e5 + 10;
+ 
+struct node
+{
+    int p, id;
+    bool operator < (const node &oth)const
+    {
+        if (p != oth.p)
+            return p > oth.p;
+        return id < oth.id;
+    }
+};
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    map<int, set<node>>mp;
+    int n, m;
+    cin >> n >> m;
+    for (int i = 1; i <= n; i++)
+    {
+        int c, t;
+        cin >> c >> t;
+        mp[c].insert({ t, i });
+    }
+    for (int i = 1; i <= m; i++)
+        cout << mp[i].begin()->id << (i == m ? '\n' : ' ');
+    return 0;
+}

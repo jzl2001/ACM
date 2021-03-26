@@ -1,0 +1,50 @@
+Eddy likes to walk around. Especially, he likes to walk in a loop called "Infinite loop". But, actually, it's just a loop with finite length(Anyway, the name doesn't matter). Eddy can walk in a fixed length. He finds that it takes him N steps to walk through the loop a cycle. Then, he puts N marks on the "Infinite loop" labeled with , where i and i+1 are a step away each other, so as 0 and N-1. After that, Eddy stands on the mark labeled 0 and start walking around. For each step, Eddy will independently uniformly randomly choose to move forward or backward. If currently Eddy is on the mark labeled i, he will on the mark labeled i+1 if move forward or i-1 if move backward. If Eddy is on the mark labeled N-1 and moves forward, he will stand on the mark labeled 0. If Eddy is on the mark labeled 0 and moves backward, he will stand on the mark labeled N-1.
+
+Although, Eddy likes to walk around. He will get bored after he reaches each mark at least once. After that, Eddy will pick up all the marks, go back to work and stop walking around.
+
+You, somehow, notice the weird convention Eddy is doing. And, you record T scenarios that Eddy walks around. For i-th scenario, you record two numbers N_i, M_i, where N_i tells that in the i-th scenario, Eddy can walk through the loop a cycle in exactly N_i steps(Yes! Eddy can walk in different fixed length for different day.). While M_i tells that you found that in the i-th scenario, after Eddy stands on the mark labeled M_i, he reached all the marks. 
+
+However, when you review your records, you are not sure whether the data is correct or even possible. Thus, you want to know the probability that those scenarios will happen. 
+<规律>
+从某一个点出发到其他点的期望, 趋近于 1 / n
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int mod = 1e9 + 7;
+ll quickpow(ll a, ll b, int c)
+{
+    a = a % c;
+    ll res = 1;
+    while (b)
+    {
+        if (b & 1)
+            res = res * a % c;
+        b >>= 1;
+        a = a * a % c;
+    }
+    return res % c;
+}
+ 
+int main()
+{
+    int t;
+    ll ans = 1;
+    scanf("%d", &t);
+    while (t--)
+    {
+        ll n, m;
+        scanf("%lld%lld", &n, &m);
+        if (n == 1)
+        {
+            printf("%lld\n", ans);
+        }
+        else
+        {
+            if (m == 0)
+                ans = 0;
+            else
+                ans = (ans * quickpow(n - 1, mod - 2, mod)) % mod;
+            printf("%lld\n", ans);
+        }
+    }
+    return 0;

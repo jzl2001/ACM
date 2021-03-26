@@ -1,0 +1,56 @@
+/*
+https://ac.nowcoder.com/acm/contest/5668/A
+题意：有四个阶段。
+0：什么都没有
+1：没鱼但是有一个鱼饵
+2：有一个鱼但是没有鱼铒
+3：有一个鱼和一个鱼饵
+每个阶段四种操作
+1.使用一个鱼饵钓鱼
+2.如果当前有鱼则直接可以抓
+3.储存当前鱼饵
+4.什么也不做
+显然有鱼的阶段直接抓鱼，剩下考虑鱼饵的使用，有0的关卡能用就用
+剩下的有鱼饵没鱼的关卡，一个做鱼饵，一个抓鱼，所以最后剩余的cnt/2
+*/
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+const int N = 2e6 + 10;
+char s[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        scanf("%d", &n);
+        scanf("%s", s + 1);
+        int len = strlen(s + 1);
+        int ans = 0, cnt = 0;
+        for (int i = 1; i <= len; i++)
+        {
+            if (s[i] == '3' || s[i] == '2')
+                ans++;
+            if (s[i] == '0' && cnt)
+                cnt--, ans++;
+            if (s[i] == '1')
+                cnt++;
+        }
+        cout << ans + cnt / 2 << endl;
+    }
+	return TIME;
+}

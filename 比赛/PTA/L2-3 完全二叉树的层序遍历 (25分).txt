@@ -1,0 +1,61 @@
+一个二叉树，如果每一个层的结点数都达到最大值，则这个二叉树就是完美二叉树。对于深度为 D 的，有 N 个结点的二叉树，若其结点对应于相同深度完美二叉树的层序遍历的前 N 个结点，这样的树就是完全二叉树。
+
+给定一棵完全二叉树的后序遍历，请你给出这棵树的层序遍历结果。
+
+输入格式：
+输入在第一行中给出正整数 N（≤30），即树中结点个数。第二行给出后序遍历序列，为 N 个不超过 100 的正整数。同一行中所有数字都以空格分隔。
+
+输出格式：
+在一行中输出该树的层序遍历序列。所有数字都以 1 个空格分隔，行首尾不得有多余空格。
+
+输入样例：
+8
+91 71 2 34 10 15 55 18
+输出样例：
+18 34 55 71 2 10 15 91
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e6 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+vector<int>G[N];
+int ans[N];
+int b[N];
+int tot;
+void dfs(int x, int fa)
+{
+	for (auto &i : G[x])
+	{
+		if (i == fa)
+			continue;
+		dfs(i, x);
+	}
+	ans[x] = ++tot;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &b[i]);
+	for (int i = 1; i <= n; i++)
+	{
+		if (2 * i > n)
+			break;
+		G[i].push_back(2 * i);
+		if (2 * i + 1 > n)
+			break;
+		G[i].push_back(2 * i + 1);
+	}
+	dfs(1, -1);
+	for (int i = 1; i <= n; i++)
+	{
+		cout << b[ans[i]];
+		if (i != n)
+			cout << " ";
+	}
+	return 0;
+}

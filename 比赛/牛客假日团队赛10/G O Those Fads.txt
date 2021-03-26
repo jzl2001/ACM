@@ -1,0 +1,83 @@
+链接：https://ac.nowcoder.com/acm/contest/1072/G
+来源：牛客网
+题目描述 
+Like any other teenager, teen cows are occasionally overtaken by fads. Sometimes it's a hula hoop or a pet rock, other times it's Counterstrike, Pokemon, Rick Astley, or tribal tattoos on their udders.
+Mathematically, we know that a fad has an initial attractiveness level L (1 <= L <= 50,000). Cow i has a resistance (0 <= Ri <= 1,000,000) that tells how long she can avoid a fad before having no alternative but to participate. When a fad's attractiveness level meets or exceeds a cow's fad resistance, then the cow will want to participate in the fad.
+Each cow who participates in a fad increases (through peer pressure) that fad's attractiveness by some value K (1 <= K <= 2,500).
+Given a population of N (1 <= N <= 100,000) cows, determine how many will participate in a fad.
+输入描述:
+* Line 1: Three space-separated integers: N, L, and K
+* Lines 2..N+1: Line i+1 contains cow i's a single integer that is fad resistance: Ri
+输出描述:
+* Line 1: A single integer that is the number of cows how ultimately participate in the fad.
+示例1 
+输入
+复制 
+5 2 3
+2
+6
+12
+5
+14
+输出
+复制 
+3
+说明
+Five cows with fad resistances 2, 6, 12, 5, and 14. Initial fad attractiveness is 2; peer pressure adds 3 for each attractiveness index for each cow that participates.
+The initial attraction level of 2 brings in cow #1 (whose resistance is 2) and raises the attractiveness level to 5, thus attracting cow #4 (whose resistance is 5) and raising the attractiveness level to 8. This attracts cow #2 (resistance: 6) and raises the attractiveness level to 11. Neither cow #3 (resistance: 12) or cow #5 (resistance: 14) is sucked into the fad; a total of 3 cows particpate.
+
+题意：给出n，l，k
+
+n代表n头奶牛， 接下来会输入n行表示每头奶牛的抵抗值， l是初始诱惑值， 小于诱惑值的奶牛会
+
+被加入集合， 导致l 增加 k， 问最终集合有几头奶牛。
+
+样例 初始诱惑值2， 第一头奶牛被加入， I 增加为 5 第四头被加入， I 增加为8 ， 第二头奶牛被加入
+
+I 增加为11， 但是没有≤11的奶牛了， 所以答案为3
+
+思路: 将奶牛排序， 每次二分查找能被新加入的位置减去之间已经加入的奶牛即新增加的奶牛数目ad，
+
+然后I增加 ad * k。
+
+
+<二分><模拟>
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e5 + 10;
+ll a[N];
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif 
+	ll n, l, k;
+	cin >> n >> l >> k;
+	for (int i = 1; i <= n; i++)
+		scanf("%lld", &a[i]);
+	sort(a + 1, a + 1 + n);
+	ll ans = 0;
+	ll cnt = 0;
+	while (true)
+	{
+		ll j = lower_bound(a + 1, a + 1 + n, l) - a;
+		if (a[j] != l)
+			j--;
+		ll ad = j - cnt; // 现在能被加入的
+		if (!ad)
+			break;
+		ans += ad;
+		cnt = j;
+		l += ad * k;	
+	}
+	cout << ans << endl;
+	return TIME;
+}

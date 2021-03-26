@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#define SZ(x) ((int)(x).size())
+#define ALL(x) (x).begin(), (x).end()
+ 
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int MOD = 1e9 + 7;
+template<typename S, typename T> inline bool Min(S &a, const T &b){ return a > b ? a = b, true : false; }
+template<typename S, typename T> inline bool Max(S &a, const T &b){ return a < b ? a = b, true : false; }
+template<typename S, typename T> inline void Adm(S &a, const T &b){ a = (a + b) % MOD; if (a < 0) a += MOD; }
+//emplace pair
+ 
+const int N = 4e4 + 100;
+ 
+struct node
+{
+    int l, r;
+    bool operator < (const node &o) const
+    {
+        return r < o.r;
+    }
+}a[N];
+int main()
+{
+#ifdef LOCAL
+    freopen("C:/input.txt", "r", stdin);
+#endif
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; ++i)
+        scanf("%d%d", &a[i].l, &a[i].r), a[i].r = a[i].l + a[i].r - 1;
+    sort(a + 1, a + n + 1);
+    int last = 0, cnt = 0;
+    for (int i = 1; i <= n; ++i)
+        if (a[i].l > last)
+            last = a[i].r, ++cnt;
+    cout << cnt << endl;
+ 
+    return 0;
+}

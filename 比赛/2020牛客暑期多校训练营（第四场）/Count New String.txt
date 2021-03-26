@@ -1,0 +1,195 @@
+链接：https://ac.nowcoder.com/acm/contest/7882/C
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 524288K，其他语言1048576K
+64bit IO Format: %lld
+题目描述 
+Besides data structures and number theory, ZYB also loves strings.
+
+Consider a string {S}S of length {n}n, denote S_iS 
+i
+​	
+  as the {i}i-th character in the string (1-based).
+Define a string function f(S, x, y)(1 \leq x \leq y \leq n)f(S,x,y)(1≤x≤y≤n) such that {|f(S, x, y)|=y-x+1}∣f(S,x,y)∣=y−x+1 and the {k}k-th character of {f(S, x, y)}f(S,x,y) is \max_{i=x \dots x+k-1} S_imax 
+i=x…x+k−1
+​	
+ S 
+i
+​	
+ .
+For example, if {S=dbca}S=dbca, then {f(S, 1, 4)} = dddd, f(S, 2, 4) = bccf(S,1,4)=dddd,f(S,2,4)=bcc.
+Let {A=\{f(f(S,x_1,y_1), x_2-x_1+1,y_2-x_1+1) \mid 1 \leq x_1 \leq x_2 \leq y_2 \leq y_1 \leq n\}}A={f(f(S,x 
+1
+​	
+ ,y 
+1
+​	
+ ),x 
+2
+​	
+ −x 
+1
+​	
+ +1,y 
+2
+​	
+ −x 
+1
+​	
+ +1)∣1≤x 
+1
+​	
+ ≤x 
+2
+​	
+ ≤y 
+2
+​	
+ ≤y 
+1
+​	
+ ≤n}. ZYB wants to know how many different strings in set {A}A (i.e. the value of {|A|}∣A∣).
+输入描述:
+The input only contains one test case. 
+There is a string S~(1 \leq |S| \leq 10^5)S (1≤∣S∣≤10 
+5
+ ) in the first line, indicating the string we focus. 
+It is guaranteed that the string is composed of only first {10}10 lowercase letters (i.e. a \dots ja…j).
+输出描述:
+The output only contains one integer indicating the answer.
+示例1
+输入
+复制
+dbca
+输出
+复制
+10
+示例2
+输入
+复制
+dbcad
+输出
+复制
+15
+广义后缀自动机，单调栈。
+每个位置最多被更新10次，
+比如
+dcba
+dcbb
+dccc
+dddd
+所以建立广义后缀自动机，最多10 * n的长度。
+#include <iostream>
+#include <set>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+#include <assert.h>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+#include <string>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+char s[100010];
+int len[N << 1];
+int lnk[N << 1];
+int cnt[N << 1];
+int nxt[N << 1][11];
+int idx;
+int last;
+int tot;
+int deg[100010];
+int sub[N << 1];
+void init()
+{
+	idx = 1;
+	lnk[1] = len[1] = 0;
+}
+void clear()
+{
+	memset(len, 0, sizeof len);
+	memset(lnk, 0, sizeof lnk);
+	memset(cnt, 0, sizeof cnt);
+	memset(nxt, 0, sizeof nxt);
+}
+int extend(int c, int last)
+{
+	int x = ++idx;
+	len[x] = len[last] + 1;
+	sub[x] = 1;
+	int p;
+	for (p = last; p && !nxt[p][c]; p = lnk[p])
+		nxt[p][c] = x;
+	if (!p)
+		lnk[x] = 1, cnt[1]++;
+	else
+	{
+		int q = nxt[p][c];
+		if (len[p] + 1 == len[q])
+			lnk[x] = q, cnt[q]++;
+		else
+		{
+			int nq = ++idx;
+			len[nq] = len[p] + 1;
+			lnk[nq] = lnk[q];
+			memcpy(nxt[nq], nxt[q], sizeof nxt[q]);
+			for (; p && nxt[p][c] == q; p = lnk[p])
+				nxt[p][c] = nq;
+			lnk[q] = lnk[x] = nq;
+			cnt[nq] += 2;
+		}
+	}
+	return last = x;
+}
+int stk[100010];
+int id[100010];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	init();
+	ll ans = 0;
+	int top = 0;
+	scanf("%s", s + 1);
+	int n = strlen(s + 1);
+	int last = 1;
+	stk[0] = n + 1;
+	for (int i = n; i >= 1; i--)
+	{
+		while (top && s[stk[top]] < s[i]) //递减
+			--top;
+		last = top ? id[stk[top]] : 1; //后面没有比他大的，则直接更新到n
+		for (int j = i; j < stk[top]; j++) //遇到第一个大的则中间这段直接更新成s[i]
+			last = extend(s[i] - 'a', last);
+		stk[++top] = i;
+		id[i] = last; //记录下此时的last，方便以后的继续插入。
+	}
+	for (int i = 2; i <= idx; i++)
+	{
+		ans += len[i] - len[lnk[i]];
+	}
+	cout << ans << endl;
+	return TIME;
+}

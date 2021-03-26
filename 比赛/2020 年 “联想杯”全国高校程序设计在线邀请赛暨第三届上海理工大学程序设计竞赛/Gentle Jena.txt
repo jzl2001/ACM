@@ -1,0 +1,120 @@
+https://acm.ecnu.edu.cn/contest/270/problem/G/
+G. Gentle Jena
+… Why don’t you come to the planetarium?
+
+The beautiful twinkling of eternity that will never fade, no matter what.
+
+All the stars in the sky are waiting for you…
+
+A planetarium, it was once where people went to soothe their hearts by gazing at a starry sky.
+
+And Yumemi, a planetarium guide who has been waiting for a visitor for a long time, is looking up at the stars.
+
+Stars in the sky can be defined by their brightness, denoted by .
+
+Yumemi found that stars always appear in groups, and she thinks the beauty of the starry night depends on the darkest one, so she defined the beauty value as
+ 
+
+where
+ 
+
+But the night sky is not always the same. The movement of celestial bodies will make more and more stars in the night sky. The following events will happen in order every second:
+
+There are exactly  stars in the sky so . A star with brightness  appears, and it will be appended to the end of the sequence , so it will be .
+Yumemi records the value (i.e., She calculates the value of ).
+At the beginning, there is no star in the sky, so  initially.
+
+As time goes by, because she is not as good at calculation as before, the task will be given to you.
+
+Note that the sequence is given in a modified way.
+
+输入格式
+To avoid huge input, we use Linear Congruential Method to generate input data, and your solution should be on-line.
+
+The first line contains six integers , indicating the number of the stars and the parameters of the data generator.
+
+You need to generate the sequence  by yourself using the following formula:
+
+where  is the value of  when  .
+
+输出格式
+To avoid huge output, you only need to output  	 , where “” denotes the bitwise XOR operation.
+
+样例
+input
+5 13 2 0 1 3
+output
+27
+提示
+In the first second, , so .
+
+It can be inferred that .
+
+In the second second, , so .
+
+It can be inferred that .
+
+Keep calculating, and you will get .
+
+So you should output .
+
+	return TIME;
+}
+
+
+  
+自动: C++17
+思路：单调栈。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 1e7 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll n, p, x, y, z;
+ll b[N];
+ll a[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	cin >> n >> p >> x >> y >> z >> b[1];
+	stack<int>s;
+	a[1] = b[1];
+	s.push(1);
+	for (int i = 2; i <= n; i++)
+	{
+		b[i] = (x * a[i - 1] + y * b[i - 1] + z) % p;
+		while (!s.empty() && b[s.top()] > b[i])
+			s.pop();
+		ll L = 0;
+		if (!s.empty())
+			L = s.top();
+		s.push(i);
+		a[i] = (a[i - 1] + (i - L) * b[i] + a[L] - a[L - 1] + mod) % mod;
+	}
+	ll ans = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		ans ^= a[i];
+	}
+	cout << ans << endl;
+	return TIME;
+}

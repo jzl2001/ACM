@@ -1,0 +1,121 @@
+Fluctuation Limit
+Time Limit: 2000/2000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 827    Accepted Submission(s): 359
+Special Judge
+
+Problem Description
+It is preferrable to read the pdf statment.
+
+Cuber QQ has signed up for a gambling game, that challenges him to predict the stock price of Quber CC Limited, for the next following n days. He shall make his prediction by filling a table with n intervals, the i-th of which is the predicted interval [li,ri] at the i-th day. If all n prices lie in the corresponding interval, Cuber QQ will win 1 million dollars. Otherwise, he will not earn a single penny.
+
+As is well known, the stock price has a fluctuation limit. For simplicity, we assume the limit up and the limit down are both k, which is an integer. That means, if the stock price at the i-th day is x, the price at the i+1-th day is at most x+k and at least x−k.
+
+Cuber QQ wants to know whether it is possible to manipulate the stock price, without breaking the limitation above of course, so that he can have the 1 million dollars. Since his table has already been submitted, he cannot modify his predicted intervals any more. It has to be done secretly behind the scenes, and smartly cover it up so that no one will notice.
+ 
+
+Input
+The input starts with an integer T (1≤T≤105), denoting the number of test cases.
+
+For each test case, the first line contains two space-separated integers n and k (2≤n≤105, 0≤k≤109), where n is the number of days and k is the fluctuation limit.
+
+The i-th line of the next n lines contains two space-separated integers li and ri (0≤li≤ri≤109), which is Cuber QQ's predicted interval in the i-th day. A prediction is believed to be correct if the stock price i-th day lies between li and ri, inclusive.
+
+It is guaranteed that the sum of all n does not exceed 106.
+ 
+
+Output
+For each test case, first output a single line YES or NO, that states whether Cuber QQ will win the 1 million price.
+
+If YES, in the next line, output a possible price series, a1,a2,…,an, where li≤ai≤ri (1≤i≤n) and |ai−ai+1|≤k (1≤i≤n−1). The integers should be separated with space.
+ 
+
+Sample Input
+2
+3 1
+1 6
+2 5
+3 6
+2 3
+1 5
+10 50
+ 
+
+Sample Output
+YES
+2 3 3
+NO
+ 
+
+Source
+2020 Multi-University Training Contest 8
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+题意：给出n个区间跟一个数字k，从每个区间选一个数字使得满足为上一个选的数[-k,+k]区间。
+从左到右边求区间并集，再从右边向左边求。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+ll l[N], r[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+	freopen("E:/output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		ll k;
+		scanf("%d%lld", &n, &k);
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%lld%lld", &l[i], &r[i]);
+		}
+		ll L = l[1], R = r[1];
+		for (int i = 2; i <= n; i++)
+		{
+			L = max(L - k, l[i]);
+			R = min(R + k, r[i]);
+			if (L > R)
+			{
+				puts("NO");
+				goto brk;
+			}
+			l[i] = L, r[i] = R;
+		}
+		puts("YES");
+		for (int i = 1; i <= n; i++)
+		{
+			cout << l[i] << (i == n ? '\n' : ' ');
+		}
+	brk:;
+	}
+	return TIME;
+}

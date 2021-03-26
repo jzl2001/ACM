@@ -1,0 +1,31 @@
+#include<bits/stdc++.h>
+using namespace std;
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int M = 0;
+		string a;
+		cin >> a;
+		string ans;
+		int len = a.size();
+		for (int i = 0; i < len; i++)
+			for (int j = 1; j <= len; j++)
+			{
+				if (i + j <= len)
+				{
+					string x = a.substr(i, j);
+					string b = x;
+					reverse(x.begin(), x.end());
+					if (a.find(x) != -1 && j > M)
+					{
+						M = j;
+						ans = b;
+					}
+				}
+			}
+		cout << ans << endl;
+	}
+	return 0;
+}

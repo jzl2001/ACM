@@ -1,0 +1,141 @@
+Hexagon
+Time Limit: 2000/2000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 496    Accepted Submission(s): 267
+Special Judge
+
+Problem Description
+It is preferrable to read the pdf statment.
+
+If the world is a hexagon, I will take as many turns as possible before reaching the end.
+
+Cuber QQ has constructed a hexagon grid with radius n. This will be better if explained in a picture. For example, this is a hexagon grid with radius 3:
+
+
+
+
+He challenges you take a perfect tour over the hexagon, that is to visit each cell exactly once. Starting from any point in the grid, you can move to any adjacent cell in each step. There are six different directions you can choose from:
+
+
+
+
+Of course, if you are on the boundary, you cannot move outside of the hexagon.
+
+Let D(x,y) denote the direction from cell x to y, and sequence A denotes your route, in which Ai denotes the i-th cell you visit. For index i (1<i<|A|), if D(Ai−1,Ai)≠D(Ai,Ai+1), we say there is a turning on cell i.
+
+Maximize the number of turning while ensuring that each cell is visited exactly once. Print your route. If there are multiple solution, print any.
+ 
+
+Input
+The first line of the input contains a single integer T (1≤T≤104), denoting the number of test cases.
+
+Each of the next T cases:
+
+The first line contains an integer n (2≤n≤500).
+
+It is guaranteed that the sum of n doesn't exceed 2⋅104.
+ 
+
+Output
+For each test case, output one line contains a string with 3(n−1)n characters. The i-th character is D(Ai,Ai+1).
+ 
+
+Sample Input
+1
+2
+ 
+
+Sample Output
+313456
+ 
+
+Source
+2020 Multi-University Training Contest 8
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+题意：输出不重复走且每步都要拐弯六边形的方案，找规律，分奇数偶数。
+<构造>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+ll l[N], r[N];
+void pr(int i)
+{
+	for (int j = 1; j <= i - 2; j++)
+		cout << "42";
+	cout << "3";
+	for (int j = 1; j <= i - 2; j++)
+		cout << "53";
+	cout << "4";
+	for (int j = 1; j <= i - 2; j++)
+		cout << "64";
+	cout << "5";
+	for (int j = 1; j <= i - 2; j++)
+		cout << "15";
+	cout << "6";
+	for (int j = 1; j <= i - 2; j++)
+		cout << "26";
+	cout << "1";
+	for (int j = 1; j <= i - 3; j++)
+		cout << "31";
+	cout << "243";
+}
+int main()
+{
+#ifdef LOCAL
+	//freopen("E:/input.txt", "r", stdin);
+	//freopen("E:/output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		cin >> n;
+		if (n % 2 != 0)
+		{
+			for (int i = n; i > 1; i -= 2)
+			{
+				pr(i);
+			}
+		}
+		else
+		{
+			for (int i = n; i >= 1; i -= 2)
+			{
+				if (i > 2)
+				{
+					pr(i);
+				}
+				else
+					cout << "543215";
+			}
+		}
+		puts("");
+	}
+	return TIME;
+}

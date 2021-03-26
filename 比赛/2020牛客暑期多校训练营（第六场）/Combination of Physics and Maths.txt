@@ -1,0 +1,254 @@
+链接：https://ac.nowcoder.com/acm/contest/8100/C
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+Special Judge, 64bit IO Format: %lld
+题目描述 
+Roundgod has an n \times mn×m matrix A = [a_{i,j}]A=[a 
+i,j
+​	
+ ]. One day while she's doing her physics homework, she wonders is it possible to define the physical quantity for matrices.
+As we all know, the pressure pp satisfies a formula p=\frac{F}{S}p= 
+S
+F
+​	
+ , where FF is the compressive force and SS is the base area.
+To describe it in maths, Roundgod puts forward that the compressive force of a matrix equals the sum of all its entries, while the base area of a matrix equals the sum of the entries in its last row. Then she can calculate the pressure for a matrix with the same formula.
+
+Your goal is to find the submatrix of AA with maximum pressure.
+A submatrix is obtained by taking nonempty subsets of its rows and columns. Formally, given a nonempty subsequence SS of \{1,2, \ldots, n\}{1,2,…,n} and a nonempty subsequence TT of \{1, 2, \ldots, m\}{1,2,…,m}, then
+\begin{bmatrix} a_{S_1, T_1} & a_{S_1, T_2} & \cdots & a_{S_1, T_{|T|}} \\ a_{S_2, T_1} & a_{S_2, T_2} & \cdots & a_{S_2, T_{|T|}} \\​\vdots & \vdots & \ddots & \vdots \\ a_{S_{|S|}, T_1}​ & a_{S_{|S|}, T_2}​ &\cdots & a_{S_{|S|}, T_{|T|}} \end{bmatrix} 
+⎣
+⎢
+⎢
+⎢
+⎡
+​	
+  
+a 
+S 
+1
+​	
+ ,T 
+1
+​	
+ 
+​	
+ 
+a 
+S 
+2
+​	
+ ,T 
+1
+​	
+ 
+​	
+ 
+​⋮
+a 
+S 
+∣S∣
+​	
+ ,T 
+1
+​	
+ 
+​	
+ ​
+​	
+  
+a 
+S 
+1
+​	
+ ,T 
+2
+​	
+ 
+​	
+ 
+a 
+S 
+2
+​	
+ ,T 
+2
+​	
+ 
+​	
+ 
+⋮
+a 
+S 
+∣S∣
+​	
+ ,T 
+2
+​	
+ 
+​	
+ ​
+​	
+  
+⋯
+⋯
+⋱
+⋯
+​	
+  
+a 
+S 
+1
+​	
+ ,T 
+∣T∣
+​	
+ 
+​	
+ 
+a 
+S 
+2
+​	
+ ,T 
+∣T∣
+​	
+ 
+​	
+ 
+⋮
+a 
+S 
+∣S∣
+​	
+ ,T 
+∣T∣
+​	
+ 
+​	
+ 
+​	
+  
+⎦
+⎥
+⎥
+⎥
+⎤
+​	
+ 
+is a submatrix of AA.
+输入描述:
+There are multiple test cases. The first line of input contains an integer T\ (T\le100)T (T≤100), indicating the number of test cases. For each test case:
+The first line contains two integers n, m\ (1\le n,m\le 200)n,m (1≤n,m≤200), the number of rows and columns of the matrix, respectively.
+Each of the next nn lines contains mm integers, specifying the matrix (1\le a_{i,j}\le 5\cdot 10^4)(1≤a 
+i,j
+​	
+ ≤5⋅10 
+4
+ ).
+输出描述:
+For each test case, print the maximum pressure within an absolute or relative error of no more than 10^{-8}10 
+−8
+  in one line.
+示例1
+输入
+复制
+1
+3 3
+1 3 5
+6 8 9
+2 7 4
+输出
+复制
+4.50000000
+说明
+\begin{bmatrix}
+1 & 5\\
+6 & 9 \\​
+2 & 4 
+\end{bmatrix} 
+⎣
+⎡
+​	
+  
+1
+6
+​2
+​	
+  
+5
+9
+4
+​	
+  
+⎦
+⎤
+​	
+ is one of submatrices of AA with maximum pressure \frac{1+5+6+9+2+4}{2+4}=\frac{27}{6}=4.5 
+2+4
+1+5+6+9+2+4
+​	
+ = 
+6
+27
+​	
+ =4.5.
+题意：给出一个矩阵，选着任意行列，或得交叉点即是一个矩阵，压力最大就是矩阵的sum/底边sum。
+思路：肯定最多是一行，因为两行或者更多合并分母会更小，然后某列的某个位置上面一定都选，直
+接计算答案即可。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e7 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+ll res[N];
+int a[210][210];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		scanf("%d%d", &n, &m);
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= m; j++)
+				scanf("%d", &a[i][j]);
+		double ans = 0;
+		for (int j = 1; j <= m; j++)
+		{
+			int sum = 0;
+			for (int i = 1; i <= n; i++)
+			{
+				sum += a[i][j];
+				ans = max(ans, 1.0 * sum / a[i][j]);
+			}
+		}
+		printf("%.8f\n", ans);
+	}
+
+	return TIME;
+}

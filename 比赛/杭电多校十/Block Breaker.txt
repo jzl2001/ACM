@@ -1,0 +1,66 @@
+/*
+一个块他的上下方和左右方各有一个消失， 则他消失， 使用BFS遍历与当前点有关系的块
+*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+ll mod = 1e9 + 7;
+ll fpow(ll a, ll b) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 2e3 + 10;
+int a[N][N];
+int dir[4][2] = { 0, 1, 0, -1, 1, 0, -1, 0 };
+struct node
+{
+	int x, y;
+};
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(a, 0, sizeof a);
+		int n, m, q;
+		cin >> n >> m >> q;
+		while (q--)
+		{
+			queue<node>q;
+			int x, y;
+			scanf("%d%d", &x, &y);
+			if (a[x][y])
+				continue(cout << "0" << endl);
+			q.push({ x, y });
+			int ans = 0;
+			while (!q.empty())
+			{
+				int xx = q.front().x, yy = q.front().y;
+				q.pop();
+				if (a[xx][yy] == 1)
+					continue;
+				a[xx][yy] = 1;
+				if (a[xx][yy] == 1)
+					ans++;
+				for (int i = 0; i < 4; i++)
+				{
+					int xxx = xx + dir[i][0];
+					int yyy = yy + dir[i][1];
+					if ((a[xxx - 1][yyy] == 1 || a[xxx + 1][yyy] == 1) && (a[xxx][yyy - 1] == 1 || a[xxx][yyy + 1] == 1) && xxx <= n && xxx >= 1 && yyy <= m && yyy >= 1)
+						q.push({ xxx, yyy });
+				}
+			}
+			cout << ans << endl;
+		}
+	}
+	return 0;
+}

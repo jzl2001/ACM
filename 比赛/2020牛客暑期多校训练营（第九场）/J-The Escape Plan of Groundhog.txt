@@ -1,0 +1,118 @@
+链接：https://ac.nowcoder.com/acm/contest/10434/J
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+One deep dark evening, Groundhog was unhappy. It was not until the teacher came that he found he had forgotten to do his homework. In order to save his life, he must immediately hide under the table to prevent himself from being hammered by the teacher. 
+
+The desks in his class are arranged in a rectangle of N \times MN×M. {a_{i,j}=1}a 
+i,j
+​	
+ =1 means there is a table at position{(i,j)}(i,j) , otherwise it is not.
+
+In order not to be caught by the teacher, He decided to hide in a subrectangle only if：
+There are no vacancies on the four sides of this subrectangle;
+Because Groundhog is fat, so space can not be too little; However, if there are too many vacancies, Groundhog is easy to be found, so there should not be too many vacancies. Therefore, he hopes that the difference between the number of vacancies in the sub-rectangle and the number of tables is no more than {1}1 (excluding the table on the side).
+The length and width of the subrectangle must be greater than {1}1.
+ Groundhog now wants to know: how many sub-rectangles are there that meet the requirements?    
+输入描述:
+Input contains two integer numbers {N}N and {M}M in the range {[ 1 , 500 ]}[1,500] separated with space(s).
+Then n line follow, each contains m characters to describe the rectangle{(a_{i,j} \in \{0,1\})}(a 
+i,j
+​	
+ ∈{0,1}).
+输出描述:
+The output contains an integer, describing the number of the subrectangles which meet the requirements.
+示例1
+输入
+复制
+4 4
+1 1 1 1
+1 0 1 1
+1 1 0 1
+1 1 1 1
+输出
+复制
+3
+说明
+There're two 2*2 rectangle full of "1",and the whole 4*4 rectangle .
+示例2
+输入
+复制
+5 5
+1 0 1 1 1
+1 0 1 0 1
+1 1 0 1 1
+1 0 0 1 1
+1 1 1 1 1
+输出
+复制
+3
+#include <bits/stdc++.h>
+#include <unordered_map>
+
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf;  int x = false;  char ch = gc;  bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+
+const int mod = 1e9 + 7;
+const int N = 500 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+
+int a[N][N];
+int c[N][N];
+int res[N * N * 2];
+int off = 500 * 500;
+
+int query(int x1, int y1, int x2, int y2)
+{
+	if (x1 > x2 || y1 > y2)
+		return 0;
+	return c[x2][y2] + c[x1 - 1][y1 - 1] - c[x1 - 1][y2] - c[x2][y1 - 1];
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	scanf("%d%d", &n, &m);
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= m; j++)
+			scanf("%d", &a[i][j]), c[i][j] = a[i][j] + c[i - 1][j] + c[i][j - 1] - c[i - 1][j - 1];
+	ll ans = 0;
+	for (int up = 1; up <= n; up++) //上边界
+		for (int low = up + 1; low <= n; low++) //下边界
+		{
+			vector<int>v;
+			int heig = low - up - 1;
+			int one = 0, zero = 0;
+			for (int k = 1; k <= m; k++) //枚举列
+			{
+				if (a[up][k] == 0 || a[low][k] == 0)
+				{
+					one = zero = 0;
+					for (int i : v)
+						res[i] = 0;
+					v.clear();
+					continue;
+				}
+				int cnt = query(up + 1, k, low - 1, k);
+				one += cnt, zero += heig - cnt;
+				int x = one - zero + off;
+				int ask = x - heig;
+				if (cnt == heig)
+					ans += res[ask] + res[ask - 1] + res[ask + 1], res[x]++;
+				v.push_back(x);
+			}
+			for (int i : v)
+				res[i] = 0;
+		}
+	cout << ans << endl;
+	return 0;
+}

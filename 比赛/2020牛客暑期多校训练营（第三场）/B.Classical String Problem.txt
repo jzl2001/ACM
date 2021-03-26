@@ -1,0 +1,42 @@
+/*
+https://ac.nowcoder.com/acm/contest/5668/B
+题意：两种操作，A操作直接查询当前字符串的某个位置字符
+M操作，正数前num个字符后到最后面，负数后面num个字符移动到前面。
+*/
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+const int N = 2e6 + 10;
+char s[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    scanf("%s", s);
+    int len = strlen(s);
+    int t;
+    cin >> t;
+    int py = 0;
+    while (t--)
+    {
+        char op;
+        int num;
+        getchar();
+        scanf("%c %d", &op, &num);
+        if (op == 'M')
+            py = (py + num + len) % len;
+        else
+            putchar(s[(num + py - 1 + len) % len]), putchar('\n');
+    }
+	return TIME;
+}

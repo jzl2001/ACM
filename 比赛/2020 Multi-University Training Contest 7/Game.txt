@@ -1,0 +1,138 @@
+Game
+Time Limit: 30000/15000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 1308    Accepted Submission(s): 529
+
+
+Problem Description
+Notice：Don't output extra spaces at the end of one line.
+
+Dodo bird and ddd are playing a stone game on a 2-d plane. There are n points on the plane where they can put the stone. The rule is as follows:
+
+- Before the game start, The stone is at the first point.
+- Dodo and ddd move the stone in turn, Dodo moves first.
+- In the first move, the player can move the stone to any point except the first point.
+- Starting from the second move, assume the stone is currently at point x, and the distance of the stone traveled in the last move is d. The player can move the stone to a point y if and only if distance(x,y)>d and point y has never been visited before.
+- If a player cannot make a move, he loses the game.
+
+Please determine who will win the game if both player use the best strategy.
+ 
+
+Input
+The first line contains an integer T(1≤T≤100), indicating the number of test cases.
+
+Each test case contains several lines. The first line contains an integer n(2≤n≤2000), indicating the number of points. Next n lines, each line contains two integers xi,yi(−109≤x,y≤109), indicating the coordinate of the i-th point.
+
+It is guaranteed that there are at most 12 test cases with n>500.
+ 
+
+Output
+For each test case, If Dodo can win the game, print "YES". Otherwise, print "NO".
+ 
+
+Sample Input
+2
+5
+1 1
+0 0
+2 0
+0 2
+2 2
+4
+1 1
+0 0
+0 2
+2 2
+ 
+
+Sample Output
+NO
+YES
+ 
+
+Source
+2020 Multi-University Training Contest 7
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+题意：给出n个点，起点是1，每次跳的距离要比上次的长。
+博弈，思路：假设现在有四个点，最长边的两个点，还有次长的两个点，如果一个人跳到了最长边的
+点，另外一个人就赢了，则另外一个人如果从次长边的一端跳到另一端，另外一个人要么无路可跳。
+要么跳到最长边的一个端点。则先手赢了，所以每次删边，看先手能赢否。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 2e3 + 10;
+ll x[N];
+ll y[N];
+int vis[N];
+struct node
+{
+	int a, b;
+	ll dis;
+}a[N * N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(vis, 0, sizeof vis);
+		int n, cnt = 0;
+		cin >> n;
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%lld%lld", &x[i], &y[i]);
+		}
+		auto dis = [](int i, int j)
+		{
+			return sqrt((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j]));
+		};
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = i + 1; j <= n; j++)
+			{
+				a[++cnt] = { i, j, dis(i, j) };
+			}
+		}
+		sort(a + 1, a + cnt + 1, [](node a, node b){ return a.dis > b.dis; });
+		for (int i = 1; i <= cnt; i++)
+		{
+			if (!vis[a[i].a] && !vis[a[i].b])
+			{
+				vis[a[i].a] = vis[a[i].b] = 1;
+			}
+		}
+		if (vis[1])
+		{
+			puts("YES");
+		}
+		else
+			puts("NO");
+	}
+	return TIME;
+}

@@ -1,0 +1,189 @@
+有一串长度为nn的核桃，每个核桃上有一个字母，从第一个核桃开始盘，盘完最后一个又回到第一个，盘每个核桃的时候会读出对应的字母。有一个长度为mm的咒语，依次读出咒语的每一个字母后可以获得一个奖励(必须连续读出这mm的字母)，问获得kk个奖励需要盘多少次核桃。
+
+输入描述
+
+第一行输入一个整数TT，代表有TT组测试数据 对于每一组测试数据，第一行输入三个整数n,m,kn,m,k，第二行输入22个字符串s_1, s_2s 
+1
+​	
+ ,s 
+2
+​	
+ ，分别表示核桃上的字母和咒语
+
+输出描述
+
+对于每组测试数据，输出盘核桃的次数，如果不能完成输出-1−1
+
+数据范围
+
+1≤T≤101≤T≤10
+
+1≤n≤10^51≤n≤10 
+5
+ 
+
+1≤m≤10^51≤m≤10 
+5
+ 
+
+1≤k≤10^{12}1≤k≤10 
+12
+ 
+
+字符串中只含有小写英文字母
+
+样例输入复制
+4
+5 3 2
+ououo ouo
+6 3 2
+ououou ouo
+2 5 1
+ou ououo
+3 4 1
+ouo ouou
+样例输出复制
+8
+7
+5
+-1
+样例解释
+对于前三组样例的解释
+
+ououo ououo
+
+ououou ououou
+
+ou ou ou
+
+处理某个位置到某个位置向后len2个能匹配的长度，然后记录位置与答案，循环节。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+#define cel cout << endl;
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+char s[N];
+char t[N];
+int nxt[N];
+vector<int>v;
+int vis[N];
+int pos[N];
+ll f_ans[N];
+void get_nxt(char* s)
+{
+	memset(nxt, 0, sizeof nxt);
+	nxt[0] = -1;
+	int i = 0;
+	int j = -1;
+	int len = strlen(s);
+	while (i < len)
+	{
+		if (j == -1 || s[i] == s[j])
+			i++, j++, nxt[i] = j;
+		else
+			j = nxt[j];
+	}
+	return;
+}
+void kmp(char* s, char* t)
+{
+	get_nxt(s);
+	int i = 0, j = 0;
+	int len1 = strlen(t);
+	int len2 = strlen(s);
+	while (i < len1 && j < len2)
+	{
+		if (j == -1 || t[i] == s[j])
+			i++, j++;
+		else
+			j = nxt[j];
+		if (j == len2 && i - len2 < len1 - len2)
+			v.push_back(i - len2), j = nxt[j];
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int T;
+	cin >> T;
+	assert(T <= 10);
+	while (T--)
+	{
+		memset(t, 0, sizeof t);
+		memset(s, 0, sizeof s);
+		v.clear();
+		int n, m;
+		ll k;
+		scanf("%d%d%lld", &n, &m, &k);
+		int idx = n - 1;
+		scanf("%s%s", t, s);
+		for (int i = 0; i < m; i++)
+			t[++idx] = t[i % n];
+		kmp(s, t);
+		int len = v.size();
+		if (len == 0)
+		{
+			puts("-1");
+			continue;
+		} //ououoouo
+		memset(pos, -1, sizeof pos);
+		memset(f_ans, -1, sizeof f_ans);
+		memset(vis, -1, sizeof vis);
+		for (int i = 0; i < len; i++)
+			pos[v[i]] = v[i];
+		int next = -1;
+		for (int i = n - 1; i >= 0; i--)
+		{
+			if (pos[i] != -1)
+				next = pos[i];
+			else
+				if (next == -1)
+					next = v[0];
+			pos[i] = next;
+		}
+		// 		for (int i = 0; i < n; i++)
+		// 			cout << pos[i] << endl;
+		ll ans = 0;
+		int st = 0;
+		int flag = 0;
+		for (ll i = 1; i <= k; i++)
+		{
+			ans += (pos[st] - st + n) % n;
+			st = pos[st];
+			if (!flag && vis[st] != -1)
+			{
+				flag = 1;
+				ll dis = i - vis[st];
+				ans += ((k - i) / dis) * (ans - f_ans[st]);
+				i += (k - i) / dis * dis;
+			}
+			vis[st] = i;
+			f_ans[st] = ans;
+			ans += m;
+			st = (st + m) % n;
+		}
+		cout << ans << endl;
+	}
+
+	return TIME;
+}

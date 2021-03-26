@@ -1,0 +1,64 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 100000;
+const int N = 2e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+char a[N];
+char b[N];
+int idx[N];
+int vis[N];
+int len;
+int lenb;
+bool check(int mid)
+{
+	for (int i = 1; i <= len; i++)
+		vis[i] = 1;
+	for (int i = 1; i <= mid; i++)
+		vis[idx[i]] = 0;
+	int cnt = 1;
+	for (int i = 1; i <= len; i++)
+		if (vis[i] && a[i] == b[cnt])
+			++cnt;
+	return cnt >= lenb + 1;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	scanf("%s", a + 1);
+	scanf("%s", b + 1);
+	len = strlen(a + 1);
+	lenb = strlen(b + 1);
+	for (int i = 1; i <= len; i++)
+		scanf("%d", &idx[i]);
+	int L = 0, R = len;
+	int ans;
+	while (L <= R)
+	{
+		int mid = L + R >> 1;
+		if (check(mid))
+			ans = mid, L = mid + 1;
+		else
+			R = mid - 1;
+	}
+	cout << ans << endl;
+	return TIME;
+}

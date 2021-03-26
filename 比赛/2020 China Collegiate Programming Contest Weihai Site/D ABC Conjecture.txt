@@ -1,0 +1,198 @@
+The ABC conjecture (also known as the Oesterlé--Masser conjecture) is a famous conjecture in number theory, first proposed by Joseph Oesterlé and David Masser. It is formally stated as follows:
+
+For every positive real number ε, there are only finitely many positive integer triples (a,b,c) such that
+
+a and b are relatively prime;
+a+b=c; and
+c>rad(abc)
+​1+ε
+​​ ,
+where rad(n)=∏
+​p∣n,p∈Prime
+​​ p is the product of all distinct prime divisors of n.
+
+Shinichi Mochizuki claimed to have proven this conjecture in August 2012. Later, Mochizuki's claimed proof was announced to be published in Publications of the Research Institute for Mathematical Sciences (RIMS), a journal of which Mochizuki is the chief editor.
+
+shinichi-mochizuki.jpg
+Figure 1: Shinichi Mochizuki
+Spike is a great fan of number theory and wanted to prove the ABC conjecture as well. However, due to his inability, he turned to work on a weaker version of the ABC conjecture, which is formally stated as follows:
+
+Given a positive integer c, determine if there exists positive integers a,b, such that a+b=c and rad(abc)<c.
+
+Note that in the original ABC conjecture, the positive integers a and b are required to be relatively prime. However, as Spike is solving an easier version of the problem, this requirement is removed.
+
+Input Specification:
+The first line of input contains one integer T (1≤T≤10), the number of test cases.
+
+The next lines contain description of the t test cases. Each test case contains one line, including an integer c (1≤c≤10
+​18
+​​ ).
+
+Output Specification:
+For each test case, if there exist two positive integers a,b satisfying a+b=c and rad(abc)<c , then output yes in a line, otherwise output no instead.
+
+Sample Input 1:
+3
+4
+18
+30
+Sample Output 1:
+yes
+yes
+no
+Notes:
+For the first test case, we have 2+2=4 and rad(2×2×4)=2<4.
+
+For the second test case, we have 6+12=18 and rad(6×12×18)=6<18.
+
+For the third test case, there's no solution.
+
+给出一个c，问有没有a+b=c，并且a*b*c的素因子之积小于c。
+规律，对c质因子分解后如果含有次方数大于2则有。
+
+#include <bits/stdc++.h>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+
+ll Mult_Mod(ll a, ll b, ll m) // res = (a*b) % m
+{
+	a %= m; b %= m;
+	ll res = 0;
+	while (b)
+	{
+		if (b & 1)
+			res = (res + a) % m;
+		a = (a <<= 1) % m;
+		b >>= 1;
+	}
+	return res % m;
+}
+ll Pow_Mod(ll a, ll b, ll m) //res=(a^b)%m
+{
+	ll res = 1, k = a;
+	while (b)
+	{
+		if ((b & 1)) 
+			res = Mult_Mod(res, k, m) % m;
+		k = Mult_Mod(k, k, m) % m;
+		b >>= 1;
+	}
+	return res%m;
+}
+ll GCD(ll a, ll b)
+{
+	return b == 0 ? a : GCD(b, a%b);
+}
+ll Pollard_Rho(ll n, ll c){//寻找一个因子
+	ll i = 1, k = 2;
+	ll x = rand() % n;//产生随机数 x0(并控制其范围在 1 ~ x-1 之间)
+	ll y = x;
+	while (1)
+	{
+		i++;
+		x = (Mult_Mod(x, x, n) + c) % n;
+		ll gcd = GCD(y - x, n);
+		if (gcd < 0) gcd = -gcd;
+		if (gcd > 1 && gcd < n) return gcd;
+		if (y == x) return n;
+		if (i == k)
+			y = x, k <<= 1;
+	}
+}
+bool Witness(ll a, ll n, ll x, ll sum)
+{
+	ll judge = Pow_Mod(a, x, n);
+	if (judge == n - 1 || judge == 1)
+		return 1;
+	while (sum--)
+	{
+		judge = Mult_Mod(judge, judge, n);
+		if (judge == n - 1)
+			return 1;
+	}
+	return 0;
+}
+bool Miller_Rabin(ll n)
+{
+	if (n < 2) return 0;
+	if (n == 2) return 1;
+	if ((n & 1) == 0) return 0;
+	ll x = n - 1;
+	ll sum = 0;
+	while (x % 2 == 0)
+		x >>= 1, sum++; 
+	int times = 20;
+	for (ll i = 1; i <= times; i++)
+	{
+		ll a = rand() % (n - 1) + 1;//取与 p 互质的整数 a
+		if (!Witness(a, n, x, sum))//费马小定理的随机数检验
+			return 0;
+	}
+	return 1;
+}
+int total;//因子的个数
+ll factor[N];//存储所有因子的数组，无序的
+void Find_fac(ll n)
+{
+	if (n == 1)
+		return;
+	//对 n 进行素因子分解，存入 factor
+	if (Miller_Rabin(n))
+	{//是素数就把这个素因子存起来
+		factor[++total] = n;
+		return;
+	}
+	long long p = n;
+	while (p >= n)//值变化，防止陷入死循环 k
+		p = Pollard_Rho(p, rand() % (n - 1) + 1);
+	Find_fac(n / p);
+	Find_fac(p);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll n;
+		cin >> n;
+		Find_fac(n);
+		for (int i = 1; i <= total; i++)
+		{
+			ll u = n;
+			int cnt = 0;
+			while (u % factor[i] == 0)
+				u /= factor[i], cnt++;
+			if (cnt >= 2)
+			{
+				puts("yes");
+				goto brk;
+			}
+		}
+		puts("no");
+	brk:;
+	}
+	return TIME;
+}

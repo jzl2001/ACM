@@ -1,0 +1,115 @@
+D. Glass Half Spilled
+time limit per test2 seconds
+memory limit per test512 megabytes
+inputstandard input
+outputstandard output
+There are n glasses on the table numbered 1,…,n. The glass i can hold up to ai units of water, and currently contains bi units of water.
+
+You would like to choose k glasses and collect as much water in them as possible. To that effect you can pour water from one glass to another as many times as you like. However, because of the glasses' awkward shape (and totally unrelated to your natural clumsiness), each time you try to transfer any amount of water, half of the amount is spilled on the floor.
+
+Formally, suppose a glass i currently contains ci units of water, and a glass j contains cj units of water. Suppose you try to transfer x units from glass i to glass j (naturally, x can not exceed ci). Then, x/2 units is spilled on the floor. After the transfer is done, the glass i will contain ci−x units, and the glass j will contain min(aj,cj+x/2) units (excess water that doesn't fit in the glass is also spilled).
+
+Each time you transfer water, you can arbitrarlly choose from which glass i to which glass j to pour, and also the amount x transferred can be any positive real number.
+
+For each k=1,…,n, determine the largest possible total amount of water that can be collected in arbitrarily chosen k glasses after transferring water between glasses zero or more times.
+
+Input
+The first line contains a single integer n (1≤n≤100) — the number of glasses.
+
+The following n lines describe the glasses. The i-th of these lines contains two integers ai and bi (0≤bi≤ai≤100, ai>0) — capacity, and water amount currently contained for the glass i, respectively.
+
+Output
+Print n real numbers — the largest amount of water that can be collected in 1,…,n glasses respectively. Your answer will be accepted if each number is within 10−9 absolute or relative tolerance of the precise answer.
+
+Example
+inputCopy
+3
+6 5
+6 5
+10 2
+outputCopy
+7.0000000000 11.0000000000 12.0000000000
+Note
+In the sample case, you can act as follows:
+
+for k=1, transfer water from the first two glasses to the third one, spilling (5+5)/2=5 units and securing 2+(5+5)/2=7 units;
+for k=2, transfer water from the third glass to any of the first two, spilling 2/2=1 unit and securing 5+5+2/2=11 units;
+for k=3, do nothing. All 5+5+2=12 units are secured.
+题意：给出n瓶水，告诉你每瓶水的最大装水量，以及当前装了多少。
+现在询问你选取1~n瓶水，并且其他瓶子的水可以往里面注入的最大装水量，
+注水的时候会洒掉一半。
+思路：做个背包求出原先不注水的时候选i个瓶子，容量为j的时候能装多少水。
+然后剩余的水肯定是直接倒进去这些可以装的瓶子里面，取个最值。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf;  int x = false;  char ch = gc;  bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int N = 100 + 10;
+
+int d[N][10010]; //选了i个杯子，总容量为j 能装的水
+int a[N];
+int b[N];
+double res[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	double sum = 0;
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d%d", &a[i], &b[i]);
+		sum += b[i];
+	}
+	memset(d, -1, sizeof d);
+	d[0][0] = 0;
+	for (int i = 1; i <= n; i++) 
+	{
+		for (int j = i; j >= 1; j--)
+			for (int k = a[i]; k <= j * 100; k++)
+			{
+				if (~d[j - 1][k - a[i]])
+				{
+					if (!~d[j][k])
+						d[j][k] = d[j - 1][k - a[i]] + b[i];
+					else
+						d[j][k] = max(d[j][k], d[j - 1][k - a[i]] + b[i]);
+				}
+			}
+	}
+	double ans = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		ans = 0;
+		for (int j = 0; j <= i * 100; j++) //当前容量
+		{
+			if (~d[i][j])
+			{
+				ans = max(ans, min(1.0 * j, d[i][j] + (sum - d[i][j]) / 2));
+			}
+		}
+		res[i] = ans;
+	}
+	for (int i = 1; i <= n; i++)
+		printf("%.10f%c", res[i], i == n ? '\n' : ' ');
+	return TIME;
+}

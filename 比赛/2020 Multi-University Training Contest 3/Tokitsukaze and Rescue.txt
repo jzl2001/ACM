@@ -1,0 +1,194 @@
+Time Limit: 8000/8000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 937    Accepted Submission(s): 344
+
+
+Problem Description
+Princess CJB has lived almost her entire life in the isolated town of Ertona, where CJB uses her unique ability to recognize where crystals of materials are buried. By way of a fateful encounter, CJB learns of the Alchemy Exam and decides to take her first step into the outside world, setting off on a grand journey to become a certified alchemist and discover the mysteries that life has to offer!
+
+In order to take part in the Alchemy Exam, CJB goes to the Reisenberg town without any partners. But the kingdom Adalet is unbelievably enormous so that there are many hidden risks. Claris, a powerful evil magician, wants to monopolize CJB for the extraordinary beauty of her. Due to the power limitation of CJB, she can't escape from Claris without any assistance. The alchemist Tokitsukaze has heard this savage act and wants to rescue the princess CJB.
+
+There are n cities numbered from 1 to n in the kingdom Adalet. Because of the excellent transportation, there is exactly a two-way road between any two cites. Tokitsukaze lives in city 1. The Magician Claris lives in city n. Since the exam will be held soon, Tokitsukaze wants to rescue CJB as fast as possible, so she will choose the shortest path to reach city n.
+
+Claris has also heard this news and is afraid of being punished, so he decides to slow Tokitsukaze down by making an explosion on k roads he chose and causing these roads to lose their capability of two-way transportation, since it can pave the way for having enough time to prepare his powerful magic against Tokitsukaze.
+
+Tokitsukaze knows some roads will be destroyed and can immediately recognize where they are, but she has no approach to prevent this explosion, so she chooses just to move along the shortest path after Claris completes his explosion.
+
+Now Claris wants to know, after finishing his explosion, what the longest possible length is of the shortest path from city 1 to city n.
+ 
+
+Input
+There are several test cases.
+
+The first line contains an integer T (1≤T≤100), denoting the number of test cases. Then follow all the test cases.
+
+For each test case, the first line contains two integers n and k (3≤n≤50,1≤k≤min(n−2,5)), denoting the number of cities and the number of roads being exploded, respectively.
+
+The next n(n−1)2 lines describe all the roads, where each line contains three integers u, v and w (1≤u,v≤n,u≠v,1≤w≤104), representing a two-way road of length w between city u and city v. It is guaranteed that for every two cities, there exists exactly one road whose length is randomly distributed between 1 and 104.
+ 
+
+Output
+For each case, output in one line an integer, denoting the longest possible length of the shortest path after the explosion.
+ 
+
+Sample Input
+3
+5 1
+1 2 2990
+1 3 2414
+1 4 4018
+1 5 6216
+2 3 9140
+2 4 4169
+2 5 550
+3 4 6618
+3 5 3206
+4 5 105
+5 2
+1 2 2990
+1 3 2414
+1 4 4018
+1 5 6216
+2 3 9140
+2 4 4169
+2 5 550
+3 4 6618
+3 5 3206
+4 5 105
+5 3
+1 2 2990
+1 3 2414
+1 4 4018
+1 5 6216
+2 3 9140
+2 4 4169
+2 5 550
+3 4 6618
+3 5 3206
+4 5 105
+ 
+
+Sample Output
+4123
+5620
+6216
+ 
+
+Source
+2020 Multi-University Training Contest 3
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6801 6800 6799 6798 6797 
+ 
+
+Statistic | Submit | Discuss | Note
+题意，给出一个完全图，删掉k条边，使得从1到n的最短路最长，问是多少。
+因为边权随机，所以最短路很多，我们每次找到一条最短路，枚举删了哪条边。
+复杂度O(n*n * c^k)c为最短路边数。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 1e6 + 10;
+const int M = 5e4 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int dis[51];
+int vis[51];
+int pre[51];
+int a[51][51];
+int n, k;
+void dijkstra()
+{
+	memset(dis, 0x3f, sizeof dis);
+	memset(pre, 0, sizeof pre);
+	memset(vis, 0, sizeof vis);
+	for (int i = 1; i <= n; i++)
+		dis[i] = a[1][i];
+	vis[1] = 1;
+	for (int i = 1; i < n; i++)
+	{
+		int k = -1, mx = INF;
+		for (int j = 1; j <= n; j++)
+		{
+			if (vis[j])
+				continue;
+			if (dis[j] < mx)
+				mx = dis[j], k = j;
+		}
+		dis[k] = mx;
+		vis[k] = 1;
+		for (int j = 1; j <= n; j++)
+		{
+			if (!vis[j] && dis[j] > dis[k] + a[k][j])
+				dis[j] = dis[k] + a[k][j], pre[j] = k;
+		}
+	}
+}
+int ans;
+void dfs(int d)
+{
+	if (d > k)
+	{
+		dijkstra();
+		ans = max(ans, dis[n]);
+	}
+	else
+	{
+		dijkstra();
+		vector<pair<int, int>>p;
+		int now = n, last;
+		while (true)
+		{
+			last = now;
+			now = pre[now];
+			if (!now)
+			{
+				p.push_back({ 1, last });
+				break;
+			}
+			else
+				p.push_back({ now, last });
+		}
+		int sz = p.size();
+		for (auto &i : p)
+		{
+			int v = a[i.first][i.second];
+			a[i.first][i.second] = a[i.second][i.first] = INF;
+			dfs(d + 1);
+			a[i.first][i.second] = a[i.second][i.first] = v;
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ans = 0;
+		scanf("%d%d", &n, &k);
+		int all = n * (n - 1) / 2;
+		for (int i = 1; i <= all; i++)
+		{
+			int u, v, w;
+			scanf("%d%d%d", &u, &v, &w);
+			a[u][v] = w, a[v][u] = w;
+		}
+		dfs(1);
+		cout << ans << endl;
+	}
+	return TIME;
+}

@@ -1,0 +1,25 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <string.h>
+#include <vector>
+using namespace std;
+typedef long long ll;
+const int N = 1e5 + 10;
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll num = 1;
+		cin >> num;
+		for (int i = 63; i >= 0; i--)
+			if ((1LL << i) & num)
+			{
+				num ^= (1LL << i);
+				break;
+			}
+		cout << num * 2 + 1 << endl;
+	}
+	return 0;
+}

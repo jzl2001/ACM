@@ -1,0 +1,68 @@
+A. Kids Seating
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Today the kindergarten has a new group of n kids who need to be seated at the dinner table. The chairs at the table are numbered from 1 to 4n. Two kids can't sit on the same chair. It is known that two kids who sit on chairs with numbers a and b (a≠b) will indulge if:
+
+gcd(a,b)=1 or,
+a divides b or b divides a.
+gcd(a,b) — the maximum number x such that a is divisible by x and b is divisible by x.
+
+For example, if n=3 and the kids sit on chairs with numbers 2, 3, 4, then they will indulge since 4 is divided by 2 and gcd(2,3)=1. If kids sit on chairs with numbers 4, 6, 10, then they will not indulge.
+
+The teacher really doesn't want the mess at the table, so she wants to seat the kids so there are no 2 of the kid that can indulge. More formally, she wants no pair of chairs a and b that the kids occupy to fulfill the condition above.
+
+Since the teacher is very busy with the entertainment of the kids, she asked you to solve this problem.
+
+Input
+The first line contains one integer t (1≤t≤100) — the number of test cases. Then t test cases follow.
+
+Each test case consists of one line containing an integer n (1≤n≤100) — the number of kids.
+
+Output
+Output t lines, which contain n distinct integers from 1 to 4n — the numbers of chairs that the kids should occupy in the corresponding test case. If there are multiple answers, print any of them. You can print n numbers in any order.
+
+Example
+inputCopy
+3
+2
+3
+4
+outputCopy
+6 4
+4 6 10
+14 10 12 8
+
+<构造>
+
+题意：n个人要坐座位，一共4*n个座位，要求两个人的座位号不能互质，且不能一个座位号能被
+另一个人的座位号整除，要求输出n个人的座位号。
+首先输出n*2，然后每次加2，满足公约数是2，且因为最大的是2*n-2，所以也不会出现整除的情况。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		cin >> n;
+		int num = n * 2;
+		for (int i = 1; i <= n; i++)
+		{
+			cout << num;
+			num += 2;
+			printf("%c", i == n ? '\n' : ' ');
+		}
+	}
+	return 0;
+}

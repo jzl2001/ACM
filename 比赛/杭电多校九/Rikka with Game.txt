@@ -1,0 +1,44 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+int main(){
+#ifdef LOCAL
+    freopen("D:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        string s;
+        cin >> s;
+        int flag = -1;
+        int len = s.size();
+        int e = s.find('z');
+        if (e == -1)
+            continue(cout << s << endl;);
+        for (int i = 0; i <= e; i++)
+        {
+            if (s[i] <= 'x')
+            {
+                flag = i;
+                break;
+            }
+        }
+        if (flag != -1)
+            cout << s << endl;
+        else
+        {
+            s[e] = 'b';
+            cout << s << endl;
+        }
+    }
+    return 0;
+}

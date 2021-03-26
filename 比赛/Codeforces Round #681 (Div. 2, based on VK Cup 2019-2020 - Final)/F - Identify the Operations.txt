@@ -1,0 +1,101 @@
+F. Identify the Operations
+time limit per test2 seconds
+memory limit per test512 megabytes
+inputstandard input
+outputstandard output
+We start with a permutation a1,a2,…,an and with an empty array b. We apply the following operation k times.
+
+On the i-th iteration, we select an index ti (1≤ti≤n−i+1), remove ati from the array, and append one of the numbers ati−1 or ati+1 (if ti−1 or ti+1 are within the array bounds) to the right end of the array b. Then we move elements ati+1,…,an to the left in order to fill in the empty space.
+
+You are given the initial permutation a1,a2,…,an and the resulting array b1,b2,…,bk. All elements of an array b are distinct. Calculate the number of possible sequences of indices t1,t2,…,tk modulo 998244353.
+
+Input
+Each test contains multiple test cases. The first line contains an integer t (1≤t≤100000), denoting the number of test cases, followed by a description of the test cases.
+
+The first line of each test case contains two integers n,k (1≤k<n≤200000): sizes of arrays a and b.
+
+The second line of each test case contains n integers a1,a2,…,an (1≤ai≤n): elements of a. All elements of a are distinct.
+
+The third line of each test case contains k integers b1,b2,…,bk (1≤bi≤n): elements of b. All elements of b are distinct.
+
+The sum of all n among all test cases is guaranteed to not exceed 200000.
+
+Output
+For each test case print one integer: the number of possible sequences modulo 998244353.
+
+Example
+inputCopy
+3
+5 3
+1 2 3 4 5
+3 2 5
+4 3
+4 3 2 1
+4 3 1
+7 4
+1 4 7 3 6 2 5
+3 2 4 5
+outputCopy
+2
+0
+4
+Note
+Let's denote as a1a2…aiai+1––––…an→a1a2…ai−1ai+1…an−1 an operation over an element with index i: removal of element ai from array a and appending element ai+1 to array b.
+
+In the first example test, the following two options can be used to produce the given array b:
+
+123–45→12–35→125–→12; (t1,t2,t3)=(4,3,2);
+123–45→12–35→235–→15; (t1,t2,t3)=(4,1,2).
+In the second example test, it is impossible to achieve the given array no matter the operations used. That's because, on the first application, we removed the element next to 4, namely number 3, which means that it couldn't be added to array b on the second step.
+
+In the third example test, there are four options to achieve the given array b:
+
+1473–625→14362–5→14–325→4325–→435;
+1473–625→14362–5→14–325→1425–→145;
+1473–625→14732–5→14–725→4725–→475;
+1473–625→14732–5→14–725→1425–→145;
+题意：给出一个长度为n的序列，可以删除a序列的某个数字，然后把左右两个数字任选其一
+复制加到空序列b里，给出长度为m的b序列询问有多少种方案满足能得到b序列。
+思路：记录位置，遍历b序列，看下每个数字在a序列左右的数字，如果不是b序列中的，则可以
+删除，如果是b序列中的某个数字，但是位置在其之前，因为已经放到b集合了则也可以删除，否
+则不能删除，累乘计算答案就可以了。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 2e5 + 10;
+const int mod = 998244353;
+typedef long long ll;
+
+int a[N];
+int b[N];
+int pos1[N];
+int pos2[N];
+int vis[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		cin >> n >> m;
+		for (int i = 1; i <= n; i++)
+			scanf("%d", &a[i]), pos1[a[i]] = i, vis[i] = 0;
+		for (int i = 1; i <= m; i++)
+			scanf("%d", &b[i]), pos2[b[i]] = i, vis[b[i]] = 1;
+		ll ans = 1;
+		for (int i = 1; i <= m; i++)
+		{
+			int cnt = 0;
+			if (pos1[b[i]] - 1 >= 1 && (!vis[a[pos1[b[i]] - 1]] || pos2[b[i]] > pos2[a[pos1[b[i]] - 1]]))
+				cnt++;
+			if (pos1[b[i]] + 1 <= n && (!vis[a[pos1[b[i]] + 1]] || pos2[b[i]] > pos2[a[pos1[b[i]] + 1]]))
+				cnt++;
+			ans = ans * cnt % mod;
+		}
+		cout << ans << endl;
+	}
+	return 0;
+}

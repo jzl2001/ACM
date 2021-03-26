@@ -1,0 +1,46 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <string.h>
+#include <vector>
+#include <map>
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int N = 1e5 + 10;
+unordered_map<int, int>mp1;
+unordered_map<int, int>mp2;
+unordered_map<ll, int>mp3;
+unordered_map<ll, int>mp4;
+struct node
+{
+	ll x, y;
+}a[N];
+int main(){
+	int K;
+	cin >> K;
+	for (int i = 1; i <= K; i++)
+	{
+		scanf("%lld%lld", &a[i].x, &a[i].y);
+		if (!mp1[a[i].x])
+			mp1[a[i].x] = i;
+		if (!mp2[a[i].y])
+			mp2[a[i].y] = i;
+		if (!mp3[a[i].x - a[i].y])
+			mp3[a[i].x - a[i].y] = i;
+		if (!mp4[a[i].x + a[i].y])
+			mp4[a[i].x + a[i].y] = i;
+	}
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int num;
+		scanf("%d", &num);
+		if ((mp1[a[num].x] < num) || (mp2[a[num].y] < num) || (mp3[a[num].x - a[num].y] < num) || (mp4[a[num].x + a[num].y] < num))
+			puts("Yes");
+		else
+			puts("No");
+	}
+	return 0;
+}

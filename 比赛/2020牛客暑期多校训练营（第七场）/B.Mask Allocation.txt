@@ -1,0 +1,85 @@
+链接：https://ac.nowcoder.com/acm/contest/9643/B
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+Nowadays, the Kingdom of Dreamgrid is suffering from a national pandemic. Fortunately, president Baobao is working effectively with the Center for Disease Control (CDC) and they are trying their best to make everything under control.
+
+President Baobao has received n \times mn×m medical masks from his friend Reku, an extremely rich billionaire. As the chief of the CDC, you are required to allocate these masks properly. There are 2 kinds of hospitals in the Kingdom of Dreamgrid, n senior hospitals for critically ill patients and m mobile cabin hospitals for patients with mild symptoms.
+
+Before allocating them to hospitals, you have to pack them into boxes. Please note that boxes must not be opened in order to prevent contamination and you only know these boxes will be allocated to either senior hospitals or mobile cabin hospitals. That is to say, there should be a way of dividing masks boxes into m groups of n masks, and a way of dividing into n groups of m masks.
+
+You want the number of boxes to be minimal and please also provide a lexicographically greatest sequence of the numbers of masks in boxes. We say a sequence a is lexicographically greater than another b of the same length if there exists an integer i, such that
+a_j = b_ja 
+j
+​	
+ =b 
+j
+​	
+ , for all j < i; and
+a_i > b_ia 
+i
+​	
+ >b 
+i
+​	
+ .
+输入描述:
+There are multiple test cases. The first line of the input contains an integer T (1 \leq T \leq 100)(1≤T≤100), indica1ting the number of test cases. 
+
+For each test case, the only line of the input contains two integers n,m (1 \leq n,m \leq 10^4)(1≤n,m≤10 
+4
+ ), representing the numbers of senior hospitals and mobile cabin hospitals.
+输出描述:
+For each test case, please output two lines. The first line should contain a single integer k in the first line, indicating the minimum number of boxes. In the second line, please output k integers, denoting the lexicographically greatest sequence.
+示例1
+输入
+复制
+2
+5 4
+3 3
+输出
+复制
+8
+4 4 4 4 1 1 1 1
+3
+3 3 3
+题意：给出n*m个物品，分成最少份使得可以组成n个m同时可以组成m个n。
+当前为n和m，假设n>m,输出m个m，然后剩下了n-m，m，问题规模转化为
+为n-m，m，为相同的问题，继续处理。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		scanf("%d%d", &n, &m);
+		if (n < m)
+			swap(n, m);
+		vector<int>ans;
+		while (m)
+		{
+			for (int i = 1; i <= m; i++)
+				ans.push_back(m);
+			n -= m;
+			if (n < m)
+				swap(n, m);
+		}
+		cout << ans.size() << endl;
+		for (int i = 0; i < ans.size(); i++)
+			printf("%d%c", ans[i], i == ans.size() - 1 ? '\n' : ' ');
+	}
+	return 0;
+}

@@ -1,0 +1,69 @@
+C. Row GCD
+time limit per test2 seconds
+memory limit per test512 megabytes
+inputstandard input
+outputstandard output
+You are given two positive integer sequences a1,…,an and b1,…,bm. For each j=1,…,m find the greatest common divisor of a1+bj,…,an+bj.
+
+Input
+The first line contains two integers n and m (1≤n,m≤2⋅105).
+
+The second line contains n integers a1,…,an (1≤ai≤1018).
+
+The third line contains m integers b1,…,bm (1≤bj≤1018).
+
+Output
+Print m integers. The j-th of them should be equal to GCD(a1+bj,…,an+bj).
+
+Example
+inputCopy
+4 4
+1 25 121 169
+1 2 7 23
+outputCopy
+2 3 8 24
+题意：给出一个a序列和b序列，询问GCD(a1+bj,…,an+bj)。
+思路：性质，n个数字的gcd等于n个数字中任意数值与n-1个差值的gcd。
+所以GCD(a1+bj,…,an+bj)等于(a1 + bj) 跟a序列差值的gcd。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf;  int x = false;  char ch = gc;  bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int N = 2e5 + 10;
+
+ll a[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	scanf("%d%d", &n, &m);
+	ll g = 0;
+	for (int i = 1; i <= n; i++)
+		scanf("%lld", &a[i]);
+	sort(a + 1, a + n + 1);
+	for (int i = 2; i <= n; i++)
+		g = gcd(g, a[i] - a[i - 1]);
+	ll b;
+	for (int i = 1; i <= m; i++)
+		scanf("%lld", &b), printf("%lld%c", gcd(g, a[1] + b), i == m ? '\n' : ' ');
+	return TIME;
+}

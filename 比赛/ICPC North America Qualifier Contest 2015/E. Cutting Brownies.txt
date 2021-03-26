@@ -1,0 +1,61 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace std;
+using namespace __gnu_pbds;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+int d[510][510][2];//横纵
+bool dfs(int n, int m, int cnt)
+{
+    if (d[n][m][cnt] != -1)
+        return d[n][m][cnt];
+    bool ans = 0;
+    if (cnt == 1)
+    {
+        for (int i = 1; i < n; i++)
+        {
+            ans |= !(dfs(i, m, 0) || dfs(n - i, m, 0));
+        }
+    }
+    else
+    {
+        for (int i = 1; i < m; i++)
+        {
+            ans |= !(dfs(n, i, 1) || dfs(n,  m - i, 1));
+        }
+    }
+    return d[n][m][cnt] = ans;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    memset(d, -1, sizeof d);
+    d[1][1][0] = d[1][1][1] = 0;
+    while (t--)
+    {
+        int n, m;
+        string s;
+        cin >> n >> m >> s;
+        if (s == "Harry")
+        {
+            if (dfs(n, m, 0))
+                puts("Harry can win");
+            else
+                puts("Harry cannot win");
+        }
+        else
+        {
+            if (dfs(n, m, 1))
+                puts("Vicky can win");
+            else
+                puts("Vicky cannot win");
+        }
+    }
+	return 0;
+}

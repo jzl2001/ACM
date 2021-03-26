@@ -1,0 +1,94 @@
+#include <iostream>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+#include <string>
+#include <set>
+#include <math.h>
+#include <queue>
+#include <map>
+using namespace std;
+
+typedef long long ll;
+const int N = 5e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+bool vis[N];
+vector<int>G[N];
+map<int, int>mp;
+int a[N];
+int b[N];
+struct node
+{
+	int num, t;
+};
+int n;
+int bfs(int x1, int x2)
+{
+	queue<node>q;
+	q.push({ x1, 0 });
+	q.push({ x2, 0 });
+	while (!q.empty())
+	{
+		int f = q.front().num;
+		int t = q.front().t;
+		q.pop();
+		if (vis[f])
+			continue;
+		vis[f] = 1;
+		if (f == mp[a[n] + b[n]] || f == mp[a[n] - b[n]])
+			return t;
+		for (auto &i : G[f])
+		{
+			q.push({ i, t + 1 });
+		}
+	}
+	return -1;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif // LOCAL
+	int kcase = 0;
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		mp.clear();
+		int cnt = 0;
+		cin >> n;
+		for (int i = 1; i <= n; i++)
+		{
+			cin >> a[i];
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			cin >> b[i];
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			if (mp[a[i] - b[i]] == 0)
+				mp[a[i] - b[i]] = ++cnt;
+			if (mp[a[i] + b[i]] == 0)
+				mp[a[i] + b[i]] = ++cnt;
+		}
+		for (int i = 1; i <= cnt; i++)
+			G[i].clear(), vis[i] = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			int u = mp[a[i] + b[i]];
+			int v = mp[a[i] - b[i]];
+			G[u].push_back(v);
+			G[v].push_back(u);
+		}
+		int ans = bfs(mp[a[1] + b[1]], mp[a[1] - b[1]]);
+		printf("Field #%d: ", ++kcase);
+		if (ans == -1)
+			puts("-1");
+		else
+			printf("%d\n", ans + 1);
+		puts("");
+	}
+	return 0;
+}

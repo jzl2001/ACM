@@ -1,0 +1,64 @@
+ Time Limit: 2000/1000 MS (Java/Others)  Memory Limit: 32768/32768 K (Java/Others)
+Problem Description
+我们有 nn 种不同的饮料，每种饮料有无限多瓶，第 ii 种饮料一瓶提供 x[i]x[i] 毫升的水分，包含 y[i]y[i] 卡路里。
+
+现在我们需要选择一种饮料一直喝，直到补充了至少 mm 毫升的水分，我们想使得摄入的卡路里总和最小。请求出这个最小值。
+
+一旦打开一瓶饮料，就一定要喝完。
+
+Input
+第一行一个整数 test(1 \le test \le 100)test(1≤test≤100) 表示数据组数。
+
+对于每组数据，第一行两个整数 n, m(1 \le n \le 100, 1 \le m \le 10000)n,m(1≤n≤100,1≤m≤10000)。
+
+接下来 nn 行，每行两个整数 x[i], y[i](1 \le x[i], y[i] \le 100)x[i],y[i](1≤x[i],y[i]≤100)。
+
+Output
+对于每组数据，一行一个整数表示答案。
+
+Sample Input
+2
+1 10
+3 3
+2 10
+3 3
+2 1
+Sample Output
+12
+5
+Statistic | Submit | Clarifications | Back
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 1e5 + 10;
+const int mod = 998244353;
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n, m;
+        cin >> n >> m;
+        int ans = 0x3f3f3f3f;
+        for (int i = 1; i <= n; i++)
+        {
+            int x, y;
+            scanf("%d%d", &x, &y);
+            ans = min(ans, (m - 1) / x * y + y);
+        }
+        cout << ans << endl;
+    }
+    return TIME;
+}

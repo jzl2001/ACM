@@ -1,0 +1,106 @@
+<交互>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res % mod; }
+const int mod = 1e9 + 7;
+const int N = 10 + 100;
+char s[N][N];
+int ex, ey, n, m;
+bool vis[N][N];
+int cz[N][N];
+int dir[4][2] = { -1, 0, 1, 0, 0, -1, 0, 1 };
+int dir1[4][2] = { 1, 0, -1, 0, 0, 1, 0, -1 };
+struct node
+{
+	int x, y, op;
+}pre[N][N];
+void bfs(int x, int y)
+{
+	queue<node>q;
+	q.push({ x, y, 0 });
+	while (!q.empty())
+	{
+		int x = q.front().x;
+		int y = q.front().y;
+		int op = q.front().op;
+		q.pop();
+		if (vis[x][y])
+			continue;
+		vis[x][y] = 1;
+		cz[x][y] = op;
+		if (x == ex && y == ey)
+			break;
+		for (int i = 0; i < 4; i++)
+		{
+			int xx = x + dir[i][0];
+			int yy = y + dir[i][1];
+			if (xx >= 1 && xx <= n && yy >= 1 && yy <= m && s[xx][yy] != '*')
+				q.push({ xx, yy, i });
+		}
+	}
+	int nx = ex, ny = ey;
+	while (nx != 1 || ny != 1)
+	{
+		int u = cz[nx][ny];
+		int xx = nx + dir1[u][0];
+		int yy = ny + dir1[u][1];
+		pre[xx][yy].x = nx;
+		pre[xx][yy].y = ny;
+		pre[xx][yy].op = u;
+		nx = xx;
+		ny = yy;
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	cin >> n >> m;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%s", s[i] + 1);
+		for (int j = 1; j <= m; j++)
+			if (s[i][j] == 'F')
+				ex = i, ey = j;
+	}
+	bfs(1, 1);
+	string c = "UDLR";
+	int nx = 1, ny = 1;
+	int cnt = 0;
+	for (;;)
+	{
+ 
+		int d = pre[nx][ny].op;
+		int xx = pre[nx][ny].x;
+		int yy = pre[nx][ny].y;
+		cout << c[d] << endl;
+		int x, y;
+		scanf("%d%d", &x, &y);
+		if (x == ex && y == ey)
+			break;
+		if (x != xx || y != yy)
+		{
+			if (d <= 1)
+				swap(c[0], c[1]);
+			else
+				swap(c[2], c[3]);
+		}
+		else
+			nx = x, ny = y;
+	}
+	return TIME;
+}

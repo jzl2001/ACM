@@ -1,0 +1,42 @@
+Gromah and LZR have entered the second level. There is a sequence  on the wall.
+
+
+There is also a note board saying "the beauty value of a sequence is the number of different elements in the sequence".
+
+LZR soon comes up with the password of this level, which is the sum of the beauty values of all successive subintervals of the sequence on the wall.
+
+Please help them determine the password!
+题意 : 所有区间不同的数的个数乘以区间个数之和
+/*
+两个相同元素间的乘以后面的个数即是贡献
+*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e5 + 10;
+int vis[N];
+int main(){
+#ifdef LOCAL
+    freopen("D:/input.txt", "r", stdin);
+#endif
+    int n;
+    cin >> n;
+    ll ans = 0;
+    int num;
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> num;
+        ans += ll(n - i + 1) * (i - vis[num]);
+        vis[num] = i;
+    }
+    cout << ans << endl;
+    return TIME;
+}

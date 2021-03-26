@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <bits/stdc++.h>
+const int N = 1e3 + 10;
+using namespace std;
+typedef long long ll;
+ll a[N][N];
+ll p[N][N];
+ll f[N][N];
+ll d[N];   
+ll q[N];
+ll s[N];
+int main(){
+	int t;
+	cin >> t;
+	int kcase = 0;
+	while (t--)
+	{
+		printf("Case #%d: ", ++kcase);
+		memset(p, 0, sizeof p);
+		memset(q, 0, sizeof q);
+		memset(s, 0, sizeof s);
+		memset(d, 0, sizeof d);
+		int n, m;
+		cin >> n >> m;
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= m; j++)
+				scanf("%lld", &a[i][j]), p[i][j] += p[i][j - 1] - a[i][j];
+		memset(f, -0x3f, sizeof f);
+		for (int i = 1; i <= m; i++)
+			scanf("%lld", &q[i]), s[i] += q[i] + s[i - 1];
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = m; j >= 1; j--)
+			{
+				f[i][j] = max(p[i][j], f[i][j + 1]);
+			}
+		}
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= m; j++)
+			{
+				d[j] += f[i][j];
+			} // d 表示选取到i位所有人的最大收益
+		ll ans = 0;
+		for (int i = 1; i <= n; i++) // 枚举第i个人为等级最低
+		{
+			for (int j = 1; j <= m; j++) // 枚举等级
+			{
+				ans = max(ans, d[j] + s[j] + p[i][j] - f[i][j]);
+			}
+			ll tot = 0;
+			for (int j = 1; j <= n; j++) // 每个人连等级1都不需要的时候
+			{
+				if (j == i)
+					continue;
+					if (f[j][1] > 0)
+						tot += f[j][1];
+			}
+			ans = max(ans, tot);
+		}
+		cout << ans << endl;
+	}
+	return 0;
+}

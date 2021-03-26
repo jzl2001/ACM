@@ -1,0 +1,14 @@
+#include <stdio.h>
+#include <bits/stdc++.h>
+#define N 5e5 + 10;
+using namespace std;
+typedef long long ll;
+ll mod = 998244353;
+inline ll fpow(ll a, ll b, ll mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int main()
+{
+	ll a, b;
+	cin >> a >> b;
+	cout << fpow(2, a + b, mod) << endl;
+	return 0;
+}

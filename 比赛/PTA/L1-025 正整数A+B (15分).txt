@@ -1,0 +1,93 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 1e7 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+bool check(string s)
+{
+	for (int i = 0; i < s.size(); i++)
+	{
+		if (s[i] < '0' || s[i] > '9')
+		{
+			return false;
+		}
+	}
+	return true;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	string a, b;
+	string s;
+	getline(cin, s);
+	if (s[0] == ' ')
+	{
+		a = "?";
+		b = s.substr(1);
+		if (!check(b) || stoi(b) < 1 || stoi(b) > 1000)
+		{
+			b = "?";
+		}
+		cout << a << " " << "+ " << b << " = ?";
+	}
+	else
+	{
+		string a, b;
+		int f = s.find(' ');
+		a = s.substr(0, f);
+		b = s.substr(f + 1);
+		int num1 = 0, num2 = 0, ans = 0;
+		if (check(a))
+		{
+			num1 = stoi(a);
+		}
+		if (check(b))
+		{
+			num2 = stoi(b);
+		}
+		if (num1 >= 1 && num1 <= 1000 && num2 >= 1 && num2 <= 1000)
+		{
+			ans = num1 + num2;
+		}
+		if (num1 >= 1 && num1 <= 1000)
+		{
+			cout << num1;
+		}
+		else
+			cout << "?";
+		cout << " + ";
+		if (num2 >= 1 && num2 <= 1000)
+		{
+			cout << num2;
+		}
+		else
+			cout << "?";
+		cout << " = ";
+		if (ans && num1 >= 1 && num1 <= 1000 && num2 >= 1 && num2 <= 1000)
+		{
+			cout << ans << endl;
+		}
+		else
+			cout << "?" << endl;
+	}
+	return TIME;
+}

@@ -1,0 +1,88 @@
+B. Saving the City
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Bertown is a city with n buildings in a straight line.
+
+The city's security service discovered that some buildings were mined. A map was compiled, which is a string of length n, where the i-th character is "1" if there is a mine under the building number i and "0" otherwise.
+
+Bertown's best sapper knows how to activate mines so that the buildings above them are not damaged. When a mine under the building numbered x is activated, it explodes and activates two adjacent mines under the buildings numbered x−1 and x+1 (if there were no mines under the building, then nothing happens). Thus, it is enough to activate any one mine on a continuous segment of mines to activate all the mines of this segment. For manual activation of one mine, the sapper takes a coins. He can repeat this operation as many times as you want.
+
+Also, a sapper can place a mine under a building if it wasn't there. For such an operation, he takes b coins. He can also repeat this operation as many times as you want.
+
+The sapper can carry out operations in any order.
+
+You want to blow up all the mines in the city to make it safe. Find the minimum number of coins that the sapper will have to pay so that after his actions there are no mines left in the city.
+
+Input
+The first line contains one positive integer t (1≤t≤105) — the number of test cases. Then t test cases follow.
+
+Each test case begins with a line containing two integers a and b (1≤a,b≤1000) — the cost of activating and placing one mine, respectively.
+
+The next line contains a map of mines in the city — a string consisting of zeros and ones.
+
+The sum of the string lengths for all test cases does not exceed 105.
+
+Output
+For each test case, output one integer — the minimum number of coins that the sapper will have to pay.
+
+Example
+inputCopy
+2
+1 1
+01000010
+5 1
+01101110
+outputCopy
+2
+6
+Note
+In the second test case, if we place a mine under the fourth building and then activate it, then all mines on the field are activated. The cost of such operations is six, b=1 coin for placing a mine and a=5 coins for activating.
+
+题意：给出n个位置，每个位置是0或者1，1表示有炸弹，引爆一个炸弹会导致相邻的炸弹爆炸，
+两种操作，点爆一个炸弹或者在一个0的位置安防一个炸弹，询问引爆所有炸弹的最小代价。
+思路：设d[i][2]表示引爆第i堆答案是连着上一堆一起点爆的，还是单独点爆的。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+char s[N];
+int d[N][2];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int a, b;
+		cin >> a >> b;
+		scanf("%s", s + 1);
+		int len = strlen(s + 1);
+		int cnt = 0, flag = 0;
+		ll ans = 0;
+		int x = 0;
+		for (int i = 1; i <= len; i++)
+		{
+			if (s[i] == '0')
+				++cnt;
+			else
+			{
+				x++;
+				d[x][0] = min(d[x - 1][1] + a, d[x - 1][0] + a);
+				if (x == 1)
+					d[x][1] = d[x][0];
+				if (x >= 2)
+					d[x][1] = min(d[x - 1][1] + cnt * b, d[x - 1][0] + cnt * b);
+				cnt = 0;
+			}
+		}
+		cout << min(d[x][0], d[x][1]) << endl;
+	}
+	return 0;
+}

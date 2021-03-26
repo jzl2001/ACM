@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#define SZ(x) ((int)(x).size())
+#define ALL(x) (x).begin(), (x).end()
+ 
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int MOD = 1e9 + 7;
+template<typename S, typename T> inline bool Min(S &a, const T &b){ return a > b ? a = b, true : false; }
+template<typename S, typename T> inline bool Max(S &a, const T &b){ return a < b ? a = b, true : false; }
+template<typename S, typename T> inline void Adm(S &a, const T &b){ a = (a + b) % MOD; if (a < 0) a += MOD; }
+//emplace pair
+ 
+const int N = 8e4 + 100;
+int a[N];
+ 
+int main()
+{
+#ifdef LOCAL
+    freopen("C:/input.txt", "r", stdin);
+#endif
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; ++i)
+        scanf("%d", &a[i]);
+    stack<int> stk;
+    ll ans = 0;
+    for (int i = 1; i <= n; ++i)
+    {
+        while (!stk.empty() && a[stk.top()] <= a[i])
+            ans += i - stk.top() - 1, stk.pop();
+        stk.push(i);
+    }
+    while (!stk.empty())
+        ans += n - stk.top(), stk.pop();
+    cout << ans << endl;
+ 
+    return 0;
+}

@@ -1,0 +1,106 @@
+Equal Sentences
+Time Limit: 2000/1000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 616    Accepted Submission(s): 323
+
+
+Problem Description
+Sometimes, changing the order of the words in a sentence doesn't influence understanding. For example, if we change "what time is it", into "what time it is"; or change "orz zhang three ak world final", into "zhang orz three world ak final", the meaning of the whole sentence doesn't change a lot, and most people can also understand the changed sentences well.
+
+Formally, we define a sentence as a sequence of words. Two sentences S and T are almost-equal if the two conditions holds:
+
+1. The multiset of the words in S is the same as the multiset of the words in T.
+2. For a word α, its ith occurrence in S and its ith occurrence in T have indexes differing no more than 1. (The kth word in the sentence has index k.) This holds for all α and i, as long as the word α appears at least i times in both sentences.
+
+Please notice that "almost-equal" is not a equivalence relation, unlike its name. That is, if sentences A and B are almost-equal, B and C are almost-equal, it is possible that A and C are not almost-equal.
+
+Zhang3 has a sentence S consisting of n words. She wants to know how many different sentences there are, which are almost-equal to S, including S itself. Two sentences are considered different, if and only if there is a number i such that the ith word in the two sentences are different. As the answer can be very large, please help her calculate the answer modulo 109+7.
+ 
+
+Input
+The first line of the input gives the number of test cases, T(1≤T≤100). T test cases follow.
+
+For each test case, the first line contains an integer n(1≤n≤105), the number of words in the sentence.
+
+The second line contains the sentence S consisting of n words separated by spaces. Each word consists of no more than 10 lowercase English letters.
+
+The sum of n in all test cases doesn't exceed 2×105.
+ 
+
+Output
+For each test case, print a line with an integer, representing the answer, modulo 109+7.
+ 
+
+Sample Input
+2
+6
+he he zhou is watching you
+13
+yi yi si wu yi si yi jiu yi jiu ba yao ling
+ 
+
+Sample Output
+8
+233
+ 
+
+Source
+2020 Multi-University Training Contest 4
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6813 6812 6811 6810 6809 
+ 
+
+Statistic | Submit | Discuss | Note
+<dp>
+/*
+给出S，求T，要求T中的某个单词在S中下标的差不超过1，即相邻的单词可以交换，考虑每一个位置，
+如果当前位置和之前的位置相同，则交换不会改变方案。
+否则换的方案数是改变了i - 1跟i方案就是d[i - 2]
+不变方案就是d[i - 1]。
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 1e5 + 500;
+const int M = 4e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+char s[11];
+char x[11];
+ll d[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		scanf("%d", &n);
+		d[0] = 1, d[1] = 1;
+		scanf("%s", x);
+		for (int i = 2; i <= n; i++)
+		{
+			scanf("%s", s);
+			if (strcmp(s, x) == 0)//相等
+				d[i] = d[i - 1];
+			else
+				d[i] = (d[i - 1] + d[i - 2]) % mod;
+			memcpy(x, s, sizeof s);
+		}
+		cout << d[n] << endl;
+	}
+	return TIME;
+}

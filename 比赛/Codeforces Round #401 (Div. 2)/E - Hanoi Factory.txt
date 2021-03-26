@@ -1,0 +1,83 @@
+/*
+树状数组，dp
+*/
+#include <iostream>
+#include <algorithm>
+#include <ctime>
+#include <cstdio>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res % mod; }
+const int mod = 1e9 + 7;
+const int N = 1e5 + 100;
+ll c[N];
+struct node
+{
+	ll a, b, c;
+	bool operator < (node &oth)const
+	{
+		if (b != oth.b)
+			return b > oth.b;
+		return a > oth.a;
+	}
+}a[N];
+int lowbit(int x)
+{
+	return x & (-x);
+}
+ll ask(int x)
+{
+	ll res = 0;
+	while (x)
+	{
+		res = max(res, c[x]);
+		x -= lowbit(x);
+	}
+	return res;
+}
+void update(int x, ll y)
+{
+	while (x <= N - 1)
+	{
+		c[x] = max(c[x], y);
+		x += lowbit(x);
+	}
+}
+vector<ll>v;
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	scanf("%d", &n);
+	for (int i = 1; i <= n; i++)
+		scanf("%d%d%d", &a[i].a, &a[i].b, &a[i].c), v.push_back(a[i].b);
+	sort(a + 1, a + n + 1);
+	sort(v.begin(), v.end());
+	v.erase(unique(v.begin(), v.end()), v.end());
+	ll ans = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		int pos1 = upper_bound(v.begin(), v.end(), a[i].a) - v.begin() + 1; // 修改
+		int pos2 = lower_bound(v.begin(), v.end(), a[i].b) - v.begin() + 1;
+		ll res = ask(pos2);
+		ans = max(ans, res + a[i].c);
+		update(pos1, res + a[i].c);
+	}
+	cout << ans << endl;
+	return TIME;
+}

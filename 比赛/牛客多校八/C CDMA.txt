@@ -1,0 +1,52 @@
+Gromah and LZR have entered the third level. There is a blank grid of size , and above the grid is a word "CDMA".
+
+In CDMA Technology, a Technology about computer network, every network node should be appointed a unique binary sequence with a fixed and the same length. Moreover, if we regard  in the sequence as , and regard  as , then these sequences should satisfy that for any two different sequences , the inner product of  should be exactly .
+
+The inner product of two sequences  with the same length  equals to .
+
+So, the key to the next level is to construct a grid of size , whose elements are all  or , and for any two different rows, the inner product of them should be exactly .
+
+In this problem, it is guaranteed that  is a positive integer power of  and there exists some solutions for input . If there are multiple solutions, you may print any of them.
+题意: 构造出1 -1序列， 任意两行的和为0， 按照
+1 1
+1 -1 复制
+<构造>
+#include <bits/stdc++.h>
+using namespace std;
+ 
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RunTime: " << clock() << "ms\n", 0
+#else
+#define debug(x) ;
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e3 + 100;
+int a[N][N];
+int main(){
+#ifdef LOCAL
+    freopen("D:/input.txt", "r", stdin);
+#endif
+    a[1][1] = 1;
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n / 2; i <<= 1)
+    {
+        for (int j = 1; j <= i; j++)
+        {
+            for (int k = 1; k <= i; k++)
+            {
+                a[j][k + i] = a[j][k];
+                a[j + i][k] = a[j][k];
+                a[j + i][k + i] = -a[j][k];
+            }
+        }
+    }
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+            printf("%d%c", a[i][j], j == n ? '\n' : ' ');
+    return TIME;
+}

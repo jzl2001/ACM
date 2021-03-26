@@ -1,0 +1,57 @@
+#include<iostream>
+#include<queue>
+#include<string.h>
+#include<vector>
+#include<string>
+#include<map>
+using namespace std;
+typedef long long ll;
+map<ll, int>mp;
+typedef long long ll;
+ll get_num(string a, ll base)
+{
+	ll ans = 0;
+	int len = a.length();
+	for (int i = 0; i < len; i++)
+		ans = ans * base + a[i] - '0';
+	return ans;
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		string a, b;
+		cin >> a >> b;
+		int len1 = a.length(), len2 = b.length();
+		for (int i = 0; i < len1; i++)
+		{
+			string c = a;
+			for (int j = 0; j < 2; j++)
+			{
+				c[i] = j + '0';
+				ll ans = get_num(c,2);
+				mp[ans]++;
+				c = a;
+			}
+		}
+		for (int i = 0; i < len2;i++)
+		{
+			string c = b;
+			for (int j = 0; j < 3; j++)
+			{
+				c[i] = j + '0';
+				ll ans = get_num(c, 3);
+				mp[ans]++;
+				c = b;
+			}
+		}
+		for (auto i = mp.begin(); i != mp.end();i++)
+			if (i->second == 2)
+			{
+				cout << i->first << endl;
+				break;
+			}
+		mp.clear();
+	}
+}

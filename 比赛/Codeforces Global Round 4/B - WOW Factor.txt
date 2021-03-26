@@ -1,0 +1,64 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int N = 1e6 + 10;
+ 
+ll a[N];
+ll b[N];
+int main()
+{
+	string s;
+	cin >> s;
+	string x;
+	int len = s.size();
+	int t = 0;
+	for (int i = 0; i < len; i++)
+	{
+		if (s[i] == 'v')
+			t++;
+		else
+			if (t >= 1)
+			{
+				for (int j = 1; j < t; j++)
+				{
+					x.push_back('w');
+				}
+				x.push_back(s[i]);
+				t = 0;
+			}
+			else
+				x.push_back('o');
+	}
+	if (t != 0)
+	{
+		for (int j = 1; j < t; j++)
+		{
+			x.push_back('w');
+		}
+	}
+	int sum = 0;
+	int len1 = x.size();
+	for (int i = 0; i < len1; i++)
+	{
+		if (x[i] == 'w')
+			sum++;
+		else
+			a[i] = sum;
+	}
+	sum = 0;
+	for (int i = len1 - 1; i >= 0; i--)
+	{
+		if (x[i] == 'w')
+			sum++;
+		else
+			b[i] = sum;
+	}
+	ll ans = 0;
+	for (int i = 0; i < len1; i++)
+	{
+		if (x[i] == 'o')
+			ans += a[i] * b[i];
+	}
+	cout << ans << endl;
+	return 0;
+}

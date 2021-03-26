@@ -1,0 +1,148 @@
+有一颗有nn个结点树，结点被编号为11~nn，记根结点深度为11，如果第ii个结点的深度是dd，则它贡献的价值是d\times{w_i}d×w 
+i
+​	
+ ，这棵树的价值是所有结点的价值和 求当根结点为11~nn时，树的价值分别为多少
+
+输入描述
+
+第一行输入一个整数TT，代表有TT组测试数据  对于每一组测试数据，第一行有11个整数nn，第二行有nn个整数w_iw 
+i
+​	
+ ，接下来n-1n−1行每行有两个整数x,yx,y表示xx和yy之间有一条边
+
+输出描述
+
+对于每组测试数据，在一行中输出nn个整数，第i个整数代表以ii结点为根结点时树的价值
+
+数据范围
+
+1≤T≤10001≤T≤1000
+
+1≤n≤2\cdot{10}^51≤n≤2⋅10 
+5
+ 
+
+1≤w_i≤10^81≤w 
+i
+​	
+ ≤10 
+8
+ 
+
+\sum{n}≤2\cdot{10}^5∑n≤2⋅10 
+5
+ 
+
+输出时每行末尾的多余空格，不影响答案正确性
+
+样例输入复制
+2
+6
+5 2 8 1 7 8
+4 5
+5 6
+2 5
+1 3
+4 3
+5
+1 1 1 1 1
+1 2
+2 3
+3 4
+4 5
+样例输出复制
+102 100 81 76 73 88
+15 12 11 12 15
+换根法
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+#define cel cout << endl;
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll sum[N];
+ll ans[N];
+int d[N];
+ll a[N];
+vector<int>G[N];
+void dfs1(int x, int fa)
+{
+	sum[x] = a[x];
+	for (auto &i : G[x])
+	{
+		if (i == fa)
+			continue;
+		d[i] = d[x] + 1;
+		dfs1(i, x);
+		sum[x] += sum[i];
+	}
+	ans[1] += d[x] * a[x];
+}
+void dfs2(int x, int fa)
+{
+	if (x != 1)
+		ans[x] = ans[fa] + (sum[1] - sum[x]) - a[x];
+	for (auto &i : G[x])
+	{
+		if (i == fa)
+			continue;
+		if (x != 1)
+			ans[x] -= sum[i];
+	}
+	for (auto &i : G[x])
+	{
+		if (i == fa)
+			continue;
+		dfs2(i, x);
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		cin >> n;
+		for (int i = 1; i <= n; i++)
+			scanf("%lld", &a[i]);
+		for (int i = 1; i < n; i++)
+		{
+			int u, v;
+			scanf("%d%d", &u, &v);
+			G[u].push_back(v);
+			G[v].push_back(u);
+		}
+		d[1] = 1;
+		dfs1(1, 0);
+		dfs2(1, 0);
+		for (int i = 1; i <= n; i++)
+		{
+			G[i].clear();
+			cout << ans[i] << " ";
+			ans[i] = 0;
+		}
+		puts("");
+	}
+	return TIME;
+}

@@ -1,0 +1,81 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 5e4 + 10;
+int mod = 998244353;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll d[40][2][2][3][3]; // 0不满足 1可能满足 2 已经满足
+int a[40];
+int b[40];
+int c[40];
+ll dfs(int pos, int alim, int blim, int u, int v) // u == &    v == ^
+{
+	if (pos == 0)
+		return u == 2 || v == 2;
+	if (d[pos][alim][blim][u][v] != -1)
+		return d[pos][alim][blim][u][v];
+	int up1 = alim ? a[pos] : 1;
+	int up2 = blim ? b[pos] : 1;
+	ll sum = 0;
+	for (int i = 0; i <= up1; i++)
+		for (int j = 0; j <= up2; j++)
+		{
+			int nowu = u, nowv = v;
+			if ((i & j) > c[pos] && u)
+				nowu = 2;
+			if ((i & j) < c[pos] && u != 2)
+				nowu = 0;
+			if ((i ^ j) < c[pos] && v)
+				nowv = 2;
+			if ((i ^ j) > c[pos] && v != 2)
+				nowv = 0;
+			if (!nowu && !nowv)
+				continue;
+			sum += dfs(pos - 1, alim && i == up1, blim && j == up2, nowu, nowv);
+		}
+	return d[pos][alim][blim][u][v] = sum;
+}
+ll get_num(int x, int y, int z)
+{
+	int cnt = 0;
+	memset(d, -1, sizeof d);
+	memset(a, 0, sizeof a);
+	memset(b, 0, sizeof b);
+	memset(c, 0, sizeof c);
+	int cnt1 = 0;
+	while (x)
+		a[++cnt1] = x % 2, x /= 2;
+	int cnt2 = 0;
+	while (y)
+		b[++cnt2] = y % 2, y /= 2;
+	int cnt3 = 0;
+	while (z)
+		c[++cnt3] = z % 2, z /= 2;
+	int M = max({ cnt1, cnt2, cnt3 });
+	return dfs(M, 1, 1, 1, 1);
+}
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int A, B, C;
+		cin >> A >> B >> C;
+		ll zero = min(A, C - 1) + min(B, C - 1) + 1;  // 两个都为0的时候 0 ^ 0 = 0 所以去掉个1, 一个为0， 另外一个小于C时 则^小于, 所以取min
+		cout << get_num(A, B, C) - zero << endl;
+	}
+	return TIME;
+}

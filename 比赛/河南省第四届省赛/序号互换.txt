@@ -1,0 +1,40 @@
+#include<bits/stdc++.h>
+using namespace std;
+int get_num(string a)
+{
+	int sum = 0;
+	int len = a.size();
+	for (int i = 0; i < len; i++)
+		sum = sum * 26 + (a[i] - 'A' + 1);
+	return sum;
+}
+int gets_num(string a)
+{
+	int sum = 0;
+	int len = a.size();
+	for (int i = 0; i < len; i++)
+		sum = sum * 10 + (a[i] - '0');
+	return sum;
+}
+string get_s(int num)
+{
+	string ans;
+	while (num)
+		ans.push_back((num - 1) % 26 + 'A'), num = (num - 1) / 26;
+	reverse(ans.begin(), ans.end());
+	return ans;
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		string qury;
+		cin >> qury;
+		if (qury[0] >= '0' && qury[0] <= '9')
+			cout << get_s(gets_num(qury)) << endl;
+		else
+			cout << get_num(qury) << endl;
+	}
+	return 0;
+}

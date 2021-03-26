@@ -1,0 +1,68 @@
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <queue>
+#include <time.h>
+#include <algorithm>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+const int N = 1e6 + 10;
+const int mod = 1e9 + 7;
+int a[N];
+int pos[N];
+int n;
+int num;
+vector<pair<int, int>>ans;
+bool calc(int x)
+{
+	if (abs(pos[num] - x) * 2 >= n)
+	{
+		ans.push_back({ pos[num], x });
+		pos[a[x]] = pos[num];
+		swap(a[pos[num]], a[x]);
+		pos[num] = x;
+		return true;
+	}
+	return false;
+}
+void solve()
+{
+	while (num != pos[num])
+		if (!calc(num))
+			if (!calc(1))
+				calc(n);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d", &a[i]);
+		pos[a[i]] = i;
+	}
+	for (int i = 1; i <= n / 2; i++)
+	{
+		for (int j = 1; j <= 2; j++)
+		{
+			if (j == 1)
+				num = n / 2 - i + 1;
+			else
+				num = n / 2 + i;
+			solve();
+		}
+	}
+	cout << ans.size() << endl;
+	for (auto &i : ans)
+		cout << i.first << " " << i.second << endl;
+	return TIME;
+}

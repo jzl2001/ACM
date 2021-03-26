@@ -1,0 +1,119 @@
+链接：https://ac.nowcoder.com/acm/contest/5678/H
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+给出函数的定义如下：
+f(x)是所有能够整除 x 的数（包含 1 和 x ）中的中位数向下取整的大小,
+g(x)=\sum_{i = 1}^{x}{f(i)}g(x)=∑ 
+i=1
+x
+​	
+ f(i)
+输入描述:
+输入包含多组数据，第一行为一个数字 T(1 \le T \le 10)T(1≤T≤10) ，表示测试数据组数。
+接下来是 T 组数据，每组数据为一行，包含一个整数 x(1 \le x \le1000000)x(1≤x≤1000000)
+输出描述:
+每组数据输出包含一个整数，表示 g(x) 的值，结果要求对 1e9+7 取模。
+
+示例1
+输入
+复制
+3
+1
+2
+3
+输出
+复制
+1
+2
+4
+说明
+能够整除 1 的数字有 1 ，故 f(1)=1；
+能够整除 2 的数字有 1，2 所以中位数为\lfloor \frac{1+2}{2} \rfloor = 1⌊ 
+2
+1+2
+​	
+ ⌋=1，故 f(2) = 1；
+能够整除 3 的数字有 1,3 ，所以中位数为\frac{1+3}{2}=2 
+2
+1+3
+​	
+ =2 ，故 f(3) = 2；
+从而得出 g(1) = 1,g(2) = 2,g(3) = 4 。
+示例2
+输入
+复制
+1
+1000000
+输出
+复制
+677045223
+import java.util.*; 
+import java.util.Scanner; 
+public class Main
+{
+	static int mod = 1000000007;
+	static int[] vis = new int[10000010];
+	static long[] ans = new long[10000010];
+	public static void sai()
+	{
+		vis[1] = 1;
+		for (int i = 2; i * i < 1000010; i++)
+		{
+			if (vis[i] == 1)
+				continue;
+			int mul;
+			if (i == 2)
+				mul = 1;
+			else
+				mul = 2;
+			for (int j = i * i; j < 1000010; j += i * mul)
+			{
+				vis[j] = 1;
+			}
+		}
+	}
+	public static int calc(int num)
+	{
+		if (vis[num] == 0)
+			return (1 + num) / 2;
+		int cnt = 0;
+		int k = (int) Math.sqrt(1.0 *num);
+		for (int i = k; i >= 2; i--)
+		{
+			if (num % i == 0)
+			{
+				if (i * i != num)
+					return (i + (num / i)) / 2;
+				else
+					return i;
+			}
+		}
+		return (1 + num) / 2;
+	}
+	public static void main(String args[])
+	{
+		sai();
+		Scanner cin = new Scanner(System.in);
+		ans[1] = 1;
+		for (int i = 2; i <= 1000000; i++)
+		{
+			ans[i] = ans[i - 1] + calc(i);
+			if (ans[i] > mod)
+				ans[i] -= mod;
+		}
+		int t;
+		t = cin.nextInt();
+		while (t != 0)
+		{
+			int num;
+			t--;
+			num = cin.nextInt();
+			System.out.println(ans[num]);
+		}
+	}
+}
+

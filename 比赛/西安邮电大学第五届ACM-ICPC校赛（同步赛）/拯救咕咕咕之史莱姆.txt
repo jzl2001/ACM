@@ -1,0 +1,65 @@
+https://ac.nowcoder.com/acm/contest/5678/A
+链接：https://ac.nowcoder.com/acm/contest/5678/A
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+信鸽王国有一位美丽的公主，被可恶的巫师囚禁在了城堡里，你是一位倾慕公主的勇者，准备去解救她。你来到了城堡外，发现有一只丑陋的史莱姆阻挡了你的去路，向你索要进堡费，你囊中羞涩，并不想给钱，于是你给它撒了“洞洞索命粉末”！
+洞洞索命粉末：被撒此粉末它的身上就会出现一个大洞，从中毒的第二天开始，大洞每天早上会分裂出一个小洞，小洞在出现后的第四天会长成大洞（并开始分裂），每个洞在每天下午会减少它 3 点 HP，HP 为 0 时它就会死去。史莱姆很聪明，如果他意识到自己第二天就会死去，他就会向你求饶，让开道路。
+PS：你从小道消息得知公主就快要饿死了，所以你要赶在 5 天之内进入城堡，如果 5 天之后史莱姆还没有向你求饶，那你只能氪金了。
+输入描述:
+测试输入包含若干测试用例，每个测试用例占一行，包含一个整数 n（long long范围内），表示史莱姆的初始 HP 值，当 n 为 0 时输入结束。
+输出描述:
+对每个测试用例，如果 5 天之内（包括第 5 天）史莱姆向你求饶，那就输出“AOLIGEI!”，否则，输出“DAAAAAMN!”，没有双引号。
+示例1
+输入
+复制
+5
+73
+77
+0
+输出
+复制
+AOLIGEI!
+AOLIGEI!
+DAAAAAMN!
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	ll n;
+	while (cin >> n, n)
+	{
+		if (n < 77)
+			puts("AOLIGEI!");
+		else
+			puts("DAAAAAMN!");
+	}
+	return TIME;
+}

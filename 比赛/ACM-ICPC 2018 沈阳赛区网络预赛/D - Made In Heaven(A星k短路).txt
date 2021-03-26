@@ -1,0 +1,294 @@
+Made In Heaven
+One day in the jail, F·F invites Jolyne Kujo (JOJO in brief) to play tennis with her. However, Pucci the father somehow knows it and wants to stop her. There are 
+N
+ spots in the jail and 
+M
+ roads connecting some of the spots. JOJO finds that Pucci knows the route of the former 
+(
+K
+−
+1
+)
+-th shortest path. If Pucci spots JOJO in one of these 
+K
+−
+1
+ routes, Pucci will use his stand Whitesnake and put the disk into JOJO's body, which means JOJO won't be able to make it to the destination. So, JOJO needs to take the 
+K
+-th quickest path to get to the destination. What's more, JOJO only has 
+T
+ units of time, so she needs to hurry.
+
+JOJO starts from spot 
+S
+, and the destination is numbered 
+E
+. It is possible that JOJO's path contains any spot more than one time. Please tell JOJO whether she can make arrive at the destination using no more than 
+T
+ units of time.
+
+Input
+There are at most 
+50
+ test cases.
+
+The first line contains two integers 
+N
+ and 
+M
+ 
+(
+1
+≤
+N
+≤
+1000
+,
+0
+≤
+M
+≤
+10000
+)
+. Stations are numbered from 
+1
+ to 
+N
+.
+
+The second line contains four numbers 
+S
+,
+E
+,
+K
+ and 
+T
+ ( 
+1
+≤
+S
+,
+E
+≤
+N
+, 
+S
+≠
+E
+, 
+1
+≤
+K
+≤
+10000
+, 
+1
+≤
+T
+≤
+100000000
+ ).
+
+Then 
+M
+ lines follows, each line containing three numbers 
+U
+,
+V
+ and 
+W
+ 
+(
+1
+≤
+U
+,
+V
+≤
+N
+,
+1
+≤
+W
+≤
+1000
+)
+ . It shows that there is a directed road from 
+U
+-th spot to 
+V
+-th spot with time 
+W
+.
+
+It is guaranteed that for any two spots there will be only one directed road from spot 
+A
+ to spot 
+B
+ 
+(
+1
+≤
+A
+,
+B
+≤
+N
+,
+A
+≠
+B
+)
+, but it is possible that both directed road 
+<
+A
+,
+B
+>
+ and directed road 
+<
+B
+,
+A
+>
+ exist.
+
+All the test cases are generated randomly.
+
+Output
+One line containing a sentence. If it is possible for JOJO to arrive at the destination in time, output "yareyaredawa" (without quote), else output "Whitesnake!" (without quote).
+
+Sample Input
+2 2
+1 2 2 14
+1 2 5
+2 1 4
+Sample Output
+yareyaredawa
+Sponsor
+A*最短路
+#include <stdio.h>
+#include <utility>
+#include <vector>
+#include <iostream>
+#include <time.h>
+#include <queue>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 2e4 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int cnt[1010];
+int H[1010]; //估值函数，从终点到i的最短距离
+int n, m;
+int vis[1010];
+vector<pair<int, int> >G1[1010];
+vector<pair<int, int> >G2[1010];
+struct node
+{
+	int x, w;
+	bool operator <(const node &oth)const
+	{
+		if (w + H[x] == oth.w + H[oth.x])
+			return w > oth.w;
+		return w + H[x] > oth.w + H[oth.x];
+	}
+};
+struct node1
+{
+	int x, w;
+	bool operator <(const node1 &oth)const
+	{
+		return w > oth.w;
+	}
+};
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	while (~scanf("%d%d", &n, &m))
+	{
+		priority_queue<node>q;
+		priority_queue<node1>Q;
+		int s, e, k, t;
+		scanf("%d%d%d%d", &s, &e, &k, &t);
+		if (s == e)//比如1到1距离2，答案为2，不加会为0。
+			k++;
+		for (int i = 1; i <= m; i++)
+		{
+			int u, v, w;
+			scanf("%d%d%d", &u, &v, &w);
+			G1[u].push_back({ v, w });
+			G2[v].push_back({ u, w });
+		}
+		for (int i = 1; i <= n; i++)
+			H[i] = LINF;
+		Q.push({ e, 0 });
+		H[e] = 0;
+		while (!Q.empty())
+		{
+			node1 now = Q.top();
+			Q.pop();
+			if (vis[now.x])
+				continue;
+			vis[now.x] = 1;
+			int len = G2[now.x].size();
+			for (int j = 0; j < len; j++)
+			{
+				pair<int, int>i = G2[now.x][j];
+				if (H[i.first] > now.w + i.second)
+					H[i.first] = now.w + i.second, Q.push({ i.first, now.w + i.second });
+			}
+		}
+		int flag = 0;
+		if (H[s] <= t)
+		{
+			q.push({ s, 0 });
+			while (!q.empty())
+			{
+				node now = q.top();
+				q.pop();
+				cnt[now.x]++; //通知
+				if (now.x == e && cnt[e] == k)
+				{
+					if (now.w <= t)
+					{
+						puts("yareyaredawa");
+						flag = 1;
+					}
+					break;
+				}
+				if (cnt[now.x] > k)
+					continue;
+				int len = G1[now.x].size();
+				for (int j = 0; j < len; j++) 
+				{
+					pair<int, int>i = G1[now.x][j];
+					q.push({ i.first, now.w + i.second });
+				}
+			}
+		}
+		if (!flag)
+			puts("Whitesnake!");
+		for (int i = 1; i <= n; i++)
+			G1[i].clear(), G2[i].clear(), vis[i] = cnt[i] = 0;
+	}
+	return TIME;
+}

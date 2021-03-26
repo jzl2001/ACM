@@ -1,0 +1,97 @@
+https://vjudge.net/contest/380790#problem/L
+分层图最短路
+#pragma GCC optimize(2)
+#pragma GCC optimize(3)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll d[N][11];
+int vis[N][11];
+int k;
+vector<pair<int, int>>G[N];
+struct node
+{
+	int x;
+	int cnt;
+	ll w;
+	bool operator < (const node &oth)const
+	{
+		return w > oth.w;
+	}
+};
+void dijkstra()
+{
+	memset(d, 0x3f, sizeof d);
+	memset(vis, 0, sizeof vis);
+	priority_queue<node>pq;
+	d[1][0] = 0;
+	pq.push({ 1, 0, 0 });
+	while (!pq.empty())
+	{
+		int x = pq.top().x;
+		int cnt = pq.top().cnt;
+		ll w = pq.top().w;
+		pq.pop();
+		if (vis[x][cnt])
+			continue;
+		vis[x][cnt] = 1;
+		for (auto &i : G[x])
+		{
+			if (d[x][cnt] + i.second < d[i.first][cnt])
+				d[i.first][cnt] = d[x][cnt] + i.second, pq.push({ i.first, cnt, d[i.first][cnt] });
+			if (cnt != k)
+				if (d[x][cnt] < d[i.first][cnt + 1])
+					d[i.first][cnt + 1] = d[x][cnt], pq.push({ i.first, cnt + 1, d[i.first][cnt + 1] });
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		cin >> n >> m >> k;
+		for (int i = 1; i <= m; i++)
+		{
+			int u, v, w;
+			scanf("%d%d%d", &u, &v, &w);
+			G[u].push_back({ v, w });
+		}
+		dijkstra();
+		ll ans = LINF;
+		for (int i = 0; i <= k; i++)
+		{
+			ans = min(ans, d[n][i]);
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			G[i].clear();
+		}
+		printf("%lld\n", ans);
+	}
+	return TIME;
+}

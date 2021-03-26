@@ -1,0 +1,164 @@
+链接：https://ac.nowcoder.com/acm/contest/7882/I
+来源：牛客网
+
+时间限制：C/C++ 4秒，其他语言8秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+ZYB likes to read detective novels and detective cartoons. One day he is immersed in such story:
+
+As a spy of country B, you have been lurking in country A for many years. There are nn troops and mm legions in country A, and each troop belongs to only one legion. Your task is to investigate which legion each troop belongs to.
+
+One day, you intercept a top secret message--a paper which records all the pairwise relationship between troops. You can learn from the paper that whether troop {i}i and troop {j}j belongs to the same legion for each {(i,j)}(i,j). However, each piece of data has a independent probability of \frac{1}{S} 
+S
+1
+​	
+  being reversed.
+Formally, the troop is numbered from {0}0 to {n-1}n−1, and the region is numbered from {0}0 to  {m-1}m−1. You are given \frac{n(n-1)}{2} 
+2
+n(n−1)
+​	
+  boolean numbers, indicating whether  {i}i and {j}j belong to the same region (1 for yes and 0 for no). However, every number will be reversed(i.e., 0 to 1 and 1 to 0) in a probablity of \frac{1}{S} 
+S
+1
+​	
+ . You can assume that the data is generated like this:
+
+
+
+be[i] means the region that troop {i}i belongs to. rand() can be considered as a uniform random function. i.e., select a integer from interval [0, \mathrm{lcm}(m, S)-1][0,lcm(m,S)−1] with equal probability.
+
+Note that you have already known {n}n and {S}S, but you don't know the exact value of mm. Please help country B construct the original data.
+输入描述:
+The input contains multiple cases. The first line of the input contains a single integer T\ (1 \le T \le 100)T (1≤T≤100), the number of cases.
+
+For each case, the first line of the input contains two integers {n,S}n,S (30 \le n \le 300,20 \le S \le 10030≤n≤300,20≤S≤100), denoting the number of troops and the integer parameter to generate data. There is a binary string (i.e. the string only contains '0' and '1') with length \frac{n(n-1)}{2} 
+2
+n(n−1)
+​	
+  in the next line, decribing the pairwise relationship. It is arrayed like this: (0,1),(0,2)...(0,n-1),(1,2) \dots (n-3,n-1),(n-2,n-1)(0,1),(0,2)...(0,n−1),(1,2)…(n−3,n−1),(n−2,n−1).
+
+{m}m is not given but it is guaranteed that 1 \le m \le \lfloor \frac{n}{30} \rfloor1≤m≤⌊ 
+30
+n
+​	
+ ⌋. And the sum of {n}n over {T}T cases doesn't exceed {1200}1200.
+输出描述:
+For each case, output  integers seperated by space, the $i$-th integer describes be[i]. The value of be[i] is meaningless, so please output the solution with the smallest lexicographical order. For example, if there are 4 troops and 2 regions {\{0,3\},\{1,2\}}{0,3},{1,2}, you should output 0 \ 1 \ 1 \ 00 1 1 0.
+示例1
+输入
+复制
+1
+10 20
+101110101010101010100010010101010100101010010
+输出
+复制
+0 0 1 0 1 0 1 0 1 0
+备注:
+The sample input does not follow the input format, and it won't appear in the final test. The parameter is {n=10,m=2,S=20}n=10,m=2,S=20.
+题意：给出n个点，以及n个点跟其他点的关系，如果是1则是同一组，否则不同组，但是有1/S的概率反转。求原来的分组字典序最小。
+做法每次加入未分组的点为新的集合，然后看下这些点跟这个点集里面的点同一组的个数。因为S很小所以反转的个数不多，大于10即可。
+#include <iostream>
+#include <set>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+#include <assert.h>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+#include <string>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+int a[310][310];
+vector<int>group;
+int ans[310];
+int tot[310];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, s;
+		string m;
+		cin >> n >> s >> m;
+		int g = n / 30;
+		int be = 0, st = 0;
+		for (int i = 0; i < m.size();)
+		{
+			int w = st;
+			for (int u = 1; u < n - w; u++, i++)
+			{
+				a[be][++st] = m[i] - '0';
+				a[st][be] = m[i] - '0';
+			}
+			a[be][be] = 1;
+			++be;
+			st = be;
+		}
+		memset(ans, -1, sizeof ans);
+		int cnt = 0;
+		for (int i = 0; i < n; i++)
+		{
+			if (~ans[i])
+				continue;
+			memset(tot, 0, sizeof tot);
+			group.clear();
+			for (int j = 0; j < n; j++)
+			{
+				if (a[i][j] && ans[j] == -1)
+				{
+					group.push_back(j);
+				}
+			}
+			int mx = 0;
+			for (auto & i : group)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					if (a[i][j])
+					{
+						tot[j]++, mx = max(mx, tot[j]);
+					}
+				}
+			}
+			for (int j = 0; j < n; j++)
+			{
+				if (tot[j] > 10)
+				{
+					ans[j] = cnt;
+				}
+			}
+			++cnt;
+		}
+		for (int i = 0; i < n; i++)
+		{
+			cout << ans[i] << " ";
+		}
+		cout << endl;
+	}
+	return TIME;
+}

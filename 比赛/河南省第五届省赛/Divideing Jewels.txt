@@ -1,0 +1,50 @@
+#include<iostream>
+#include<string.h>
+#include<algorithm>
+using namespace std;
+const int N = 1e5 + 10;
+int a[20], b[N];
+int d[N];
+int main(){	
+	//freopen("D:/input.txt", "r", stdin);
+	int cnt = 0;
+	while (true)
+	{
+		memset(d, 0, sizeof d);
+		cnt++;
+		int sum = 0;
+		for (int i = 1; i <= 10; i++)
+			cin >> a[i], sum += a[i] * i;
+		if (sum == 0)
+		{
+			cout << endl;
+			return 0;
+		}
+		if (sum % 2 != 0)
+			printf("#%d:Can't be divided.\n", cnt);
+		else
+		{
+			int x = 0;
+			int m = sum / 2;
+			for (int i = 1; i <= 10; i++)
+			{
+				for (int j = 1; j <= a[i]; j <<= 1)
+				{
+					b[x++] = i * j;
+					a[i] -= j;
+				}
+				if (a[i] > 0)
+					b[x++] = i * a[i] ;
+			}
+			for (int i = 0; i < x; i++)
+				for (int j = m; j >= b[i]; j--)
+					d[j] = max(d[j], d[j - b[i]] + b[i]);
+			if (d[m] == m)
+				printf("#%d:Can be divided.\n", cnt);
+			else
+				printf("#%d:Can't be divided.\n", cnt);
+		}
+		cout << endl;
+	}
+	return 0;
+}

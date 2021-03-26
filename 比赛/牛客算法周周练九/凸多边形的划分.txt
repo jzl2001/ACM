@@ -1,0 +1,70 @@
+链接：https://ac.nowcoder.com/acm/problem/50500
+来源：牛客网
+
+题目描述 
+给定一个具有N个顶点的凸多边形，将顶点从1至N标号，每个顶点的权值都是一个正整数。将这个凸多边形划分成N-2个互不相交的三角形，试求这些三角形顶点的权值乘积和至少为多少。
+输入描述:
+输入第一行为顶点数N
+第二行依次为顶点1至顶点N的权值。
+输出描述:
+输出仅一行，为这些三角形顶点的权值乘积和的最小值。
+示例1
+输入
+复制
+5
+121 122 123 245 231
+输出
+复制
+12214884
+备注:
+对于100 \%100%的数据，有N \leq 50N≤50，每个点权值小于10^910 
+9。
+区间dp， 高精度。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 100 + 10;
+const int mod = 998244353;
+ 
+__int128_t d[N][N];
+__int128_t a[N];
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; i++)
+    {
+        int num;
+        cin >> num;
+        a[i] = num;
+    }
+    for (int len = 3; len <= n; len++)
+    {
+        for (int i = 1; i + len - 1 <= n; i++)
+        {
+            int j = i + len - 1;
+            d[i][j] = 1e36;
+            for (int k = i + 1; k <= j - 1; k++)
+            {
+                d[i][j] = min(d[i][j], d[i][k] + d[k][j] + a[i] * a[j] * a[k]);
+            }
+        }
+    }
+    ll base = 1e18;
+    if (d[1][n] < base)
+        printf("%lld\n", (ll)d[1][n]);
+    else
+        printf("%lld%018lld\n", (ll)(d[1][n] / base), (ll)(d[1][n] % base));
+    return TIME;
+}

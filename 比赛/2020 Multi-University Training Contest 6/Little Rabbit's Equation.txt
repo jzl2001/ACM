@@ -1,0 +1,143 @@
+Time Limit: 2000/1000 MS (Java/Others)    Memory Limit: 65536/65536 K (Java/Others)
+Total Submission(s): 1023    Accepted Submission(s): 449
+
+
+Problem Description
+Little Rabbit is interested in radix. In a positional numeral system, the radix is the number of unique digits, including the digit 0, used to represent numbers. For example, for the decimal system (the most common system in use today) the radix is ten, because it uses the ten digits from 0 to 9. Generally, in a system with radix b (b>1), a string of digits d1…dn denotes the number d1bn−1+d2bn−2+⋯+dnb0, where 0≤di<b.
+
+Little Rabbit casually writes down an equation. He wonders which radix this equation fits.
+ 
+
+Input
+The are several test cases. Each test case contains a string in a line, which represents the equation Little Rabbit writes down. The length of the string is at most 15. The input is terminated by the end-of-file.
+
+The equation's format: number, operator, number, =, number. There's no whitespace in the string.
+
+Each number has at least 1 digit, which may contain digital numbers 0 to 9 or uppercase letters A to F (which represent decimal 10 to 15). The number is guaranteed to be a non-negative integer, which means it doesn't contain the radix point or negative sign. But the number may contain leading zeros.
+
+The operator refers to one of +, −, ∗, or /. It is guaranteed that the number after / will not be equal to 0. Please note that the division here is not integer division, so 7/2=3 is not correct.
+ 
+
+Output
+For each test case, output an integer r (2≤r≤16) in a line, which means the equation is correct in the system with radix r. If there are multiple answers, output the minimum one. If there is no answer between 2 and 16, output −1.
+ 
+
+Sample Input
+1+1=10
+18-9=9
+AA*AA=70E4
+7/2=3
+ 
+
+Sample Output
+2
+10
+16
+-1
+ 
+
+Source
+2020 Multi-University Training Contest 6
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+<进制转化><模拟>
+Statistic | Submit | Discuss | Note
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+int get(char x)
+{
+	if (x <= 'F' && x >= 'A')
+		return x - 'A' + 10;
+	return x - '0';
+}
+bool check(string s1, char op, string s2, string s3, int r)
+{
+	ll num1 = 0, num2 = 0, num3 = 0;
+	for (int i = 0; i < s1.size(); i++)
+	{
+		num1 = num1 * r + get(s1[i]);
+	}
+	for (int i = 0; i < s2.size(); i++)
+	{
+		num2 = num2 * r + get(s2[i]);
+	}
+	for (int i = 0; i < s3.size(); i++)
+	{
+		num3 = num3 * r + get(s3[i]);
+	}
+	if (op == '/')
+		return num1 % num2 == 0 && num1 / num2 == num3;
+	else
+		if (op == '+')
+			return num1 + num2 == num3;
+		else
+			if (op == '-')
+				return num1 - num2 == num3;
+			else
+				if (op == '*')
+					return num1 * num2 == num3;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	string s;
+	while (cin >> s)
+	{
+		int mi = 2;
+		string s1, s2, s3;
+		char op;
+		int si, fi = s.find('=');
+		for (int i = 0; i < s.size(); i++)
+		{
+			if (s[i] == '+' || s[i] == '*' || s[i] == '-' || s[i] == '/')
+			{
+				si = i;
+			}
+			else
+				if (s[i] != '=')
+				{
+					mi = max(mi, get(s[i]) + 1);
+				}
+		}
+		s1 = s.substr(0, si);
+		op = s[si];
+		s2 = s.substr(si + 1, fi - si - 1);
+		s3 = s.substr(fi + 1);
+		for (int i = max(2, mi); i <= 16; i++)
+		{
+			if (check(s1, op, s2, s3, i))
+			{
+				cout << i << endl;
+				goto brk;
+			}
+		}
+		puts("-1");
+	brk:;
+	}
+	return TIME;
+}

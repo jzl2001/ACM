@@ -1,0 +1,123 @@
+#include <algorithm>　　　
+#include <bitset>　　　　　
+#include <cctype>         
+#include <cerrno> 　　　　
+#include <cfloat>　　　　
+#include <ciso646>      
+#include <climits> 　　　
+#include <clocale> 　　
+#include <cmath> 　　　
+#include <complex>　　　　
+#include <csignal>      
+#include <csetjmp>       
+#include <cstdarg>       
+#include <cstddef>        
+#include <cstdio> 　　　
+#include <cstdlib> 　　　　
+#include <cstring> 　　　　
+#include <ctime> 　　　　　
+#include <cwchar> 　　　　
+#include <cwctype> 　　　　
+#include <deque>　　　　　
+#include <exception>　　　
+#include <fstream> 　　　
+#include <functional>　
+#include <limits> 　　　　
+#include <list>　　　　　　
+#include <locale>        
+#include <map>　　　　　
+#include <memory>         
+#include<new>            
+#include <numeric>        
+#include <iomanip> 　　　 
+#include <ios>　　　　　　
+#include <iosfwd>　　　　　
+#include <iostream> 　　　
+#include <istream>　　　
+#include <iterator>      
+#include <ostream>　　
+#include <queue>　　　　
+#include <set>　　　　　　 
+#include <sstream>　　　　
+#include <stack>　　　　
+#include <stdexcept>　　　
+#include <streambuf>　　　
+#include <string>　　　　　
+#include <typeinfo>        
+#include <utility>　　　　
+#include <valarray>        
+#include <vector>
+using namespace std; //油傍遊猟周謹嘉膿 
+int a[110][110];
+bool vis[110][110];
+int mx, mi, n;
+int flag = 0;
+int MIN, MAX;
+int dir[4][2] = { 0, 1, 0, -1, 1, 0, -1, 0 };
+void dfs(int x, int y)
+{
+    if (flag)
+        return;
+    if (a[x][y] < MIN || a[x][y] > MAX || x < 1|| x > n || y < 1 || y > n)
+        return;
+    if (x == n && y == n)
+    {
+        flag = 1;
+        return;
+    }
+    //return ;
+    for (int i = 0; i < 4; i++)
+    {
+        int xx = x + dir[i][0];
+        int yy = y + dir[i][1];
+        if(vis[xx][yy] == 0)
+        {
+            vis[xx][yy] = 1;
+            dfs(xx, yy);
+        }
+      
+    //  vis[xx][yy] = 0;
+    }
+    return;
+}
+int check(int mid)
+{
+    for (int i = mi; i <= mx + mid; i++)
+    {
+        flag = 0;
+        memset(vis, 0, sizeof vis);
+        MIN = i, MAX = i + mid;
+        vis[1][1] = 1;
+        dfs(1, 1);
+        if (flag)
+            return 1;
+    }
+    return 0;
+}
+int main(){
+    while (cin >> n)
+    {
+        mx = -1;
+        mi = 0x3f3f3f;
+    //  memset(a, -1, sizeof a);
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= n; j++)
+            {
+                scanf("%d", &a[i][j]);
+                mx = max(mx, a[i][j]);
+                mi = min(mi, a[i][j]);
+            }
+        int l = 0, r = mx - mi;
+        int ans = 0;
+        while (l <= r)
+        {
+            int mid = (l + r) / 2;
+            if (check(mid))
+                ans = mid, r = mid - 1;
+            else
+                l = mid + 1;
+        }
+        cout << ans << endl;
+    }
+    return 0;
+}

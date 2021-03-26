@@ -1,0 +1,131 @@
+Located at the easternmost tip of Shandon Peninsula, Weihai is one of the most famous tourist destinations all over China. There are beautiful hills, seas, bays, springs, islands, and beautiful beaches in Weihai. It is also a coastal city abundant in seafood, including prawn, sea cucumber, abalone, shellfish, and algae.
+
+Attracted by the distinctive scenery and pleasant environment, three theoretical computer scientists plan to have a trip to Weihai. However, they cannot reach a consensus on accommodation, since some people prefer some hotels while other people like others. They decide to stay in separate hotels at night and meet in one hotel the next day. The hotel they meet may not necessarily be one of the hotels they stay in.
+
+There are some roads connecting the hotels in Weihai. The roads are specially designed such that there is a unique path between every pair of hotels. Every theoretical computer scientist has prepared a list of candidate hotels before their trip starts. When they arrive in Weihai, each of them will uniformly and independently choose one hotel from the candidate hotel list. Also, they will meet in a hotel such that the total length of their routes is minimized. As a member of the theoretical computer science group, can you tell the expected total length of their routes?
+
+Input Specification:
+The first line of the input contains a single integer n (1≤n≤200000), denoting the number of hotels in Weihai. Then follow n−1 lines, describing the roads connecting the hotels. Each of the n−1 lines contains three integers u,v,w (1≤u,v≤n,u≠v,1≤w≤1000), denoting a road of length w connecting the hotels numbered u and v. It is guaranteed that there is a unique path between every pair of hotels.
+
+The last three lines of the input specify the candidate hotel lists, one for each theoretical computer scientist. Each line begins with a single integer m (1≤m≤n) and m distinct integers a
+​1
+​​ ,a
+​2
+​​ ,⋯,a
+​m
+​​  (1≤a
+​i
+​​ ≤n), meaning that the candidate hotel list contains the hotels numbered a
+​1
+​​ ,a
+​2
+​​ ,⋯,a
+​m
+​​ .
+
+Output Specification:
+Print the expected total length of their routes within an absolute or relative error of no more than 10
+​−6
+​​ .
+
+Sample Input 1:
+3
+1 2 1
+2 3 2
+1 1
+1 2
+1 3
+Sample Output 1:
+3
+Sample Input 2:
+5
+1 2 3
+1 3 5
+2 4 7
+2 5 11
+3 2 4 5
+4 1 2 3 5
+2 1 3
+Sample Output 2:
+13.958333333333
+题意：给出一棵树，三个人要去约会，分别给出他们三个人可能住的酒店。
+他们约会一定会找到一个三个人到的距离之和最近的点约会。求三个人的期望约会距离。
+结论：树上a，b，c三点到某一点之和最小即(ab+bc+ac) / 2。
+#include <bits/stdc++.h>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 2e5 + 10;
+
+vector<pair<int, int>>G[N];
+ll a[4];
+ll m[4];
+ll d[N][4];
+double res;
+void dfs(int x, int fa)
+{
+	for (auto &i : G[x])
+	{
+		if (i.first == fa)
+			continue;
+		dfs(i.first, x);
+		for (int u = 1; u <= 3; u++)
+			d[x][u] += d[i.first][u];
+		ll tmp = 0;
+		tmp += d[i.first][1] * (m[2] - d[i.first][2]) * (m[3] - d[i.first][3]);
+		tmp += d[i.first][2] * (m[1] - d[i.first][1]) * (m[3] - d[i.first][3]);
+		tmp += d[i.first][3] * (m[1] - d[i.first][1]) * (m[2] - d[i.first][2]);
+		tmp += d[i.first][1] * d[i.first][2] * (m[3] - d[i.first][3]);
+		tmp += d[i.first][2] * d[i.first][3] * (m[1] - d[i.first][1]);
+		tmp += d[i.first][1] * d[i.first][3] * (m[2] - d[i.first][2]);
+		res += 1.0 * tmp * i.second / (m[1] * m[2] * m[3]);
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 1; i < n; i++)
+	{
+		int u, v, w;
+		scanf("%d%d%d", &u, &v, &w);
+		G[u].push_back({ v, w });
+		G[v].push_back({ u, w });
+	}
+	for (int i = 1; i <= 3; i++)
+	{
+		cin >> m[i];
+		for (int j = 1; j <= m[i]; j++)
+		{
+			int u;
+			scanf("%d", &u);
+			d[u][i] = 1;
+		}
+	}
+	dfs(1, 0);
+	printf("%.15f\n", res);
+	return TIME;
+}
+
+
+

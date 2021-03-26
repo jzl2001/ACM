@@ -1,0 +1,78 @@
+<hash><倍增>
+每次缩小不同的区间，然后比较第一个不同的字符
+#include <bits/stdc++.h>
+//#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+char str[N];
+int nxt[N][22];
+ull ha[N][22];
+ull base[N];
+bool check(int a, int b, int len)
+{
+	if (len == 0)
+		return str[a] > str[b];
+	if (ha[a][len - 1] != ha[b][len - 1])
+		return check(a, b, len - 1);
+	else
+		return check(nxt[a][len - 1], nxt[b][len - 1], len - 1);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	int kcase = 0;
+	base[0] = 1;
+	for (int i = 1; i < N; i++)
+		base[i] = base[i - 1] * hash_;
+	while (t--)
+	{
+		printf("Case #%d: ", ++kcase);
+		int n;
+		scanf("%d", &n);
+		scanf("%s", str);
+		for (int i = 0; i < n; i++)
+			nxt[i][0] = (1LL * i * i + 1) % n;
+		for (int j = 1; j <= 19; j++)
+			for (int i = 0; i < n; i++)
+				nxt[i][j] = nxt[nxt[i][j - 1]][j - 1];
+		for (int i = 0; i < n; i++)
+			ha[i][0] = str[i];
+		for (int j = 1; j <= 19; j++)
+			for (int i = 0; i < n; i++)
+				ha[i][j] = ha[i][j - 1] * base[1 << (j - 1)] + ha[nxt[i][j - 1]][j - 1];
+		int idx = 0;
+		for (int i = 1; i < n; i++)
+		{
+			if (check(i, idx, 19))
+			{
+				idx = i;
+			}
+		}
+		for (int i = 0; i < n; i++, idx = nxt[idx][0])
+			cout << str[idx];
+		cout << endl;
+	}
+	return TIME;
+}

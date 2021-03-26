@@ -1,0 +1,158 @@
+A prime number (or a prime) is a natural number greater than 
+1
+ that cannot be formed by multiplying two smaller natural numbers.
+
+Now lets define a number 
+N
+ as the supreme number if and only if each number made up of an non-empty subsequence of all the numeric digits of 
+N
+ must be either a prime number or 
+1
+.
+
+For example, 
+17
+ is a supreme number because 
+1
+, 
+7
+, 
+17
+ are all prime numbers or 
+1
+, and 
+19
+ is not, because 
+9
+ is not a prime number.
+
+Now you are given an integer 
+N
+ 
+(
+2
+≤
+N
+≤
+10
+100
+)
+, could you find the maximal supreme number that does not exceed 
+N
+?
+
+Input
+In the first line, there is an integer 
+T
+ 
+(
+T
+≤
+100000
+)
+ indicating the numbers of test cases.
+
+In the following 
+T
+ lines, there is an integer 
+N
+ 
+(
+2
+≤
+N
+≤
+10
+100
+)
+.
+
+Output
+For each test case print "Case #x: y", in which 
+x
+ is the order number of the test case and 
+y
+ is the answer.
+
+Sample Input
+2
+6
+100
+Sample Output
+Case #1: 5
+Case #2: 73
+求第一个小于等于n的数字，满足子序列都是素数。
+打表，数字最大为317
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+bool is_prime(int num)
+{
+	int k = sqrt(num);
+	for (int i = 2; i <= k; i++)
+		if (num % i == 0)
+			return false;
+	return true;
+}
+bool check(string num)
+{
+	int len = num.size();
+	for (int i = 1; i < (1 << len); i++)
+	{
+		string ans;
+		for (int j = 0; j < len; j++)
+		{
+			if (i & (1 << j))
+				ans.push_back(num[j]);
+		}
+		if (!is_prime(stoi(ans)))
+			return false;
+	}
+	return true;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	vector<int>v;
+	for (int i = 1; i <= 10000; i++)
+		if (check(to_string(i)))
+		{
+			v.push_back(i);
+		//	cout << i << endl;
+		}
+	int t;
+	cin >> t;
+	int kcase = 0;
+	while (t--)
+	{
+		printf("Case #%d: ", ++kcase);
+		string s;
+		cin >> s;
+		if (s.size() > 4)
+			puts("317");
+		else
+			printf("%d\n", *(--upper_bound(v.begin(), v.end(), stoi(s))));
+	}
+	return TIME;
+}

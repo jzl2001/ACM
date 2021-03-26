@@ -1,0 +1,148 @@
+求不同颜色的点之间的直径，任意处理出每种颜色的直径。
+然后四种情况求dis取max。
+链接：https://ac.nowcoder.com/acm/problem/18391
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+小N所在城市有n个漂亮的公园。有恰好n-1条双向道路连接这n个公园，保证公园间相互可以通过道路到达。每个公园i都有一个专属的属性c[i]，表示这个公园的特色。
+现在小N有q个疑问。每次他会有两个特定的特色x和y（这两个数可能相同）。他想知道，假如他随便选取一个特色为x的公园出发，必须走到一个特色为y的公园结束，在最优情况下，他最远能走过多少条道路。换句话说，枚举所有的满足c[p] = x的公园p，所有满足c[q] = y的公园q，求出p,q距离的最大值。
+输入描述:
+第一行两个整数n和q。
+第二行n个整数，第i个整数表示第i个公园对应的特色c[i]。
+接下来n-1行，每行两个整数u和v，表示有一条连接公园u和公园v的道路。
+接下来q行，每行两个整数x和y，代表小N的一个疑问。
+数据保证：n ≤ 105, q ≤ 105, 1 ≤ u, v ≤ n, 0 ≤ c[i], x, y ≤ 109
+输出描述:
+输出共q行，每行对于小N的一个疑问的答案。注意，假如一个疑问中，不存在一个公园特色为x，或不存在一个公园特色为y，那么输出答案0。代表小N一条边都走不了。
+示例1
+输入
+复制
+10 4
+9 8 9 8 9 8 7 7 8 7
+4 5
+5 10
+10 3
+3 9
+9 1
+1 8
+5 7
+10 6
+8 2
+5 8
+8 8
+7 9
+8 9
+输出
+复制
+0
+7
+5
+6
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+const int N = 1e6 + 10;
+
+int c[N];
+vector<int>G[N];
+unordered_map<int, int>mp;
+pair<int, int>cx[N];
+vector<int>color[N];
+int d[N][20];
+int dep[N];
+void dfs(int x, int f)
+{
+	dep[x] = dep[f] + 1;
+	d[x][0] = f;
+	for (int i = 1; i < 20; ++i)
+		d[x][i] = d[d[x][i - 1]][i - 1];
+	for (int y : G[x])
+		if (y != f)
+			dfs(y, x);
+}
+int LCA(int x, int y)
+{
+	if (dep[x] < dep[y])
+		swap(x, y);
+	for (int i = 19; dep[x] != dep[y]; --i)
+		if (dep[d[x][i]] >= dep[y])
+			x = d[x][i];
+	if (x == y)
+		return x;
+	for (int i = 19; i >= 0; --i)
+		if (d[x][i] != d[y][i])
+			x = d[x][i], y = d[y][i];
+	return d[x][0];
+}
+int dis(int a, int b) //查a到b的距离
+{
+	return dep[a] + dep[b] - 2 * dep[LCA(a, b)];
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, q;
+	cin >> n >> q;
+	int idx = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d", &c[i]);
+		if (mp[c[i]] == 0)
+			mp[c[i]] = ++idx;
+		color[mp[c[i]]].push_back(i);
+	}
+	for (int i = 1; i <= n - 1; i++)
+	{
+		int u, v;
+		scanf("%d%d", &u, &v);
+		G[u].push_back(v);
+		G[v].push_back(u);
+	}
+	dfs(1, 0);
+	for (int i = 1; i <= idx; i++)
+	{
+		int jl = 0;
+		cx[i].first = color[i][0];
+		for (int j = 1; j < color[i].size(); j++)
+		{
+			int dd = dis(color[i][0], color[i][j]);
+			if (dd >= jl)
+				cx[i].first = color[i][j], jl = dd;
+		}
+		jl = 0;
+		for (int j = 0; j < color[i].size(); j++)
+		{
+			int dd = dis(cx[i].first, color[i][j]);
+			if (dd >= jl)
+				jl = dd, cx[i].second = color[i][j];
+		}
+	}
+	while (q--)
+	{
+		int x, y;
+		scanf("%d%d", &x, &y);
+		if (!mp[x] || !mp[y])
+			puts("0");
+		else
+		{
+			x = mp[x], y = mp[y];
+			printf("%d\n", max({ dis(cx[x].first, cx[y].first), dis(cx[x].first, cx[y].second), dis(cx[x].second, cx[y].first), dis(cx[x].second, cx[y].second) }));
+		}
+	}
+	return TIME;
+}

@@ -1,0 +1,128 @@
+链接：https://ac.nowcoder.com/acm/contest/7501/A
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+In MI Intelligent Warehouse, there are n_{}n 
+​	
+  products, where the i_{}i 
+​	
+ -th product is of size a_ia 
+i
+​	
+ . We always need to box producsts into all kinds of containers, and it will be safer and more cost efficient if for any two sizes of products, one is the other's multiple, since there won't be any residual room in one container. So for each boxing we need to choose some products that for any two chosen products, either a_ia 
+i
+​	
+  is multiple of a_ja 
+j
+​	
+  or a_ja 
+j
+​	
+  is multiple of a_ia 
+i
+​	
+ . Print the maximum number of products that can be chosen in one boxing.
+输入描述:
+The first line contains one integer n~(1\le n \le 2\times 10^5)n (1≤n≤2×10 
+5
+ ).
+
+The second line contains n_{}n 
+​	
+  integers a_1, a_2, \cdots, a_n~(1\le a_i \le 10^7)a 
+1
+​	
+ ,a 
+2
+​	
+ ,⋯,a 
+n
+​	
+  (1≤a 
+i
+​	
+ ≤10 
+7
+ ).
+输出描述:
+Only one line containing one integer, denoting the maximum number of products we can choose in one boxing.
+示例1
+输入
+复制
+6
+1 4 2 8 5 7
+输出
+复制
+4
+说明
+One possible choice is {1, 4, 2, 8}.
+
+题意：给出n个数字，求最大的一个集合满足里面的某个数字一定有一个数字跟他互为约数。
+肯定是用一个数字更新他的倍数，然后取max。枚举素数，直接枚举约数会超时。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e7 + 10;
+
+int d[N];
+int a[N];
+int vis[N];
+int prime[N];
+void Euler()
+{
+	for (int i = 2; i < N; i++)
+	{
+		if (!vis[i])
+			prime[++prime[0]] = i;
+		for (int j = 1; j <= prime[0] && i * prime[j] < N; j++)
+		{
+			vis[i * prime[j]] = 1;
+			if (i % prime[j] == 0)
+				break;
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	//freopen("C:/input.txt", "r", stdin);
+#endif
+	Euler();
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		int num;
+		scanf("%d", &num), a[num]++;		
+	}
+	for (int i = 1; i <= N - 10; i++)
+	{
+		d[i] += a[i]; 
+		for (int j = 1; j <= prime[0] && i * prime[j] <= N - 10; j++)
+			d[i * prime[j]] = max(d[i * prime[j]], d[i]);
+	}
+	int ans = 0;
+	for (int i = 1; i <= N - 10; i++)
+		if (a[i])
+			ans = max(ans, d[i]);
+	cout << ans << endl;
+	return TIME;
+}

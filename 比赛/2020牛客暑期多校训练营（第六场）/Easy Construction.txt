@@ -1,0 +1,102 @@
+链接：https://ac.nowcoder.com/acm/contest/8100/E
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+Special Judge, 64bit IO Format: %lld
+题目描述 
+Roundgod is given n_{}, k_{}n 
+​	
+ ,k 
+​	
+ , construct a permutation PP of 1\sim n1∼n satisfying that for all integers i_{}i 
+​	
+  in [1, n]_{}[1,n] 
+​	
+ , there exists a contiguous subarray in PP of length i_{}i 
+​	
+  whose sum is kk modulo nn. If there are multiple solutions, print any of them. If there is no solution, print "-1" in one line.
+输入描述:
+The first line contains two integers n, k~(1\le n \le 5000, 0\le k < n)n,k (1≤n≤5000,0≤k<n).
+输出描述:
+Print n_{}n 
+​	
+  integers, the answer permutation in one line if such permutation exists, or print "-1" in one line if no solution exists.
+示例1
+输入
+复制
+2 1
+输出
+复制
+1 2
+说明
+The sum of subintervals [1],[1,2][1],[1,2] both satisfy \equiv 1 \pmod{2}≡1(mod2), and their lengths are 1,21,2 respectively.
+示例2
+输入
+复制
+3 1
+输出
+复制
+-1
+题意：给出n，k。
+求一个1~n的排列，使得里面含有长度为1~n的连续子序列使得sum%n=k，打表找规律，奇数必须k=0，偶数必须k=n/2。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e4 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+int main()
+{
+#ifdef LOCAL
+	//freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, k;
+	cin >> n >> k;
+	if (n % 2 == 0)
+	{
+		if (n / 2 != k)
+		{
+			puts("-1");
+			return 0;
+		}
+		for (int i = 1; i < k; i++)
+		{
+			cout << i << " " << n - i << " ";
+		}
+		cout << k << " " << n << endl;
+	}
+	else
+	{
+		if (k != 0)
+		{
+			puts("-1");
+		}
+		else
+		{
+			for (int i = 1; i <= n / 2; i++)
+			{
+				cout << i << " " << n - i << " ";
+			}
+			cout << n << endl;
+		}
+	}
+	return 0;
+}

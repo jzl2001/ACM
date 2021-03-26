@@ -1,0 +1,83 @@
+题目描述
+
+学院一共有 n 位学生，用 1 编号。每天，学院都会派遣辅导员给学生发送若干通知，以保证各项措施、活动消息得到落实。
+现在，学院要求辅导员发送一条关于光盘行动的通知。对于通知信息，同学们的反应往往各不相同，辅导员预测出第 i 号学生收到通知后会产生 wi 的愉悦度。此外，辅导员还观察到第 i 号学生会在 [ai,bi]时间段内实时查阅通知消息，能够收到这段时间内的所有通知；而其他时间将无法收到通知（愉悦度为 0）。
+辅导员会选择在某一时刻发布一次通知消息，他希望在至少有 k 名同学收到通知的前提下，使得同学们的总体愉悦度最大。同学们的总体愉悦度是所有同学愉悦度的异或和。请聪明的你帮助辅导员计算最大的总体愉悦度。
+
+输入
+
+第一行包含两个整数 n, k (1≤n≤5×105,1≤k≤n)，含义见题目描述。
+接下来 n 行，每行包含三个整数 ai, bi, wi (1≤ai≤bi≤109, 0≤wi≤109)，含义见题目描述。
+
+输出
+
+输出一行一个整数，即最大的总体愉悦度。若不可能有至少 k 名同学收到通知，输出 −1。
+
+样例输入 Copy
+
+5 1
+1 5 8
+3 6 2
+7 8 4
+8 9 0
+10 10 1
+样例输出 Copy
+
+10
+提示
+
+样例输入二
+2 2 3 5 8 1 2 4
+样例输出二
+-1
+
+
+第一个样例中，辅导员可以选择在时刻 3 发送通知，这样第 1 位和第 2 位同学会收到通知，总体愉悦度可取到最大值，为8⊕2=10。当然，最大的合法方案不止这一种，也可以选择在时刻 5 发送通知，总体愉悦度为 1。
+第二个样例中，无论选取哪一时刻发布通知，都无法让两位同学均接收消息，故输出 −1。
+
+思路：
+比较裸的一个离散化差分，因为要差分，所以注意一下右端点加1。
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+ 
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const int N = 5e5 + 10;
+ 
+int d[N * 2];
+int e[N * 2];
+int a[N], b[N], c[N];
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int n, k;
+    cin >> n >> k;
+    vector<int>v;
+    for (int i = 1; i <= n; i++)
+    {
+        scanf("%d%d%d", &a[i], &b[i], &c[i]);
+        v.push_back(a[i]), v.push_back(b[i] + 1);
+    }
+    sort(v.begin(), v.end());
+    int cnt = v.erase(unique(v.begin(), v.end()), v.end()) - v.begin();
+    for (int i = 1; i <= n; i++)
+    {
+        int bg = lower_bound(v.begin(), v.end(), a[i]) - v.begin() + 1;
+        int ed = lower_bound(v.begin(), v.end(), b[i] + 1) - v.begin() + 1;
+        d[bg] ^= c[i], d[ed] ^= c[i];
+        e[bg]++, e[ed]--;
+    }
+    int ans = -1;
+    for (int i = 1; i <= cnt; i++)
+    {
+        d[i] ^= d[i - 1];
+        e[i] += e[i - 1];
+        if (e[i] >= k)
+            ans = max(ans, d[i]);
+    }
+    cout << ans << endl;
+    return 0;
+}

@@ -1,0 +1,125 @@
+http://acm.hdu.edu.cn/showproblem.php?pid=6763
+Total Eclipse
+Time Limit: 3000/3000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 1388    Accepted Submission(s): 488
+
+
+Problem Description
+There are n cities and m bidirectional roads in Byteland. These cities are labeled by 1,2,…,n, the brightness of the i-th city is bi.
+
+Magician Sunset wants to play a joke on Byteland by making a total eclipse such that the brightness of every city becomes zero. Sunset can do the following operations for arbitrary number of times:
+
+· Select an integer k (1≤k≤n).
+
+· Select k distinct cities c1,c2,…,ck (1≤ci≤n) such that they are connected with each other. In other words, for every pair of distinct selected cities ci and cj (1≤i<j≤k), if you are at city ci, you can reach city cj without visiting cities not in {c1,c2,…,ck}.
+
+· For every selected city ci (1≤i≤k), decrease bci by 1.
+
+Note that Sunset will always choose k with the maximum possible value. Now Sunset is wondering what is the minimum number of operations he needs to do, please write a program to help him.
+ 
+
+Input
+The first line of the input contains a single integer T (1≤T≤10), the number of test cases.
+
+For each case, the first line of the input contains two integers n and m (1≤n≤100000, 1≤m≤200000), denoting the number of cities and the number of roads.
+
+The second line of the input contains n integers b1,b2,…,bn (1≤bi≤109), denoting the brightness of each city.
+
+Each of the following m lines contains two integers ui and vi (1≤ui,vi≤n,ui≠vi), denoting an bidirectional road between the ui-th city and the vi-th city. Note that there may be multiple roads between the same pair of cities.
+ 
+
+Output
+For each test case, output a single line containing an integer, the minimum number of operations.
+ 
+
+Sample Input
+1
+3 2
+3 2 3
+1 2
+2 3
+ 
+
+Sample Output
+4
+ 
+
+Source
+2020 Multi-University Training Contest 2
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6774 6773 6772 6771 6770 
+<并查集><贪心>
+题意是每个点有个值，每次可以选一个联通块，使得联通块内的每个点的值都减去1.
+每次选择一个最大的联通块，然后按权值排序遍历，每次选择某个点的时候可以看下之前的
+点，如果相联且不是一个联通块内，可以减去较小值，等价于上次选相连点的时候给这个点
+也选了。
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+typedef long long ll;
+typedef unsigned long long ull;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+vector<int>G[N];
+int pre[N];
+int vis[N];
+int a[N];
+int b[N];
+int find(int x)
+{
+	return pre[x] == x ? x : pre[x] = find(pre[x]);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(vis, 0, sizeof vis);
+		int n, m;
+		cin >> n >> m;
+		for (int i = 1; i <= n; i++)
+		{
+			pre[i] = i;
+			a[i] = i;
+			scanf("%d", &b[i]);
+		}
+		for (int i = 1; i <= m; i++)
+		{
+			int u, v;
+			scanf("%d%d", &u, &v);
+			G[u].push_back(v);
+			G[v].push_back(u);
+		}
+		ll ans = 0;
+		sort(a + 1, a + n + 1, [&](int x, int y) { return b[x] > b[y]; });
+		for (int i = 1; i <= n; i++)
+		{
+			int now = a[i];
+			ans += b[now];
+			vis[now] = 1;
+			for (auto &v : G[now])
+			{
+				if (now == find(v) || !vis[v])
+					continue;
+				ans -= min(b[v], b[now]);
+				pre[find(v)] = find(now);
+			}
+		}
+		cout << ans << endl;
+		for (int i = 1; i <= n; i++)
+			G[i].clear();
+	}
+	return TIME;
+}

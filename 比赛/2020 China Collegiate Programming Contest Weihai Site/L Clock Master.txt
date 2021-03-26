@@ -1,0 +1,105 @@
+With the rapid development of society, the demand for high-precision clocks is constantly rising. Recently, the China Clock Production Company is developing a new type of clock, which can represent a wide range of times.
+
+The novel clock displays the current time in an unusual fashion. The clock consists of several pointers, each controlled by a gear. All gears rotate synchronously -- one tooth per period. However, the numbers of teeth of the gears may differ. If a gear has t teeth, then the corresponding pointer can point to t different directions, denoted 0,1,2,⋯,t−1, respectively, where 0 is the initial direction. Furthermore, if a clock is equipped with n pointers, the i-th of which is controlled by a t
+​i
+​​ -tooth gear, then the i-th pointer will point to kmodt
+​i
+​​  after k periods of time.
+
+The price for a t-tooth gear is t yuan. Given a total budget of b yuan, you need to design a combination of gears, such that the number of valid combinations of directions of pointers is maximized, and the total cost on gears does not exceed the budget. A combination of directions (d
+​1
+​​ ,d
+​2
+​​ ,⋯,d
+​n
+​​ ) is valid, if it can be written for some nonnegative integer k, where t
+​i
+​​  is the number of teeth of the i-th gear. Since the answer may be too large, output the answer in natural logarithm (logarithm with base e=2.718281828⋯).
+
+Input Specification:
+The first line of input is a single integer T (1≤T≤30000), indicating the number of test cases. Each test case is a single line of an integer b (1≤b≤30000), denoting the total budget.
+
+Output Specification:
+For each test case, print the natural logarithm, within an absolute or relative error of no more than 10
+​−6
+​​ , of the maximum number of valid combinations, in a single line.
+
+Sample Input 1:
+3
+2
+7
+10
+Sample Output:
+0.693147181
+2.484906650
+3.401197382
+Notes:b
+For the second sample data, a 3-tooth gear along with a 4-tooth gear may yield 12 different combinations of directions, with total cost exactly being 7. So you should print the value of ln12, which is approximately 2.484906650.
+题意：给出一个数字b，将b分成几份齿轮，一个时间t，会显示
+为t % d1, t % d2 ... t % dn。
+问怎么分配，可以不全用使得显示的时间最多。
+即求x1+x2+...+xn<=b,LCM(x1,x2,...,xn)最大，结果取自然对数。
+分组背包，枚举素因子。
+#include <bits/stdc++.h>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+
+int prime[N];
+bool is_prime(int num)
+{
+	int k = sqrt(num);
+	for (int i = 2; i <= k; i++)
+	{
+		if (num % i == 0)
+			return false;
+	}
+	return true;
+}
+int num[N];
+double d[N];
+double lg[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int cnt = 0;
+	for (int i = 2; i <= 30000; i++)
+	{
+		lg[i] = log(i);
+		if (is_prime(i))
+			num[++cnt] = i;
+	}
+	for (int k = 1; k <= cnt; k++)
+		for (int i = 30000; i >= num[k]; i--)
+			for (int j = num[k]; j <= i; j *= num[k])
+				d[i] = max(d[i], d[i - j] + lg[j]);
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		scanf("%d", &n);
+		printf("%.15f\n", d[n]);
+	}
+	return TIME;
+}

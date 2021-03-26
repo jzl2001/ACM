@@ -1,0 +1,100 @@
+E. String Reversal
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+You are given a string s. You have to reverse it — that is, the first letter should become equal to the last letter before the reversal, the second letter should become equal to the second-to-last letter before the reversal — and so on. For example, if your goal is to reverse the string "abddea", you should get the string "aeddba". To accomplish your goal, you can swap the neighboring elements of the string.
+
+Your task is to calculate the minimum number of swaps you have to perform to reverse the given string.
+
+Input
+The first line contains one integer n (2≤n≤200000) — the length of s.
+
+The second line contains s — a string consisting of n lowercase Latin letters.
+
+Output
+Print one integer — the minimum number of swaps of neighboring elements you have to perform to reverse the string.
+
+Examples
+inputCopy
+5
+aaaza
+outputCopy
+2
+inputCopy
+6
+cbaabc
+outputCopy
+0
+inputCopy
+9
+icpcsguru
+outputCopy
+30
+Note
+In the first example, you have to swap the third and the fourth elements, so the string becomes "aazaa". Then you have to swap the second and the third elements, so the string becomes "azaaa". So, it is possible to reverse the string in two swaps.
+
+Since the string in the second example is a palindrome, you don't have to do anything to reverse it.
+
+题意：给出一个字符串，每次可以交换相邻两个位置的字符，询问将这个串反转的最小交换次数。
+思路：冒泡排序的交换次数即是逆序对的数目，求出每个位置最后要变换到的位置，求个逆序对即可。
+位置就是将反转后的串的每个字符的位置存下来，然后挨个分配，这样是最少次数，因为不按顺序会
+出现跨位置的现象，操作次数会变多。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+int tmp[N];
+int arr[N];
+ll ans; //逆序对数目
+char s[N];
+char t[N];
+
+void merge(int arr[], int L, int mid, int R)
+{
+	int k = 0;
+	int i = L, j = mid + 1;
+	while (i <= mid && j <= R)
+	{
+		if (arr[i] <= arr[j])
+			tmp[k++] = arr[i++];
+		else
+			tmp[k++] = arr[j++], ans += mid - i + 1; //此时a[j] < a[i] 则[i, mid]都比a[j]大。
+	}
+	while (j <= R)
+		tmp[k++] = arr[j++];
+	while (i <= mid)
+		tmp[k++] = arr[i++];
+	for (j = 0, i = L; j < k; j++, i++)
+		arr[i] = tmp[j];
+}
+void mergeSort(int arr[], int L, int R)
+{
+	if (L >= R)
+		return;
+	int mid = (L + R) / 2;
+	mergeSort(arr, L, mid);
+	mergeSort(arr, mid + 1, R);
+	merge(arr, L, mid, R);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	queue<int>st[26];
+	int n;
+	cin >> n;
+	scanf("%s", s + 1);
+	strcpy(t + 1, s + 1);
+	reverse(t + 1, t + n + 1);
+	for (int i = 1; i <= n; i++)
+		st[s[i] - 'a'].push(i);
+	for (int i = 1; i <= n; i++)
+		arr[i] = st[t[i] - 'a'].front(), st[t[i] - 'a'].pop();
+	mergeSort(arr, 1, n);
+	cout << ans << endl;
+	return 0;
+}

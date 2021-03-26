@@ -1,0 +1,76 @@
+链接：https://ac.nowcoder.com/acm/contest/1072/D
+来源：牛客网
+Bessie is playing a number game against Farmer John, and she wants you to help her achieve victory.
+Game i starts with an integer Ni (1 <= Ni <= 1,000,000). Bessie goes first, and then the two players alternate turns. On each turn, a player can subtract either the largest digit or the smallest non-zero digit from the current number to obtain a new number. For example, from 3014 we may subtract either 1 or 4 to obtain either 3013 or 3010, respectively. The game continues until the number becomes 0, at which point the last player to have taken a turn is the winner.
+Bessie and FJ play G (1 <= G <= 100) games. Determine, for each game, whether Bessie or FJ will win, assuming that both play perfectly (that is, on each turn, if the current player has a move that will guarantee his or her win, he or she will take it).
+Consider a sample game where Ni = 13. Bessie goes first and takes 3, leaving 10. FJ is forced to take 1, leaving 9. Bessie takes the remainder and wins the game.
+输入描述:
+* Line 1: A single integer: G
+* Lines 2..G+1: Line i+1 contains the single integer: Ni
+输出描述:
+* Lines 1..G: Line i contains 'YES' if Bessie can win game i, and 'NO' otherwise.
+示例1 
+输入
+复制 
+2 
+9 
+10 
+输出
+复制 
+YES
+NO
+说明
+For the first game, Bessie simply takes the number 9 and wins. For the second game, Bessie must take 1 (since she cannot take 0), and then FJ can win by taking 9.
+<SG函数><博弈>
+若当前的后续状态有一个必败的状态， 则当前必胜
+若当前的后续状态全部为必胜状态,  则当前为必败状态
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e6 + 10;
+int d[N];
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif 
+	for (int i = 1; i <= 9; i++) //0 ~ 9必胜
+		d[i] = 1;
+	for (int i = 10; i <= N - 10; i++)
+	{
+		int num1 = i, num2 = i;
+		int MX = 0, MI = 0x3f3f3f3f;
+		while (num1)
+		{
+			MX = max(MX, num1 % 10);
+			num1 /= 10;
+		}
+		while (num2)
+		{
+			if (num2 % 10 > 0)
+				MI = min(MI, num2 % 10);
+			num2 /= 10;
+		}
+		if (!d[i - MX] || !d[i - MI])  // 有一个必败的状态， 则当前必胜
+			d[i] = 1;
+	}
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		cin >> n;
+		if (d[n])
+			cout << "YES" << endl;
+		else
+			cout << "NO" << endl;
+	}
+	return TIME;
+}

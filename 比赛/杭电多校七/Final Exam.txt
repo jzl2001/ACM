@@ -1,0 +1,57 @@
+/*
+Final Exam
+Time Limit: 4000/2000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 951    Accepted Submission(s): 457
+
+
+Problem Description
+Final Exam is coming! Cuber QQ has now one night to prepare for tomorrow's exam.
+
+The exam will be a exam of problems sharing altogether m points. Cuber QQ doesn't know about the exact distribution. Of course, different problems might have different points; in some extreme cases, some problems might worth 0 points, or all m points. Points must be integers; a problem cannot have 0.5 point.
+
+What he knows, is that, these n problems will be about n totally different topics. For example, one could be testing your understanding of Dynamic Programming, another might be about history of China in 19th century. So he has to divide your night to prepare each of these topics separately. Also, if one problem is worth x points in tomorrow's exam, it takes at least x+1 hours to prepare everything you need for examination. If he spends less than x+1 hours preparing, he shall fail at this problem.
+
+Cuber QQ's goal, strangely, is not to take as much points as possible, but to solve at least k problems no matter how the examination paper looks like, to get away from his parents' scoldings. So he wonders how many hours at least he needs to achieve this goal.
+ 
+
+Input
+The first line of the input is an integer t (1≤t≤20 000), denoting the number of test cases.
+
+Each test case are three space-separated integers n,m,k (0≤m≤109, 1≤k≤n≤109). 
+ 
+
+Output
+For each test case, output the number of hours Cuber QQ needs.
+ 
+
+Sample Input
+2
+1 10 1
+10 109 10
+ 
+
+Sample Output
+11
+1100
+Hint
+
+Cuber QQ should solve one problem in sample 1, so he at least prepares 11 hours when the problem one is 10 point. 
+Cuber QQ should solve all the ten problems in sample 2, so he at least prepares 110 hours for each problem because there may be one problem is 109 point.
+ 
+ 
+*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll n, m, k;
+		cin >> n >> m >> k;
+		ll x = ceil(1.0 * m / (n - k + 1));   // n - k + 1 个任务都分配，这样学生复习时间更久 所有学生 k - 1个学科都学这么久， 并且第k个学 m + 1即可， 如不是 n - k + 1个， 则学 (m + 1) * k 可能小于 n - k + 1个任务分配
+		cout << (k - 1) * ( x + (m % (n - k + 1) == 0)) + m + 1<< endl;
+	}
+	return 0;
+}

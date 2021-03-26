@@ -1,0 +1,120 @@
+/*
+http://acm.hdu.edu.cn/showproblem.php?pid=6772
+*/
+Lead of Wisdom
+Time Limit: 8000/8000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 1743    Accepted Submission(s): 531
+
+
+Problem Description
+In an online game, "Lead of Wisdom" is a place where the lucky player can randomly get powerful items.
+
+
+
+
+There are k types of items, a player can wear at most one item for each type. For the i-th item, it has four attributes ai,bi,ci and di. Assume the set of items that the player wearing is S, the damage rate of the player DMG can be calculated by the formula:
+
+DMG=(100+∑i∈Sai)(100+∑i∈Sbi)(100+∑i∈Sci)(100+∑i∈Sdi)
+
+
+Little Q has got n items from "Lead of Wisdom", please write a program to help him select which items to wear such that the value of DMG is maximized.
+ 
+
+Input
+The first line of the input contains a single integer T (1≤T≤10), the number of test cases.
+
+For each case, the first line of the input contains two integers n and k (1≤n,k≤50), denoting the number of items and the number of item types.
+
+Each of the following n lines contains five integers ti,ai,bi,ci and di (1≤ti≤k, 0≤ai,bi,ci,di≤100), denoting an item of type ti whose attributes are ai,bi,ci and di.
+ 
+
+Output
+For each test case, output a single line containing an integer, the maximum value of DMG.
+ 
+
+Sample Input
+1
+6 4
+1 17 25 10 0
+2 0 0 25 14
+4 17 0 21 0
+1 5 22 0 10
+2 0 16 20 0
+4 37 0 0 0
+ 
+
+Sample Output
+297882000
+ 
+
+Source
+2020 Multi-University Training Contest 2
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6774 6773 6772 6771 6770 
+<搜索>
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 2e6 + 20;
+const int mod = 1e9 + 7;
+typedef long long ll;
+typedef unsigned long long ull;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int vis[51];
+struct node
+{
+	int a, b, c, d;
+}x[51][51];
+int k;
+ll ans;
+int p[51];
+int cnt[51];
+void dfs(int c, int id, ll sa, ll sb, ll sc, ll sd)
+{
+	if (c > k)
+	{
+		ans = max(ans, sa * sb * sc * sd);
+		return;
+	}
+	else
+	{
+		for (int i = 1; i <= cnt[p[id]]; i++)
+		{
+			dfs(c + 1, id + 1, sa + x[p[id]][i].a, sb + x[p[id]][i].b, sc + x[p[id]][i].c, sd + x[p[id]][i].d);
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+#endif
+	int T;
+	cin >> T;
+	while (T--)
+	{
+		k = 0;
+		ans = 0;
+		int n, w;
+		cin >> n >> w;
+		memset(vis, 0, sizeof vis);
+		memset(cnt, 0, sizeof cnt);
+		for (int i = 1; i <= n; i++)
+		{
+			int t;
+			scanf("%d", &t);
+			if (!vis[t])
+				p[++k] = t, vis[t] = 1;
+			++cnt[t];
+			scanf("%d%d%d%d", &x[t][cnt[t]].a, &x[t][cnt[t]].b, &x[t][cnt[t]].c, &x[t][cnt[t]].d);
+		}
+		dfs(1, 1, 100, 100, 100, 100);
+		cout << ans << endl;
+	}
+	return TIME;
+}

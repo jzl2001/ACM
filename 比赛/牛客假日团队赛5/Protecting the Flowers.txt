@@ -1,0 +1,33 @@
+#include <iostream>
+#include <stdio.h>
+#include <algorithm>
+#include <string.h>
+#include <map>
+using namespace std;
+typedef long long ll;
+const ll N = 1e6 + 10;
+ll b[N];
+struct node
+{
+	ll x, y;
+	bool operator< (const node &oth)
+	{
+		return x * oth.y < y * oth.x;
+	}
+}a[N];
+int main(){
+	ll n;
+	ll tot = 0;
+	cin >> n;
+	for (ll i = 1; i <= n; i++)
+		scanf("%d%d", &a[i].x, &a[i].y);
+	sort(a + 1, a + 1 + n);
+	for (ll i = 1; i <= n; i++)
+		b[i] += b[i - 1] + a[i].y;
+	for (ll i = 1; i <= n; i++)
+	{
+		tot += a[i].x * 2 * (b[n] - b[i]);
+	}
+	cout << tot << endl;
+	return 0;
+}

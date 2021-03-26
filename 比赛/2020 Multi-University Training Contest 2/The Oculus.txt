@@ -1,0 +1,127 @@
+http://acm.hdu.edu.cn/showproblem.php?pid=6768
+The Oculus
+Time Limit: 5000/5000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 1284    Accepted Submission(s): 374
+
+
+Problem Description
+Let's define the Fibonacci sequence F1,F2,… as F1=1,F2=2,Fi=Fi−1+Fi−2 (i≥3).
+
+It's well known that every positive integer x has its unique Fibonacci representation (b1,b2,…,bn) such that:
+
+· b1×F1+b2×F2+⋯+bn×Fn=x.
+
+· bn=1, and for each i (1≤i<n), bi∈{0,1} always holds.
+
+· For each i (1≤i<n), bi×bi+1=0 always holds.
+
+For example, 4=(1,0,1), 5=(0,0,0,1), and 20=(0,1,0,1,0,1) because 20=F2+F4+F6=2+5+13.
+
+There are two positive integers A and B written in Fibonacci representation, Skywalkert calculated the product of A and B and written the result C in Fibonacci representation. Assume the Fibonacci representation of C is (b1,b2,…,bn), Little Q then selected a bit k (1≤k<n) such that bk=1 and modified bk to 0.
+
+It is so slow for Skywalkert to calculate the correct result again using Fast Fourier Transform and tedious reduction. Please help Skywalkert to find which bit k was modified.
+ 
+
+Input
+The first line of the input contains a single integer T (1≤T≤10000), the number of test cases.
+
+For each case, the first line of the input contains the Fibonacci representation of A, the second line contains the Fibonacci representation of B, and the third line contains the Fibonacci representation of modified C.
+
+Each line starts with an integer n, denoting the length of the Fibonacci representation, followed by n integers b1,b2,…,bn, denoting the value of each bit.
+
+It is guaranteed that:
+
+· 1≤|A|,|B|≤1000000.
+
+· 2≤|C|≤|A|+|B|+1.
+
+·∑|A|,∑|B|≤5000000.
+ 
+
+Output
+For each test case, output a single line containing an integer, the value of k.
+ 
+
+Sample Input
+1
+3 1 0 1
+4 0 0 0 1
+6 0 1 0 0 0 1
+ 
+
+Sample Output
+4
+ 
+
+Source
+2020 Multi-University Training Contest 2
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6774 6773 6772 6771 6770 
+<hash>
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 2e6 + 20;
+const int mod = 1e9 + 9;
+typedef long long ll;
+typedef unsigned long long ull;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+ull f[N];
+int z[N];
+int main()
+{
+#ifdef LOCAL
+    freopen("E:\\input.txt", "r", stdin);
+#endif
+    f[1] = 1, f[2] = 2;
+    for (int i = 3; i <= 2000010; i++)
+    {
+        f[i] = f[i - 1] + f[i - 2];
+    }
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int a, b, c;
+        scanf("%d", &a);
+        ll res1 = 0, res2 = 0, res3 = 0;
+        for (int i = 1; i <= a; i++)
+        {
+            int num;
+            scanf("%d", &num);
+            res1 = res1 + f[i * num];
+        }
+        scanf("%d", &b);
+        for (int i = 1; i <= b; i++)
+        {
+            int num;
+            scanf("%d", &num);
+            res2 = res2 + f[i * num];
+        }
+        scanf("%d", &c);
+        for (int i = 1; i <= c; i++)
+        {
+            scanf("%d", &z[i]);
+            res3 = res3 + f[i * z[i]];
+        }
+        res1 *= res2;
+        for (int i = 1; i <= c; i++)
+        {
+            if (z[i] == 0)
+            {
+                ull now = res3 + f[i];
+                if (now == res1)
+                {
+                    cout << i << endl;
+                    break;
+                }
+            }
+        }
+    }
+    return TIME;
+}

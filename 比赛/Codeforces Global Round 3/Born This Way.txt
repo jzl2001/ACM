@@ -1,0 +1,53 @@
+#include <bits/stdc++.h> // <思维>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 100000;
+const int N = 2e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+int b[N];
+set<int>s1, s2;
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n, m, t1, t2, k;
+	cin >> n >> m >> t1 >> t2 >> k;
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &a[i]), a[i] += t1;
+	for (int i = 1; i <= m; i++)
+		scanf("%d", &b[i]);
+	if (k >= n || k >= m)
+		cout << "-1" << endl;
+	else
+	{
+		int cnt = 0, ans = 0;
+		for (int i = 0; i <= k; i++) // 枚举从A的第几个飞机飞
+		{	//如果从当前飞机，最近到的B
+			int pos = lower_bound(b + 1, b + m + 1, a[1 + i]) - b;
+			int idx = pos + k - i; // 剩余可以删除的个数
+			if (idx >= m + 1 || i >= n) // 如果当前不能到C了， 直接-1， 如果删除的个数多余n了， 那么直接结束了
+				cout << -1 << endl, exit(0);	
+			ans = max(ans, b[idx] + t2);
+		}
+		cout << ans << endl;
+	}
+	return TIME;
+}

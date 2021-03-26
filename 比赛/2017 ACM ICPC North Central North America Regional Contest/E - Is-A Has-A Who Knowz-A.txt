@@ -1,0 +1,119 @@
+传递闭包
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 500 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+map<string, int>mp;
+int map1[N][N];
+int map2[N][N];
+int idx;
+void Floyd1()//is
+{
+	for (int i = 1; i <= idx; i++)
+		map1[i][i] = 1;
+	for (int k = 1; k <= idx; k++)
+	{
+		for (int i = 1; i <= idx; i++)
+		{
+			for (int j = 1; j <= idx; j++)
+			{
+				if (map1[i][k] == 1 && map1[k][j] == 1)
+					map1[i][j] = 1;
+			}
+		}
+	}
+}
+void Floyd2()
+{
+	for (int i = 1; i <= idx; i++)
+	{
+		for (int j = 1; j <= idx; j++)
+		{
+			if (map1[i][j] == INF)
+				map1[i][j] = 0;
+		}
+	}
+	for (int k = 1; k <= idx; k++)
+	{
+		for (int i = 1; i <= idx; i++)
+		{
+			for (int j = 1; j <= idx; j++)
+			{
+				if ((map1[i][k] || map2[i][k]) && (map1[k][j]  || map2[k][j]))
+				{
+					map2[i][j] = max({ map2[i][j], map1[i][k], map2[i][k], map1[k][j], map2[k][j] });
+				}
+					
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	cin >> n >> m;
+	string s;
+	memset(map1, 0x3f, sizeof map1);
+	for (int i = 1; i <= n; i++)
+	{
+		cin >> s;
+		if (mp[s] == 0)
+			mp[s] = ++idx;
+		int u = mp[s];
+		string op;
+		cin >> op;
+		cin >> s;
+		if (mp[s] == 0)
+			mp[s] = ++idx;
+		int v = mp[s];
+		if (op[0] == 'i')
+			map1[u][v] = min(map1[u][v], 1), map2[u][v] = max(map2[u][v], 1);
+		else
+			map2[u][v] = max(map2[u][v], 2);
+	}
+	int cnt = 0;
+	Floyd1();
+	Floyd2();
+	while (m--)
+	{
+		string s, op, ans = "false";
+		cin >> s;
+		int u = mp[s];
+		cin >> op;
+		cin >> s;
+		int v = mp[s];
+		if (op[0] == 'i')
+		{
+			if (map1[u][v] == 1)
+				ans = "true";
+		}
+		else
+		{
+			if (map2[u][v] == 2)
+				ans = "true";
+		}
+		cout << "Query " << ++cnt << ": " << ans << endl;
+	}
+	return TIME;
+}

@@ -1,0 +1,18 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define sz(a) ((int)(a).size())
+typedef long long ll;
+#define me(a, b) (memset(a, b, sizeof a))
+const ll INF = 0x3f3f3f3f;
+const ll MAXN = 1e6 + 10;
+
+int main()
+{
+	int n;
+	cin >> n;
+	if (n <= 1)
+		cout << "Yang" << endl;
+	else
+		cout << "Shi" << endl;
+	return 0;
+}

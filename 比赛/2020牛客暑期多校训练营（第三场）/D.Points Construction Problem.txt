@@ -1,0 +1,152 @@
+链接：https://ac.nowcoder.com/acm/contest/5668/D
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+Special Judge, 64bit IO Format: %lld
+题目描述 
+Imagine you have an infinite 2D plane with Cartesian coordinate system. Initially, all the integral points are painted as white. You are given two integers n, and m. Please paint exactly n integral points to black such that there are exactly m pairs of points which satisfy the following conditions:
+
+1. The two points are colored by different colors.
+
+2. the two points are adjacent. We call two integral points (x_1, y_1)(x 
+1
+​	
+ ,y 
+1
+​	
+ ) and (x_2, y_2)(x 
+2
+​	
+ ,y 
+2
+​	
+ ) being adjacent if and only if |x_1 - x_2| + |y_1 - y_2| = 1∣x 
+1
+​	
+ −x 
+2
+​	
+ ∣+∣y 
+1
+​	
+ −y 
+2
+​	
+ ∣=1. (|v| means the absolute value of v.)
+
+3. The x and y coordinates of all black points are in the range [-10^9, 10^9][−10 
+9
+ ,10 
+9
+ ].
+输入描述:
+The first line contains one integer t (1 \le t \le 10^31≤t≤10 
+3
+ ) --- the number of test cases.
+
+The only line of each test case contains two integers n and m (1 \le n \le 50, 1 \le m \le 2001≤n≤50,1≤m≤200).
+输出描述:
+For each test, if there exists at least one configuration to choose n points to satisfy the conditions given by statement, you should print n+1 line for this test. The first line contains one string "Yes". And the following n lines contain the coordinator of these n points which is colored as black. If there are no solution, please print one line containing only one string "No".
+示例1
+输入
+复制
+6
+5 20
+1 2
+1 3
+1 4
+1 5
+3 8
+输出
+复制
+Yes
+1 1
+2 2
+3 3
+4 4
+5 5
+No
+No
+Yes
+1 1
+No
+Yes
+1 1
+1 2
+2 1
+说明
+In the first test and fourth test, each black point in the sample output is adjacent to exactly 4 white points.
+In the sixth test, the second and third black points in the sample output are both adjacent to 3 white points and the forst black point is adjacent to 2 white points.
+题意：在平面上放点，要求放n个黑点，有m对满足黑白对。
+如果单放肯定有4*n种，按照矩形来放，每次减2或者4，m为奇数肯定不行了，for枚举矩阵即可。
+<构造><思维><数学>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef unsigned long long ull;
+typedef long long ll;
+const int N = 2e6 + 10;
+const int mod = 998244353;
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		cin >> n >> m;
+		int mx = 4 * n;
+		if ((m & 1) || m > mx)
+			puts("No");
+		else
+		{
+			int sz = 0;
+			while (sz * sz < n)
+				sz++;
+			vector<pair<int, int>>ans;
+			int flag = 1;
+			for (int i = 1; i <= sz && flag; i++)
+			{
+				for (int j = 1; j <= sz && flag; j++)
+				{
+					int cnt = bool(i - 1) + bool(j - 1);
+					if (mx - 2 * cnt >= m && n)
+					{
+						mx -= 2 * cnt;
+						ans.push_back({ i, j });
+						--n;
+					}
+					else
+					{
+						if (mx - 2 == m && n)
+							ans.push_back({ 0, 1 }), mx -= 2, --n;
+						flag = 0;
+						while (n--)
+						{
+							ans.push_back({ 0, 1000 * (n + 1) });
+						}
+					}
+				}
+			}
+			if (mx > m)
+			{
+				puts("No");
+				continue;
+			}
+			puts("Yes");
+			for (auto &i : ans)
+			{
+				printf("%d %d\n", i.first, i.second);
+			}
+		}
+	}
+	return TIME;
+}

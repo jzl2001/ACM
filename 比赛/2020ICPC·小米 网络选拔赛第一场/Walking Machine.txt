@@ -1,0 +1,162 @@
+链接：https://ac.nowcoder.com/acm/contest/7501/I
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+Given a maze of size n\times mn×m, where upper left corner is (1, 1)_{}(1,1) 
+​	
+  and lower right corner is (n, m)_{}(n,m) 
+​	
+ . For each cell (x, y)_{}(x,y) 
+​	
+ , there is exactly one character c~(c\in \{W, A, S, D\})c (c∈{W,A,S,D}) on it, denoting the moving restriction:
+
+* If c = W_{}c=W 
+​	
+ , you can only go up from this cell, specifically go from (x, y)_{}(x,y) 
+​	
+  to (x-1, y)_{}(x−1,y) 
+​	
+ 
+
+* If c = A_{}c=A 
+​	
+ , you can only go left from this cell, specifically go from (x, y)_{}(x,y) 
+​	
+  to (x, y-1)_{}(x,y−1) 
+​	
+ 
+
+* If c = S_{}c=S 
+​	
+ , you can only go down from this cell, specifically go from (x, y)_{}(x,y) 
+​	
+  to (x+1, y)_{}(x+1,y) 
+​	
+ 
+
+* If c = D_{}c=D 
+​	
+ , you can only go right from this cell, specifically go from (x, y)_{}(x,y) 
+​	
+  to (x, y+1)_{}(x,y+1) 
+​	
+ 
+
+We say one is out if x < 1_{}x<1 
+​	
+  or x > n_{}x>n 
+​	
+  or y < 1_{}y<1 
+​	
+  or y > m_{}y>m 
+​	
+  holds, now you should determine the number of cells that one can be out if start walking on it.
+输入描述:
+The first line contains two integers n,m~(1\le n,m \le 1000)n,m (1≤n,m≤1000), denoting the size of the maze.
+
+Following n_{}n 
+​	
+  lines each contains a string of length m_{}m 
+​	
+ , where the j_{}j 
+​	
+ -th character in i_{}i 
+​	
+ -th line s_{i,j}~(s_{i,j} \in \{W, A, S, D\})s 
+i,j
+​	
+  (s 
+i,j
+​	
+ ∈{W,A,S,D}) denotes the character on cell (i, j)_{}(i,j) 
+​	
+ .
+输出描述:
+Only one line containing one integer, denoting the number of cells that can make one out.
+示例1
+输入
+复制
+3 4
+DDSD
+AWAA
+WASD
+输出
+复制
+6
+说明
+The 6 cells are (1, 4), (2, 1), (3, 1), (3, 2), (3, 3), (3, 4)_{}(1,4),(2,1),(3,1),(3,2),(3,3),(3,4) 
+​	
+  respectively.
+
+题意：每个点是WASD，表示4个方向，询问有多少个点作为起点可以走出去。
+思路：把最外圈的加入队列，反向走看看能走到几个点。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 2e5 + 10;
+
+char s[1010][1010];
+int vis[1010][1010];
+int dir[4][2] = { 0, 1, 1, 0, -1, 0, 0, -1 };
+char c[4] = { 'A', 'W', 'S', 'D' };
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	scanf("%d%d", &n, &m);
+	for (int i = 1; i <= n; i++)
+		scanf("%s", s[i] + 1);
+	queue<pair<int, int>>q;
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= m; j++)
+		{
+			if (j == 1 && s[i][j] == 'A')
+				q.push({ i, j });
+			if (j == m && s[i][j] == 'D')
+				q.push({ i, j });
+			if (i == 1 && s[i][j] == 'W')
+				q.push({ i, j });
+			if (i == n && s[i][j] == 'S')
+				q.push({ i, j });
+		}
+	int ans = 0;
+	while (!q.empty())
+	{
+		int x = q.front().first, y = q.front().second;
+		q.pop();
+		if (vis[x][y])
+			continue;
+		vis[x][y] = 1;
+		//cout << x << " " << y << endl;
+		ans++;
+		for (int i = 0; i < 4; i++)
+		{
+			int xx = x + dir[i][0];
+			int yy = y + dir[i][1];
+			if (xx >= 1 && xx <= n && yy >= 1 && yy <= m && s[xx][yy] == c[i])
+				q.push({ xx, yy });
+		}
+	}
+	cout << ans << endl;
+	return TIME;
+}

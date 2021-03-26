@@ -1,0 +1,178 @@
+链接：https://ac.nowcoder.com/acm/contest/9925/I
+来源：牛客网
+
+题目描述 
+Prof. Du and Prof. Pang plan to build a sky garden near the city of Allin. In the garden, there will be a plant maze consisting of straight and circular roads.
+
+On the blueprint of the plant maze, Prof. Du draws {n}n circles indicating the circular roads. All of them have center {(0, 0)}(0,0). The radius of the {i}i-th circle is {i}i.
+
+Meanwhile, Prof. Pang draws {m}m lines on the blueprint indicating the straight roads. All of the lines pass through {(0, 0)}(0,0). Each circle is divided into {2m}2m parts with equal lengths by these lines.
+
+Let {Q}Q be the set of the {n+m}n+m roads. Let {P}P be the set of all intersections of two different roads in {Q}Q. Note that each circular road and each straight road have two intersections.
+
+For two different points a\in Pa∈P and b\in Pb∈P, we define {dis(\{a, b\})}dis({a,b}) to be the shortest distance one needs to walk from {a}a to {b}b along the roads. Please calculate the sum of {dis(\{a, b\})}dis({a,b}) for all \{a, b\}\subseteq P{a,b}⊆P.
+输入描述:
+The only line contains two integers n,m~(1\le n,m\le 500)n,m (1≤n,m≤500).
+输出描述:
+Output one number -- the sum of the distances between every pair of points in {P}P.
+
+Your answer is considered correct if its absolute or relative error does not exceed 10^{−6}10 
+−6
+ .
+示例1
+输入
+复制
+1 2
+输出
+复制
+14.2831853072
+说明
+
+dis(p_1, p_2)=dis(p_2, p_3)=dis(p_3, p_4)=dis(p_1, p_4)=\frac{\pi}{2}dis(p 
+1
+​	
+ ,p 
+2
+​	
+ )=dis(p 
+2
+​	
+ ,p 
+3
+​	
+ )=dis(p 
+3
+​	
+ ,p 
+4
+​	
+ )=dis(p 
+1
+​	
+ ,p 
+4
+​	
+ )= 
+2
+π
+​	
+ 
+
+dis(p_1, p_5)=dis(p_2, p_5)=dis(p_3, p_5)=dis(p_4, p_5)=1dis(p 
+1
+​	
+ ,p 
+5
+​	
+ )=dis(p 
+2
+​	
+ ,p 
+5
+​	
+ )=dis(p 
+3
+​	
+ ,p 
+5
+​	
+ )=dis(p 
+4
+​	
+ ,p 
+5
+​	
+ )=1
+
+dis(p_1, p_3)=dis(p_2, p_4)=2dis(p 
+1
+​	
+ ,p 
+3
+​	
+ )=dis(p 
+2
+​	
+ ,p 
+4
+​	
+ )=2
+示例2
+输入
+复制
+2 3
+输出
+复制
+175.4159265359
+n个圆半径从1~n，且被m条直线均分，求所有交点之间的最短距离之和。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf;  int x = false;  char ch = gc;  bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int N = 5e2 + 10;
+
+double d[N];
+double pi = acos(-1);
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	cin >> n >> m;
+	double sum = 0;
+	if (m == 1)
+	{
+		double u = 0, ans = 0;
+		for (int i = 1; i <= 2 * n; i++)
+		{
+			ans += sum;
+			if (i == n)
+				sum += i + n;
+			else
+				sum += i;
+		}
+		sum = ans;
+	}
+	else
+	{
+		double x = 0, cnt = 0;
+		for (int i = 1; i < m; i++)
+		{
+			if (2 > 1.0 * i / m * pi) //判断走了几个直线，几个圆弧
+				x += i;
+			else
+				cnt += 2;
+		}
+		double u = 4 * m + 2 * x * pi + cnt * m * 2;
+		double v = 4 * m + cnt * m * 2;
+		for (int i = 1; i <= n; i++)
+		{
+			d[i] = i * u;
+			int cnt = 0;
+			for (int j = 1; j < i; j++)   
+				d[i] += (((j * u - 4 * j * m) / m + 3 * j) + (i - j) * 2 * m) * 2 * m - m * i; //减去的是到中点的距离，因为算过了。
+		}
+		for (int i = 1; i <= n; i++)
+			sum = sum + d[i];
+	}
+	printf("%.10f\n", sum);
+	return TIME;
+}

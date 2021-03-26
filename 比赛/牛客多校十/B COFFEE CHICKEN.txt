@@ -1,0 +1,53 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int maxn = 2e5 + 10;
+int mod = 998244353;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll f[510];
+const ll MX = 1e13;
+char s[3][10] = {"0", "COFFEE", "CHICKEN" };
+void slove(ll k, ll n) // 第k个串的第n个位置
+{
+	if (k <= 2)
+		putchar(s[k][n - 1]);
+	else 
+	{
+		if (n > f[k - 2]) // 当前串由 f[i - 2] f[i - 1] 组成 如果在左边， 即串k - 2， n不变
+			slove(k - 1, n - f[k - 2]); //如果右边 ， 递归到f[i - 1], 位置变为n - f[k - 2]， 右边串为k - 1
+		else
+			slove(k - 2, n);
+	}
+}
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	f[1] = 6;
+	f[2] = 7;
+	for (int i = 3; i <= 500; i++)
+		f[i] = min(f[i - 2] + f[i - 1], MX);
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll n, k;
+		scanf("%lld%lld", &n, &k);
+		for (ll i = k; i <= min(f[n], k + 9) ; i++)
+			slove(n, i);
+		putchar('\n');
+	}
+	return 0;
+}
+

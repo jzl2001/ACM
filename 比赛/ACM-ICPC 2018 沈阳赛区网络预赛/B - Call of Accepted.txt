@@ -1,0 +1,262 @@
+You and your friends are at the table, playing an old and interesting game - the Call of Cthulhu.
+
+There is a mechanism in the game: rolling the dice. You use a notation to communicate the type of dice that needs to be rolled - the operator "
+d
+". "
+x
+d
+y
+" means that an 
+y
+-sided dice should be rolled 
+x
+ times and the sum of the results is taken.
+
+Formally, for any two integers 
+x
+,
+y
+ satisfying 
+x
+≥
+0
+ and 
+y
+≥
+1
+ , "
+x
+d
+y
+" means the sum of 
+x
+ random integers in the range of 
+[
+1
+,
+y
+]
+. It's obvious that either 
+x
+<
+0
+ or 
+y
+<
+1
+ makes the expression 
+x
+ 
+d
+ 
+y
+ illegal. For example: "
+2
+d
+6
+" means that rolling a 
+6
+-sided dice 
+2
+ times. At this time, the result can be at least 
+[
+1
+,
+1
+]
+=
+2
+, and at most 
+[
+6
+,
+6
+]
+=
+12
+. The results of rolling can be used extensively in many aspects of the game. For example, an "
+1
+d
+100
+" can be used to determine whether an action with a percentage probability is successful, and a "
+3
+d
+6
++
+3
+ * 
+2
+" can be used to calculate the total damage when being attacked by 
+3
+ monsters simultaneously. In particular, the precedence of "
+d
+" is above "*". Since the operator "
+d
+" does not satisfy the associative law, it's necessary to make sure that "
+d
+" is right-associative.
+
+Now the game has reached its most exciting stage. You are facing the Great Old One - Cthulhu. Because the spirit has been greatly affected, your sanity value needs to be deducted according to the result of rolling. If the sanity value loses too much, you will fall into madness. As a player, you want to write a program for knowing the minimum and maximum loss of sanity value before rolling, in order to make a psychological preparation.
+
+The oldest and strongest emotion of mankind is fear, and the oldest and strongest kind of fear is fear of the unknown. ----H. P. Lovecraft
+
+Input
+There are multiple sets of input, at most 
+30
+ cases.
+
+Each set of input contains a string of only '+', '-', '*', 'd', '(', ')' and integers without spaces, indicating the expression of this sanity loss. The length of the expression will be at most 
+100
+.
+
+It is guaranteed that all expressions are legal, all operators except for '(' and ')' are binary, and all intermediate results while calculating are integers in the range of 
+[
+−
+2147483648
+,
+2147483647
+]
+.
+
+The most merciful thing in the world, I think, is the inability of the human mind to correlate all its contents. We live on a placid island of ignorance in the midst of black seas of infinity, and it was not meant that we should voyage far. ----H. P. Lovecraft
+
+Output
+For each set of data, output a line of two integers separated by spaces, indicating the minimum and maximum possible values of the sanity loss.
+
+Sample Input
+3d6*5
+2d3d4
+Sample Output
+15 90
+2 24
+Sponsor
+题意给出一个表达式求值，xdy表示掷一个y面的骰子的期望，表达式求值，维护个最大最小值。
+#include <stdio.h>
+#include <utility>
+#include <vector>
+#include <iostream>
+#include <time.h>
+#include <queue>
+#include <stack>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 2e4 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+struct node
+{
+    int type, num;
+    char op;
+};
+int great[130];
+char str[110];
+stack<char>s;
+queue<node>q;
+void tran()
+{
+    great['+'] = great['-'] = 1;
+    great['/'] = great['*'] = 2;
+    great['d'] = 3;
+    int len = strlen(str);
+    for (int i = 0; i < len; i++)
+    {
+        if (isdigit(str[i]))
+        {
+            int num = 0;
+            while (i <= len && isdigit(str[i]))
+                num = num * 10 + str[i] - '0', i++;
+            q.push({ 0, num, '0' });
+        }
+        if (i >= len)
+            break;
+        if (str[i] == '(')
+                s.push(str[i]);
+        else
+            if (str[i] == ')')    //括号内的
+            {
+                while (s.top() != '(')
+                    q.push({ 1, 0, s.top() }), s.pop();
+                s.pop();
+            }
+            else
+            {
+                while (!s.empty() && great[s.top()] >= great[str[i]])//优先级大的先操作
+                    q.push({ 1, 0, s.top() }), s.pop();
+                s.push(str[i]);
+            }
+    }
+    while (!s.empty())
+        q.push({ 1, 0, s.top() }), s.pop();
+}
+void calc()
+{
+    stack<int>f, g;//mi / mx
+    while (!q.empty())
+    {
+        node now = q.front();
+        q.pop();
+        if (now.type == 0)
+            f.push(now.num), g.push(now.num);
+        else
+        {
+            int a = f.top();
+            f.pop();
+            int b = f.top();
+            f.pop();
+            int c = g.top();
+            g.pop();
+            int d = g.top();
+            g.pop();
+            if (now.op == '+')
+                b += a, d += c;
+            else
+                if (now.op == '-')
+                    b -= c, d -= a;
+            else
+                if (now.op == '*')
+                {
+                    int mi = min({ a * b, b * c, d * a, d * c });
+                    int mx = max({ a * b, b * c, d * a, d * c });
+                    b = mi, d = mx;
+                }
+                else
+                    if (now.op == 'd')
+                    {
+                        if (b < 0)//不合法了
+                            b = 0;
+                        d *= c;
+                    }
+            f.push(b), g.push(d);
+        }
+    }
+    printf("%d %d\n", f.top(), g.top());
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    while (~scanf("%s", str))
+    {
+        tran();
+        calc();
+    }
+	return TIME;
+}

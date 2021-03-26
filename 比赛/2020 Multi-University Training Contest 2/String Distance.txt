@@ -1,0 +1,122 @@
+String Distance
+Time Limit: 4000/4000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 1126    Accepted Submission(s): 393
+
+
+Problem Description
+For two strings S and T, you can do the following operation for arbitrary number of times: Select a string S or T, insert or delete a character at any position. The distance between two strings S and T is defined as the minimum number of operations to make S and T equal.
+
+You will be given two strings A[1..n],B[1..m] and q queries.
+
+In each query, you will be given two integers li and ri (1≤li≤ri≤n), you need to find the distance between the continous substring A[li..ri] and the whole string B.
+ 
+
+Input
+The first line of the input contains a single integer T (1≤T≤10), the number of test cases.
+
+For each case, the first line of the input contains a string A consists of n (1≤n≤100000) lower-case English letters.
+
+The second line of the input contains a string B consists of m (1≤m≤20) lower-case English letters.
+
+The third line of the input contains a single integer q (1≤q≤100000), denoting the number of queries.
+
+Then in the following q lines, there are two integers li,ri (1≤li≤ri≤n) in each line, denoting a query.
+ 
+
+Output
+For each query, print a single line containing an integer, denoting the answer.
+ 
+
+Sample Input
+1
+qaqaqwqaqaq
+qaqwqaq
+3
+1 7
+2 8
+3 9
+ 
+
+Sample Output
+4
+2
+0
+ 
+
+Source
+2020 Multi-University Training Contest 2
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6774 6773 6772 6771 6770 
+题意：给出a，b串，每次选择a串中的某个区间子串，问对a，b进行删除增加操作最少多少次使得相等,求最长公共子序列，
+求完即长度-LCS就是对方需要补充的。
+答案就是a的询问区间长度+b长度-2*|LCS|
+<dp>
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 20;
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+typedef long long ll;
+typedef unsigned long long ull;
+char a[N];
+char b[21];
+int d[21][21];//匹配b的前i个字符匹配到j个字符在a中的最小下标。
+int nxt[N][26];
+int main()
+{ 
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        memset(nxt, 0, sizeof(nxt));
+        scanf("%s%s", a + 1, b + 1);
+        int q;
+        int n = strlen(a + 1);
+        int m = strlen(b + 1);
+        for (int i = n; i >= 1; i--)
+        {
+            for (int j = 0; j < 26; j++)
+            {
+                nxt[i][j] = nxt[i + 1][j];
+            }
+            nxt[i][a[i] - 'a'] = i;
+        }
+           scanf("%d", &q);
+        while (q--)
+        {
+            int L, R;
+            scanf("%d%d", &L, &R);
+            for (int i = 0; i <= m; i++)
+                for (int j = 0; j <= m; j++)
+                {
+                    d[i][j] = INF;
+                }
+            for (int i = 0; i <= m; i++)
+            {
+                d[i][0] = L - 1;
+            }       
+            for (int i = 1; i <= m; i++)
+            {
+                for (int j = 1; j <= i; j++)
+                {
+                    if (d[i - 1][j - 1] == INF)
+                        continue;
+                    int nex = nxt[d[i - 1][j - 1] + 1][b[i] - 'a'];
+                    if (nex)
+                        d[i][j] = min(d[i][j], nex);
+                    d[i][j] = min(d[i][j], d[i - 1][j]);
+                }
+            }
+            int le = 0;
+            for (int i = 1; i <= m; i++)
+            {
+                if (d[m][i] <= R)
+                    le = i;
+            }
+            printf("%d\n", R - L + 1 + m - 2 * le);
+        }
+    }
+    return 0;
+}

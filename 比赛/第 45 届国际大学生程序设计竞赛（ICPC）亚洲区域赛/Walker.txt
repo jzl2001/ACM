@@ -1,0 +1,151 @@
+链接：https://ac.nowcoder.com/acm/contest/9925/D
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 1048576K，其他语言2097152K
+Special Judge, 64bit IO Format: %lld
+题目描述 
+As a world-famous traveler, Prof. Pang's research interest is to travel as many places as possible in his life.
+
+We have a segment {[0, n]}[0,n]. There are two travelers on it. The first one is on position p_1p 
+1
+​	
+  with velocity v_1v 
+1
+​	
+  (which means s/he can walk v_1v 
+1
+​	
+  unit on the segment per second). The second one is on position p_2p 
+2
+​	
+  with velocity v_2v 
+2
+​	
+ .
+
+From their respective beginning points, travelers can walk on the segment. They cannot walk outside the segment. Whenever they want to change their direction, they can turn around immediately.
+
+Please help Prof. Pang to calculate the minimum possible time by which every position of the segment is passed by at least one traveler.
+输入描述:
+The first line contains one integer test~(1\le test\le 10000)test (1≤test≤10000) -- the number of test cases.
+
+The i-th of the next test lines contains five numbers n, p_{1, i}, v_{1, i}, p_{2, i}, v_{2, i}n,p 
+1,i
+​	
+ ,v 
+1,i
+​	
+ ,p 
+2,i
+​	
+ ,v 
+2,i
+​	
+  (0 < n \le 100000<n≤10000, 0\le p_{1, i},p_{2, i} \le n0≤p 
+1,i
+​	
+ ,p 
+2,i
+​	
+ ≤n, 0.001 \le v_{1, i},v_{2, i} \le 10000.001≤v 
+1,i
+​	
+ ,v 
+2,i
+​	
+ ≤1000). All numbers have at most 3 digits after the decimal point.
+输出描述:
+For each test case, we should output one number -- the minimum time that every position of the segment is passed by at least one traveler.
+
+Your answer is considered correct if its absolute or relative error does not exceed 10^{-6}10 
+−6
+ .
+示例1
+输入
+复制
+2
+10000.0 1.0 0.001 9999.0 0.001
+4306.063 4079.874 0.607 1033.423 0.847
+输出
+复制
+5001000.0000000000
+3827.8370013755
+二分答案，枚举走的情况判断能不能走。
+#include <bits/stdc++.h>
+#include <unordered_map>
+
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+const int mod = 1e9 + 7;
+const int N = 310 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+
+double p1, p2, v1, v2, n;
+double calc1()
+{
+	return min(max(p2 / v2, (n - p1) / v1), max(p2 / v1, (n - p1) / v2));
+}
+double calc2() 
+{
+	return min((min(p1, n - p1) + n) / v1, (min(p2, n - p2) + n) / v2);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		scanf("%lf%lf%lf%lf%lf", &n, &p1, &v1, &p2, &v2);
+		if (p1 > p2)
+			swap(p1, p2), swap(v1, v2);
+		double ans = 1e10, cz = (p2 - p1);
+		double l = 0, r = 1e10;
+		for (int i = 1; i <= 1000; i++)
+		{
+			int flag = 0;
+			double t = (l + r) / 2;
+			//first
+			//a，b 先走到某个点再回去
+			{
+				double y1 = (v1 * t - p1) / 2; 
+				double y2 = (v2 * t - (n - p2)) / 2;
+				if (y1 >= 0 && y2 >= 0 && y1 + y2 >= cz)
+					ans = min(ans, t), flag = 1;
+			}
+			//a 走到某个点再回去，b先到右边再回头
+			{
+				double y1 = (v1 * t - p1) / 2;
+				double y2 = (v2 * t - 2 * (n - p2));
+				if (y1 >= 0 && y2 >= 0 && y1 + y2 >= cz)
+					ans = min(ans, t), flag = 1;
+			}
+			//
+			{
+				double y1 = (v1 * t - 2 * p1);
+				double y2 = (v2 * t - (n - p2)) / 2;
+				if (y1 >= 0 && y2 >= 0 && y1 + y2 >= cz)
+					ans = min(ans, t), flag = 1;
+			}
+			//
+			{
+				double y1 = (v1 * t - 2 * p1);
+				double y2 = (v2 * t - 2 * (n - p2));
+				if (y1 >= 0 && y2 >= 0 && y1 + y2 >= cz)
+					ans = min(ans, t), flag = 1;
+			}
+			if (flag)
+				r = t;
+			else
+				l = t;
+		}
+		printf("%.15f\n", min({ ans, calc1(), calc2() }));
+	}
+	return 0;
+}

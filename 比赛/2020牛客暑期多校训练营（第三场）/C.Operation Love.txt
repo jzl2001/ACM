@@ -1,0 +1,73 @@
+/*
+https://ac.nowcoder.com/acm/contest/5668/C?&headNav=acm
+题意：给出一个原始右脚的图形，可以旋转或者平移，给出20个坐标，问是左脚
+还是右脚。
+找出最长的两段直线，判断长度8的是不是长度9的逆时针方向
+        ^C
+		|
+		|
+        |
+        |
+        |
+        |
+A<------B      向量BA跟向量BC叉积
+*/
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+const int N = 20 + 10;
+double x[N], y[N];
+double dis(int i, int j)
+{
+	return sqrt((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j]) * (y[i] - y[j]));
+}
+//向量1叉乘向量2 若结果为0则共线或重合 若结果为正2在1的逆时针 否则为顺时针
+double cross(double x1, double y1, double x2, double y2)
+{
+	return x1 * y2 - x2 * y1;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		for (int i = 1; i <= 20; i++)
+			scanf("%lf%lf", &x[i], &y[i]);
+		double mx1 = 0, mx2 = 0;
+		pair<int, int>f;
+		pair<int, int>s;
+		for (int i = 1; i <= 20; i++)
+		{
+			int nxt = (i + 1 == 21) ? 1 : i + 1;
+			double d = dis(i, nxt);
+			if (d > mx1)
+				mx2 = mx1, mx1 = d, s = f, f = { i, nxt };
+			else
+				if (d > mx2)
+					mx2 = d, s = { i, nxt };
+		}
+		if (f.first == s.second)    //见上图,注意向量方向。
+			swap(f.first, f.second);
+		if (f.second == s.first)
+			swap(s.first, s.second);
+		int res = cross(x[f.second] - x[f.first], y[f.second] - y[f.first], x[s.second] - x[s.first], y[s.second] - y[s.first]);
+		if (res < 0)
+			puts("right");
+		else
+			puts("left");
+	}
+	return TIME;
+}

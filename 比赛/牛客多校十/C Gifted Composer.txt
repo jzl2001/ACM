@@ -1,0 +1,144 @@
+链接：https://ac.nowcoder.com/acm/contest/890/C
+来源：牛客网
+时间限制：C/C++ 8秒，其他语言16秒
+空间限制：C/C++ 524288K，其他语言1048576K
+64bit IO Format: %lld
+题目描述 
+Acesrc is a gifted composer. He likes writing tuneful and melodic songs. Every song he writes can be viewed as a sequence of musical notes, and each musical note represents the pitch and the duration of the sound. In this problem, we consider only the following seven primary pitches
+do re mi fa sol la si
+and the duration of each note is one unit time. Hence, there are only seven types of notes, and we may use the pitch name to represent a note.
+
+Acesrc composes a song in the following way. Initially, the sequence of notes is empty. Every day, he inserts a new note at the beginning or at the end of the sequence, until the song is done. 
+
+Acesrc particularly likes songs with repetitions. For a song with n musical notes, we say the song has a repetition of length k (1≤k≤n)(1 \leq k \leq n)(1≤k≤n), if the song can be partitioned into one or more identical sections with k notes, optionally followed by an incomplete section, which is an initial part of a complete section. For example, do re do re do\texttt{do re do re do}do re do re do can be partitioned into do re | do re | do\texttt{do re | do re | do}do re | do re | do, so it has a repetition of length 2; similarly, do re mi do re mi\texttt{do re mi do re mi}do re mi do re mi has a repetition of length 3, and do re do re mi\texttt{do re do re mi}do re do re mi has a repetition of length 5.
+
+Acesrc wants to know, after he adds a note each day, the number of different lengths of repetitions the song has. Can you help him?
+输入描述:
+The first line of input consists of a single line n (1≤n≤106)(1 \leq n \leq 10^6)(1≤n≤106), the number of days Acesrc uses to compose the song. The ith of the remaining n lines contains a character a (a∈{p,a})(a \in \{\texttt{p}, \texttt{a}\})(a∈{p,a}) (where \texttt{p} denotes prepend, i.e., inserting at the beginning, and \texttt{a} denotes append, i.e., inserting at the end) and a string s (s∈{do,re,mi,fa,sol,la,si})(s \in \{\texttt{do}, \texttt{re}, \texttt{mi}, \texttt{fa}, \texttt{sol}, \texttt{la}, \texttt{si}\})(s∈{do,re,mi,fa,sol,la,si}), representing the action Acesrc takes in the ith day.
+输出描述:
+Output n lines. The ith line should be a single integer, denoting the answer for the ith day.
+示例1 
+输入
+复制 
+5
+a do
+p re
+a re
+a do
+p do
+输出
+复制 
+1
+1
+2
+2
+3
+示例2 
+输入
+复制 
+5
+a re
+a do
+a re
+p do
+a mi
+输出
+复制 
+1
+1
+2
+2
+1 
+题意: a往后插， p往前插
+问你， 每个串的循环节有几种
+二分: 每个长度的循环节在哪个位置消失， 以后就再也不会出现
+判断是否有这个循环节: 前len - mid个字符 == 后len - mid个字符
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e6 + 10;
+const int mod = 998244353;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ull base[N];
+ull ha[N];
+int l[N];
+int r[N];
+char s[N];
+char a[N], b[N][5];
+int re[N];
+int d[N];
+int main(){
+#ifdef LOCAL
+	  freopen("D:/input.txt", "r", stdin);
+#endif
+	  base[1] = 1;
+	  for (int i = 2; i < N; i++)
+		  base[i] = hash_ * base[i - 1];
+	  int n;
+	  cin >> n;
+	  deque<char>dq;
+	  for (int i = 1; i <= n;i++)
+	  {
+		  getchar();
+		  scanf("%c", &a[i]);
+		  scanf("%s", b[i]);
+		  char ad = b[i][0];
+		  if (strcmp("sol", b[i]) == 0)
+			  ad = 'u';
+		  if (a[i] == 'a')
+			  dq.push_back(ad);
+		  else
+			  dq.push_front(ad);
+	  }
+	  int cnt = 0;
+	  s[0] = 'w';
+	  for (auto &i : dq)
+		  s[++cnt] = i;
+	  ha[1] = s[1];
+	  for (int i = 2; i <= n; i++)
+		  ha[i] = ha[i - 1] * hash_ + s[i];
+	  int u = 1, v = cnt;
+	  for (int i = cnt; i >= 1; i--)
+	  {
+		  l[i] = u, r[i] = v;
+		  if (a[i] == 'p')
+			  u++;
+		  else
+			  v--;
+	  }
+	  for (int i = 1; i <= n; i++) // 二分每个长度在哪个串为止结束出现
+	  {
+		  int L = i, R = cnt;  // 在i第一次出现 
+		  int ans = -1;
+		  while (L <= R) 
+		  { 
+			  int mid = (L + R) >> 1;
+			  int u = l[mid], v = r[mid];
+			  int de = v - u + 1 - i;
+			  int x = de + u - 1, y = u - 1, z = v, c = v - de;
+			  if (ha[x] - ha[y] * base[de + 1] == ha[z] - ha[c] * base[de + 1])
+				  ans = mid, L = mid + 1;
+			  else
+				  R = mid - 1;
+		  }
+		  d[i]++, d[ans + 1]--;
+	  }
+	  for (int i = 1; i <= cnt; i++)
+		  re[i] = re[i - 1] + d[i], printf("%d\n", re[i]);
+	  return TIME;
+}
+
+ 

@@ -1,0 +1,84 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read() { static char buf[1000000], *p1 = buf, *p2 = buf; int x = false; char ch = gc; bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int N = 1e5 + 10;
+
+
+int pr[9][31];
+int off = 300;
+struct node
+{
+	int first, second, fi;
+}p[100100];
+int d[10][1010][1010];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	for (int r = 1; r <= 30; r++)
+	{
+		int ans = 0;
+		int cnt = 0;
+		for (int i = r; i >= -r; i--)
+			for (int j = r; j >= -r; j--)
+			{
+				if (i * i + j * j <= r * r)
+					p[++cnt] = { i, j, i * i + j * j };
+			}
+		for (int i = 0; i <= 8; i++)
+			for (int j = off - 8 * r; j <= off + 8 * r; j++)
+				for (int k = off - 8 * r; k <= off + 8 * r; k++)
+					d[i][j][k] = -INF;
+		d[0][off][off] = 0;
+		for (int u = 1; u <= cnt; u++)
+			for (int i = 0; i <= 7; i++)
+				for (int j = off - i * r; j <= off + i * r; j++)
+					for (int k = off - i * r; k <= off + i * r; k++)
+						if (d[i][j][k] != -INF)
+						{
+							d[i + 1][j + p[u].first][k + p[u].second] =
+								max(d[i + 1][j + p[u].first][k + p[u].second],
+								d[i][j][k] + p[u].first * p[u].first + p[u].second * p[u].second);
+						}
+		for (int i = 1; i <= 8; i++)
+			for (int j = off - 8 * r; j <= off + 8 * r; j++)
+				for (int k = off - 8 * r; k <= off + 8 * r; k++)
+					if (d[i][j][k] != -INF)
+						pr[i][r] = max(pr[i][r], i * d[i][j][k] - (j - off) * (j - off) - (k - off) * (k - off));
+	}
+	for (int i = 1; i <= 8; i++)
+	{
+		cout << "0, " << endl;
+		for (int j = 1; j <= 30; j++)
+			cout << pr[i][j] << ", " << endl;
+	}
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		cin >> n >> m;
+		cout << pr[n][m] << endl;
+	}
+	return TIME;
+}

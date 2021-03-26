@@ -1,0 +1,42 @@
+/*
+期望线性递推
+当前能进入下一等级的期望 = 当前成功的概率反过来 * 钱 + 失败的概率反过来 * sum[i - 1] - sum[x[i] - 1]
+*/
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 5e5 + 10;
+
+typedef long long ll;
+ll mod = 1e9 + 7;
+ll fpow(ll a, ll b) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll r[N];
+ll s[N];
+ll x[N];
+ll a[N];
+ll sum[N]; // 升到i + 1 级需要的次数
+
+int main()
+{
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, query;
+		scanf("%d%d", &n, &query);
+		for (int i = 1; i <= n; ++i)
+			scanf("%lld%lld%lld%lld", &r[i], &s[i], &x[i], &a[i]);
+		for (int i = 1; i <= n; ++i)
+		{
+			ll p = fpow(r[i], mod - 2) % mod;
+			ll q = p * s[i] % mod;
+			sum[i] = (sum[i - 1] + (((q - 1 + mod) % mod * (sum[i - 1] - sum[x[i] - 1] + mod) % mod) % mod + q * a[i] % mod) % mod) % mod; 
+		}
+		while (query--)
+		{
+			int L, R;
+			scanf("%d%d", &L, &R);
+			printf("%lld\n", (sum[R - 1] - sum[L - 1] + mod) % mod);
+		}
+	}
+	return 0;
+}

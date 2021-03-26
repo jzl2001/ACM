@@ -1,0 +1,47 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define sz(a) ((int)(a).size())
+typedef long long ll;
+#define me(a, b) (memset(a, b, sizeof a))
+const ll INF = 0x3f3f3f3f;
+const ll MAXN = 1e5 + 10;
+ 
+int a[11][11];
+bool vis[11][11];
+int dir[2][2] = { 1, 0, 0, 1 };
+bool use[1000000];
+int ans = 0;
+int n;
+void dfs(int x, int y, int t)
+{
+	if (x == n && y == n)
+	{
+		if (!use[t])
+			use[t] = 1, ans++;
+	}
+	else
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			int xx = x + dir[i][0];
+			int yy = y + dir[i][1];
+			if (!vis[xx][yy] && xx >= 1 && xx <= n && yy >= 1 && yy <= n)
+			{
+				vis[xx][yy] = 1;
+				dfs(xx, yy, t + a[xx][yy]);
+				vis[xx][yy] = 0;
+			}
+		}
+	}
+}
+int main()
+{
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= n; j++)
+			scanf("%d", &a[i][j]);
+	vis[1][1] = 1;
+	dfs(1, 1, 0);
+	cout << ans << endl;
+	return 0;
+}

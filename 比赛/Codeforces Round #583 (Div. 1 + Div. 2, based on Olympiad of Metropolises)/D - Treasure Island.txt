@@ -1,0 +1,213 @@
+/*
+思维或者dp， 考虑如果能只添加一个#使得不连通， 那么肯定这个路径只有一条，
+那先搜索， 如果可以再标记为不能走
+再搜索如不行， 即可以只添加一个
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+vector<vector<int>>vis, re;
+string s[N];
+char x[N];
+int dir[3][2] = { 0, 0, 0, 1, 1, 0 };
+int fdir[3][2] = { 0, 0, 0, -1, -1, 0 };
+int n, m;
+struct node
+{
+	int x, y;
+};
+int bfs(int x, int y)
+{
+	queue<node>q;
+	q.push({ x, y });
+	while (!q.empty())
+	{
+		int x = q.front().x;
+		int y = q.front().y;
+		q.pop();
+		if (vis[x][y])
+			continue;
+		vis[x][y] = 1;
+		if (x == n && y == m)
+			return 1;
+		for (int i = 1; i <= 2; i++)
+		{
+			int xx = x + dir[i][0];
+			int yy = y + dir[i][1];
+			if (xx <= n && xx >= 1 && yy <= m && yy >= 1 && s[xx][yy] != '#')
+				q.push({ xx, yy }), re[xx][yy] = i;
+		}
+	}
+	return 0;
+}
+void op(int n, int m)
+{
+	int x = n, y = m;
+	while (re[x][y] != 0)
+	{
+		vis[x][y] = 1;
+		int u = x;
+		x = x + fdir[re[x][y]][0];
+		y = y + fdir[re[u][y]][1];
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	cin >> n >> m;
+	vis.resize(n + 3);
+	for (int i = 0; i <= n + 1; i++)
+		vis[i].resize(m + 2);
+	re.resize(n + 3);
+	for (int i = 0; i <= n + 1; i++)
+		re[i].resize(m + 2);
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%s", x);
+		s[i] = " " + string(x);
+	}
+	int ans = 0;
+	if (bfs(1, 1))
+		ans++;
+	if (!ans)
+		cout << ans << endl, exit(0);
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= m; j++)
+			vis[i][j] = 0;
+	op(n, m);
+	vis[1][1] = 0;
+	vis[n][m] = 0;
+	if (bfs(1, 1))
+		ans++;
+	cout << ans << endl;
+	return TIME;
+}
+/*
+//d1[i][j]从1, 1到i, j的方案数 
+//d2[i][j]从n, m到i, j的方案数
+//若d1[[i][j] * d2[i][j] == d[n][m], 则该点为关键点
+//两次操作, 减少误差, 选模数看命。。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 3;
+const int mod1 = 1e9 + 7; 
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+string s[N];
+char x[N];
+vector<vector<ll>>d1;
+vector<vector<ll>>d2;
+vector<vector<ll>>d3;
+vector<vector<ll>>d4;
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n, m, len;
+	cin >> n >> m;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%s", x);
+		s[i] = " " + string(x);
+	}
+	d1.resize(n + 3);
+	for (int i = 0; i <= n; i++)
+		d1[i].resize(m + 3);
+	d1[1][1] = 1;
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= m; j++)
+		{
+			if (s[i][j] != '#' && (i != 1 || j != 1))
+				d1[i][j] = (d1[i - 1][j] + d1[i][j - 1]) % mod;
+		}
+	}
+	d4.resize(n + 3);
+	for (int i = 0; i <= n; i++)
+		d4[i].resize(m + 3);
+	d4[1][1] = 1;
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= m; j++)
+		{
+			if (s[i][j] != '#' && (i != 1 || j != 1))
+				d4[i][j] = (d4[i - 1][j] + d4[i][j - 1]) % mod1;
+		}
+	}
+	if (d1[n][m] == 0 && d4[n][m] == 0)
+		cout << "0" << endl;
+	else
+	{
+		d2.resize(n + 3);
+		for (int i = 0; i <= n + 1; i++)
+			d2[i].resize(m + 3);
+		d3.resize(n + 3);
+		for (int i = 0; i <= n + 1; i++)
+			d3[i].resize(m + 3);
+		d2[n][m] = 1;
+		for (int i = n; i >= 1; i--)
+		{
+			for (int j = m; j >= 1; j--)
+			{
+				if (s[i][j] != '#' && (i != n || j != m))
+					d2[i][j] = (d2[i + 1][j] + d2[i][j + 1]) % mod;
+			}
+		}
+		d3[n][m] = 1;
+		for (int i = n; i >= 1; i--)
+		{
+			for (int j = m; j >= 1; j--)
+			{
+				if (s[i][j] != '#' && (i != n || j != m))
+					d3[i][j] = (d3[i + 1][j] + d3[i][j + 1]) % mod1;
+			}
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= m; j++)
+			{
+				if ((i == 1 && j == 1) || (i == n && j == m))
+					continue;
+				if ((1LL * d2[i][j] * d1[i][j]) % mod == d1[n][m] && (1LL * d4[i][j] * d3[i][j]) % mod1 == d4[n][m])
+					cout << "1" << endl, exit(0);
+			}
+		}
+		cout << "2" << endl;
+	}
+	return TIME;
+}
+*/

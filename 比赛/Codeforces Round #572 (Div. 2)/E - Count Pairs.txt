@@ -1,0 +1,24 @@
+#include <iostream>
+#include <stdio.h>
+#include <algorithm>
+#include <string.h>
+#include <map>
+using namespace std;
+typedef long long ll;
+const int N = 3e5 + 10;
+ll a[N];
+ll b[N];
+map<ll, int>mp;
+int main(){
+	ll n, k, p;
+	ll cnt = 0;
+	cin >> n >> p >> k;
+	for (int i = 1; i <= n; i++)
+		scanf("%lld", &a[i]);
+	for (int i = 1; i <= n; i++)
+		mp[(a[i] * a[i] % p * a[i] % p * a[i] % p - k * a[i] % p + p) % p]++;
+	for (auto i = mp.begin(); i != mp.end(); i++)
+		cnt += (i->second - 1) * (i->second) / 2;
+	cout << cnt << endl;
+	return 0;
+}

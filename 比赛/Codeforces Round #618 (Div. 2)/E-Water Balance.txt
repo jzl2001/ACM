@@ -1,0 +1,59 @@
+/*
+单调栈维护，每两个元素之间是一个区间
+正着来能向前蔓延变小，就向前
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll a[N];
+double ans[N];
+ll sum[N];
+int s[N];
+int idx = 1;
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d", &a[i]);
+		sum[i] = sum[i - 1] + a[i];
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		while (idx > 1 && (sum[i] - sum[s[idx]]) * (i - s[idx - 1]) <= (sum[i] - sum[s[idx - 1]]) * (i - s[idx]))
+			idx--;
+		s[++idx] = i;
+	}
+	for (int i = 2; i <= idx; i++)
+	{
+		double res = 1.0 * (sum[s[i]] - sum[s[i - 1]]) / (s[i] - s[i - 1]);
+		for (int j = 1; j <= s[i] - s[i - 1]; j++)
+		{
+			printf("%.10f\n", res);
+		}
+	}
+	return TIME;
+}

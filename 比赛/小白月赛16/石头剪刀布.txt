@@ -1,0 +1,96 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#define sz(a) ((int)(a).size())
+typedef long long ll;
+bool cmp(int a, int b) { return a > b; }
+#define me(a, b) (memset(a, b, sizeof a))
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+const double PI = acos(-1);
+const int N = 210;
+#define GG return 0;
+
+ll qpow(ll a, ll b){
+	ll ans = 1;
+	while (b){
+		if (b & 1)ans = ans*a%mod;
+		a = a*a%mod;
+		b >>= 1;
+	}
+	return ans;
+}
+ll a[N][N];
+ll x[N];
+ll free_x[N];
+ll gcd(ll a, ll b){
+	if (!b) return a; else return gcd(b, a%b);
+}
+ll lcm(ll a, ll b){
+	return a / gcd(a, b)*b;
+}
+//有equ个方程，var个变元。增广矩阵行数为equ,分别为0到equ-1,列数为var+1,分别为0到var.
+int Gauss(int equ, int var){
+	ll k, max_r, col = 0, ta, tb;
+	ll LCM, temp, num = 0, free_index;
+	for (int i = 0; i <= var; i++){
+		x[i] = 0;
+		free_x[i] = true;
+	}
+	for (k = 0; k < equ && col < var; k++, col++){
+		max_r = k;
+		for (int i = k + 1; i<equ; i++){
+			if (abs(a[i][col])>abs(a[max_r][col])) max_r = i;
+		}
+		if (max_r != k){// 与第k行交换.
+			for (int j = k; j < var + 1; j++) swap(a[k][j], a[max_r][j]);
+		}
+		if (a[k][col] == 0){// 说明该col列第k行以下全是0了，则处理当前行的下一列.
+			free_x[num++] = col;
+			k--;
+			continue;
+		}
+		for (int i = k + 1; i < equ; i++){// 枚举要删去的行.
+			if (a[i][col] != 0){
+				LCM = lcm(abs(a[i][col]), abs(a[k][col]));
+				ta = LCM / abs(a[i][col]);
+				tb = LCM / abs(a[k][col]);
+				if (a[i][col] * a[k][col] < 0)tb = -tb;//异号的情况是相加
+				for (int j = col; j < var + 1; j++){
+					a[i][j] = (a[i][j] * ta%mod - a[k][j] * tb%mod + mod) % mod;      //如果取模在这里取模
+				}
+			}
+		}
+	}
+	//唯一解
+	for (int i = var - 1; i >= 0; i--){
+		temp = a[i][var];
+		for (int j = i + 1; j < var; j++){
+			if (a[i][j] != 0) temp = (temp - a[i][j] * x[j] % mod + mod) % mod;     //取模处
+		}
+		x[i] = temp%mod *qpow(a[i][i], mod - 2) % mod;      //取模处
+	}
+	return 0;
+}
+int main()
+{
+	ll n, u, v;
+	cin >> n >> u >> v;
+	ll w = (1LL - u - v + mod) % mod;
+	for (int i = 0; i < n - 1; i++)
+	{
+		if (i != 0)
+			a[i][i - 1] = w;
+		a[i][i] = v - 1;
+		a[i][i + 1] = u;
+		a[i][n] = mod - 1;
+	}
+	a[0][0] = (a[0][0] + w) % mod;
+	a[n - 1][n - 1] = 1;
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n + 1; j++)
+			a[i][j] = (a[i][j] + mod) % mod;
+	Gauss(n, n);
+	cout << (x[0] + mod) % mod << endl;
+	GG
+}

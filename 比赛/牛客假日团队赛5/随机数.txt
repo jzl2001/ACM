@@ -1,0 +1,80 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+ll pre[110];
+ll cnm(ll n,ll m)
+{
+	ll res1 = 1, j = 1;
+	if(n / 2 < m)
+		m = n - m;
+	for(ll i = n - m + 1; i <= n; i++)
+	{
+		res1 *= i;
+		while (res1 % j == 0 && j <= m)
+		{
+			res1 /= j ; 
+			j++;
+		}
+	}
+	return res1;
+}
+ll fun(ll a)
+{
+	ll u = 0, v = 0;
+	ll ans = 0;
+	ll x = a;
+	ll tot = 0;
+	while (x)
+	{
+		if(x & 1)
+			u++;
+		else
+			v++;
+		tot++;
+		x >>= 1;
+	}
+	if(u <= v && u)
+		ans++;
+	ll cnt1 = 1;
+	ll cnt2 = 0;
+	for(ll i = tot - 2; i >= 0; i--)
+	{
+		if((1LL << i) & a)
+		{
+			cnt2++;
+			if(i == 0)
+			{
+				if(cnt1 <= cnt2)
+					ans++;
+					continue;
+			}
+			for(ll j = 0; cnt1 + j <= (i - j) + cnt2; j++)
+			{
+				if(i >= j)
+					ans += cnm(i, j);
+			}
+			cnt2--;
+			cnt1++;
+		}
+		else
+			cnt2++;
+	}
+	if(tot <= 1)
+		return 1;
+	for(ll i = 1; i < tot; i++)
+		ans += pre[i];
+	return ans;
+}
+int main(){
+	for(ll i = 1; i<= 32; i++)
+	{
+		for(ll j = 0; 1 + j <= i - 1 - j; j++)
+		{
+			pre[i] += cnm(i - 1, j);
+		}
+	}
+	pre[1] = 1;
+	ll a, b;
+	while (cin >> a >> b)
+		cout << fun(b) - fun(a - 1) << endl;
+}

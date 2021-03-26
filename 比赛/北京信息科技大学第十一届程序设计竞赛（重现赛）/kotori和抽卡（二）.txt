@@ -1,0 +1,31 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <string.h>
+#include <vector>
+using namespace std;
+typedef long long ll;
+const int N = 1e5 + 10;
+double C(double n, double m)
+{
+	double cnt1 = 1, cnt2 = 1, cnt3 = 1;
+	for (double i = 1; i <= n; i++)
+		cnt1 *= i;
+	for (double i = 1; i <= m; i++)
+		cnt2 *= i;
+	for (double i = 1; i <= n - m; i++)
+		cnt3 *= i;
+	return cnt1 / (cnt2 * cnt3);
+}
+int main(){
+	int n, m;
+	cin >> n >> m;
+	double ans = 1;
+	for (int i = 1; i <= m; i++)
+		ans *= 0.8;
+	for (int i = 1; i <= n - m; i++)
+		ans *= 0.2;
+	double u = C(n, m);
+	printf("%.4f", ans * u);
+	return 0;
+}

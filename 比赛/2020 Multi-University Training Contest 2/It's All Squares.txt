@@ -1,0 +1,162 @@
+Time Limit: 4000/4000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 414    Accepted Submission(s): 128
+
+
+Problem Description
+One day when Little Q woke up, he found himself being inside a 2D pixel world. The world is a grid with n×m square cells. Little Q can only walk along the side of these cells, which means he can stay at a point (x,y) if and only if 0≤x≤n and 0≤y≤m, where x and y are all integers. There is a number written at the center of each cell, number wi,j (1≤i≤n,1≤j≤m) is written at the point (i−0.5,j−0.5).
+
+Little Q had no idea about how to escape from the pixel world, so he started wandering. You will be given q queries, each query consists of two integers (x,y) and a string S, denoting the route of Little Q. Initially, Little Q will stand at (x,y), then he will do |S| steps of movements S1,S2,…,S|S| one by one. Here is what he will do for each type of movement:
+
+· "L" : Move from (x,y) to (x−1,y).
+
+· "R" : Move from (x,y) to (x+1,y).
+
+· "D" : Move from (x,y) to (x,y−1).
+
+· "U" : Move from (x,y) to (x,y+1).
+
+It is guaranteed that Little Q will never walk outside of the pixel world, and the route will form a simple polygon. For each query, please tell Little Q how many distinct numbers there are inside the polygon formed by the route.
+
+Fortunately, after solving this problem, Little Q woke up on his bed. The pixel world had just been a dream!
+ 
+
+Input
+The first line of the input contains a single integer T (1≤T≤10), the number of test cases.
+
+For each case, the first line of the input contains three integers n,m and q (1≤n,m≤400, 1≤q≤200000), denoting the size of the pixel world and the number of queries.
+
+Each of the following n lines contains m integers, the i-th line contains m integers wi,1,wi,2,…,wi,m (1≤wi,j≤n×m), denoting the number written in each cell.
+
+Each of the following q lines contains two integers x,y (0≤x≤n, 0≤y≤m) and a non-empty string S (Si∈{L,R,D,U}), denoting each query.
+
+It is guaranteed that ∑|S|≤4000000.
+ 
+
+Output
+For each query, output a single line containing an integer, the number of distinct numbers inside the polygon.
+ 
+
+Sample Input
+1
+3 3 2
+1 2 3
+1 1 2
+7 8 9
+0 0 RRRUUULLLDDD
+0 0 RRUULLDD
+ 
+
+Sample Output
+6
+2
+ 
+
+Source
+2020 Multi-University Training Contest 2
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6774 6773 6772 6771 6770 
+题意：给出一个矩形，再给出一个路线，会形成一个简单图形即不会相交还会回到起点，
+里面包含了数字，问不同数字的数目，∑S 4e6，最坏情况4e6 / 4 / 400 * 400 * 400 = 4e8
+勉强能跑，直接扫就可以了。
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 4e6 + 10;
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+typedef long long ll;
+typedef unsigned long long ull;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int a[410][410];
+int flag[410][410];
+int vis[160010];
+char s[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	int cnt = 0;
+	while (t--)
+	{
+		int n, m, q;
+		scanf("%d%d%d", &n, &m, &q);
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= m; j++)
+			{
+				scanf("%d", &a[i][j]);
+			}
+		}
+		while (q--)
+		{
+			++cnt;
+			int mx = 0, my = 0;
+			int sx, sy;
+			scanf("%d%d%s", &sx, &sy, s + 1);
+			int len = strlen(s + 1);
+			int x = sx, y = sy;
+			int xmx = 0, xmi = n, ymx = 0, ymi = m;
+			for (int i = 1; i <= len; i++)
+			{
+				xmx = max(xmx, x);
+				xmi = min(xmi, x);
+				ymx = max(ymx, y);
+				ymi = min(ymi, y);
+				if (s[i] == 'L')
+					x--;
+				if (s[i] == 'R')
+					x++;
+				if (s[i] == 'D')
+					y--;
+				if (s[i] == 'U')
+					y++;
+			}
+			for (int i = xmi; i <= xmx; i++)
+				for (int j = ymi; j <= ymx; j++)
+					flag[i][j] = 0;
+			for (int i = 1; i <= len; i++)
+			{
+				if (s[i] == 'D')
+					sy--;
+				if (s[i] == 'U')
+					sy++;
+				if (s[i] == 'L')
+					flag[sx][sy + 1] = 1, sx--; //间隔
+				if (s[i] == 'R')
+					sx++, flag[sx][sy + 1] = 1;
+			}
+// 			for (int i = 0; i <= n; i++)
+// 			{
+// 				for (int j = 0; j <= m; j++)
+// 				{
+// 					printf("%d ", flag[i][j]);
+// 				}
+// 				puts("");
+// 			}
+			int ans = 0;
+			for (int i = xmi; i <= xmx; i++)//考虑每行
+			{
+				int k = 0;
+				for (int j = ymi; j <= ymx; j++)
+				{
+					k ^= flag[i][j]; //奇数次即是包含的区域。
+					if (k && vis[a[i][j]] != cnt)
+					{
+						vis[a[i][j]] = cnt, ans++;
+					}
+				}
+			}
+			printf("%d\n", ans);
+		}
+	}
+	return TIME;
+}

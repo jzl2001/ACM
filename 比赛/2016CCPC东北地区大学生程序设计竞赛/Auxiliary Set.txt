@@ -1,0 +1,182 @@
+Problem Description
+Given a rooted tree with n vertices, some of the vertices are important.
+
+An auxiliary set is a set containing vertices satisfying at least one of the two conditions：
+
+∙It is an important vertex
+∙It is the least common ancestor of two different important vertices.
+
+You are given a tree with n vertices (1 is the root) and q queries.
+
+Each query is a set of nodes which indicates the unimportant vertices in the tree. Answer the size (i.e. number of vertices) of the auxiliary set for each query.
+ 
+
+Input
+The first line contains only one integer T (T≤1000), which indicates the number of test cases.
+
+For each test case, the first line contains two integers n (1≤n≤100000), q (0≤q≤100000).
+
+In the following n -1 lines, the i-th line contains two integers ui,vi(1≤ui,vi≤n) indicating there is an edge between uii and vi in the tree.
+
+In the next q lines, the i-th line first comes with an integer mi(1≤mi≤100000) indicating the number of vertices in the query set.Then comes with mi different integers, indicating the nodes in the query set.
+
+It is guaranteed that ∑qi=1mi≤100000.
+
+It is also guaranteed that the number of test cases in which n≥1000  or ∑qi=1mi≥1000 is no more than 10.
+ 
+
+Output
+For each test case, first output one line "Case #x:", where x is the case number (starting from 1).
+
+Then q lines follow, i-th line contains an integer indicating the size of the auxiliary set for each query.
+ 
+
+Sample Input
+1
+6 3
+6 4
+2 5
+5 4
+1 5
+5 3
+3 1 2 3
+1 5
+3 3 1 4
+ 
+
+Sample Output
+Case #1:
+3
+6
+3
+Hint
+
+
+
+
+For the query {1，2, 3}:
+•node 4, 5, 6 are important nodes For the query {5}：
+•node 1，2, 3, 4, 6 are important nodes
+•node 5 is the lea of node 4 and node 3 For the query {3, 1，4}:
+• node 2, 5, 6 are important nodes 
+ 
+ 
+
+Source
+2016CCPC东北地区大学生程序设计竞赛 - 重现赛
+ 
+思维题
+题意:给出一棵树，询问多少点满足条件，满足条件的点为重要点或者为某两个重要点的LCA。
+某个点满足条件要么为重要点，要么某两个子树内含有重要点，所以处理每一个非重要点，按
+深度排序，自下而上更新。当某个非关键点有两个合法子树即答案加加，当当前子树不合法，父节点
+可用的cnt就减减。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+#define cel cout << endl;
+const int mod = 1e9 + 7;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+vector<int>G[N];
+int f[N];
+int cnt[N];
+int d[N];
+int now[N];
+struct node 
+{
+    int id, d;
+    bool operator < (const node &oth)const
+    {
+        return d > oth.d;
+    }
+}a[N];
+void dfs(int x, int fa)
+{
+    for (auto &i : G[x])
+    {
+        if (i == fa)
+            continue;
+        d[i] = d[x] + 1;
+        f[i] = x;
+        cnt[x]++;
+        dfs(i, x);
+    }
+}
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    int kcase = 0;
+    while (t--)
+    {
+        printf("Case #%d:\n", ++kcase);
+        int n, q;
+        cin >> n >> q;
+        for (int i = 1; i < n; i++)
+        {
+            int u, v;
+            scanf("%d%d", &u, &v);
+            G[u].push_back(v);
+            G[v].push_back(u);
+        }
+        dfs(1, 0);
+        while (q--)
+        {
+            int m;
+            cin >> m;
+            for (int i = 1; i <= m; i++)
+            {
+                int num;
+                scanf("%d", &num);
+                a[i].id = num;
+                a[i].d = d[num];
+                now[num] = cnt[num];
+            }
+            sort(a + 1, a + m + 1);
+            int ans = n - m;
+            for (int i = 1; i <= m; i++)
+            {
+                if (now[a[i].id] >= 2)
+                {
+                    ans++;
+                }
+                else
+                    if (!now[a[i].id])
+                    {
+                        now[f[a[i].id]]--;
+                    }
+            }
+            for (int i = 1; i <= m; i++)
+            {
+                now[a[i].id] = 0;
+                now[f[a[i].id]] = 0;
+            }
+            cout << ans << endl;
+        }
+        for (int i = 1; i <= n; i++)
+        {
+            G[i].clear();
+            cnt[i] = 0;
+        }
+    }
+    return TIME;
+}

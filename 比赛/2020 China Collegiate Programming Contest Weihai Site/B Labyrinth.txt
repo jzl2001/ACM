@@ -1,0 +1,196 @@
+Due to the challenging problems, some of the contestants decide to escape from this contest. However, to prevent this from happening, the EVIL problem setters made a labyrinth at the stadium's exit. The labyrinth is made of an n×m grid, on which lie the entrance and the exit, and k black holes. Contestants who accidentally step into any black hole will fall into it and thus can never escape from the contest.
+
+What's worse, the problem setters may also adjust the coordinates of the entrance and the exit. You, a poor contestant, who start from the entrance and wish to reach the exit without stepping into any of the black holes, can only move to one of the four adjacent cells in each step. You want to know, after each time the problem setters change the coordinates of the entrance and the exit, what's the minimum number of steps needed to reach the exit starting from the entrance?
+
+Input Specification:
+The first line of the input contains four integers n,m,k,q (1≤n,m≤200000,nm≤200000,0≤k≤42, 1≤q≤100000), denoting the number of rows, the number of columns, the number of black holes in the labyrinth, and the number of queries, respectively.
+
+The following k lines contain the description of the black holes. Each of these lines contains two integers x,y (1≤x≤n,1≤y≤m), denoting the coordinates of a black hole. No two black holes are located at the same position.
+
+The last q lines contain the description of the queries. Each of the q lines contains four integers x
+​s
+​​ ,y
+​s
+​​ ,x
+​t
+​​ ,y
+​t
+​​  (1≤x
+​s
+​​ ,x
+​t
+​​ ≤n,1≤y
+​s
+​​ ,y
+​t
+​​ ≤m), where (x
+​s
+​​ ,y
+​s
+​​ ) is the coordinates of the entrace and (x
+​t
+​​ ,y
+​t
+​​ ) is the exit.
+
+Output Specification:
+For each query, output a number in a line, denoting the minimum number of steps needed to reach the exit starting from the entrance. If it is impossible to reach the exit, output -1 instead. It should be considered impossible when the entrace or the exit coincides with a black hole.
+
+Sample Input 1:
+5 5 4 7
+2 2
+2 3
+3 2
+3 3
+2 1 3 4
+1 1 1 1
+2 2 2 2
+1 1 1 5
+2 2 5 5
+2 1 2 4
+1 1 3 3
+Sample Output 1:
+6
+0
+-1
+4
+-1
+5
+-1
+Sample Input 2:
+2 3 2 1
+1 2
+2 1
+1 1 2 3
+Sample Output 2:
+-1
+Notes:
+The plots for the labyrinth and the first query of the first sample data are shown below.
+
+//题意：给出一个n*m大小为2e5网格图，有t个黑点，q次询问，黑点没法走。
+每次询问两个点能相遇的最近距离。黑点最多42个，所以相邻的格子最多4*42个。
+如果询问的两个点之间的矩阵不含有黑点，则就是欧几里得距离，否则遍历每个
+黑点周围的点，这两个点如果经过黑点，枚举看看到哪个黑点的周围的距离之和最少。
+#include <bits/stdc++.h>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+
+int dir[4][2] = { 0, 1, 1, 0, -1, 0, 0, -1 };
+int n, m;
+void bfs(int x, int y, int id, int** vis, int*** d, int** hs)
+{
+	if (hs[x][y])
+		return;
+	queue<pair<int, pair<int, int>>>q;
+	stack<pair<int, int>>s;
+	q.push({ x, { y, 0 } });
+	while (!q.empty())
+	{
+		int x = q.front().first, y = q.front().second.first, t = q.front().second.second;
+		q.pop();
+		if (vis[x][y])
+			continue;
+		vis[x][y] = 1;
+		d[x][y][id] = t;
+		s.push({ x, y });
+		for (int i = 0; i < 4; i++)
+		{
+			int xx = x + dir[i][0];
+			int yy = y + dir[i][1];
+			if (xx >= 1 && yy >= 1 && xx <= n && yy <= m && !vis[xx][yy] && !hs[xx][yy])
+				q.push({ xx, { yy, t + 1 } });
+		}
+	}
+	while (!s.empty())
+		vis[s.top().first][s.top().second] = 0, s.pop();
+}
+bool check(int a, int b, int c, int d, int** sum)
+{
+	int x1 = min(a, c), x2 = max(a, c), y1 = min(b, d), y2 = max(b, d);
+	return (sum[x2][y2] + sum[x1 - 1][y1 - 1] - sum[x1 - 1][y2] - sum[x2][y1 - 1]) == 0;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t, q;
+	cin >> n >> m >> t >> q;
+	int ***d = new int **[n + 1];
+	int **vis = new int *[n + 1], **a = new int *[n + 1], **hs = new int *[n + 1];
+	for (int i = 0; i <= n; i++)
+		vis[i] = new int[m + 1], a[i] = new int [m + 1], hs[i] = new int[m + 1];
+	for (int i = 0; i <= n; i++)
+		d[i] = new int *[m + 1];
+	set<pair<int, int>>s;
+	for (int i = 0; i <= n; i++)
+		for (int j = 0; j <= m; j++)
+			vis[i][j] = a[i][j] = hs[i][j] = 0;
+	while (t--)
+	{
+		int x, y;
+		scanf("%d%d", &x, &y);
+		a[x][y] = 1;
+		hs[x][y] = 1;
+		for (int i = 0; i < 4; i++)
+		{
+			int xx = x + dir[i][0];
+			int yy = y + dir[i][1];
+			if (xx >= 1 && xx <= n && yy >= 1 && yy <= m)
+				s.insert({ xx, yy });
+		}
+	}
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= m; j++)
+			a[i][j] = a[i][j] + a[i - 1][j] + a[i][j - 1] - a[i - 1][j - 1];
+	int sz = s.size();
+	for (int i = 0; i <= n; i++)
+		for (int j = 0; j <= m; j++)
+		{
+			d[i][j] = new int[sz + 1];
+			for (int k = 0; k <= sz; k++)
+				d[i][j][k] = INF;
+		}
+	int cnt = 0;
+	for (auto &p : s)
+		bfs(p.first, p.second, ++cnt, vis, d, hs);
+	while (q--)
+	{
+		int x1, y1, x2, y2;
+		scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
+		if (hs[x1][y1] || hs[x2][y2])
+		{
+			puts("-1");
+			continue;
+		}
+		if (check(x1, y1, x2, y2, a))
+			printf("%d\n", abs(x1 - x2) + abs(y1 - y2));
+		else
+		{
+			int res = INF;
+			for (int i = 1; i <= sz; i++)
+				res = min(res, d[x1][y1][i] + d[x2][y2][i]);
+			printf("%d\n", res == INF ? -1 : res);
+		}
+	}
+	return TIME;
+}

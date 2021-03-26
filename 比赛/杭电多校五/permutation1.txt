@@ -1,0 +1,183 @@
+/*
+9以下暴力
+9以上排第k个即是答案
+*/
+#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 362880 + 10;
+int n, k;
+int cnt;
+bool vis[30];
+int b[30]; 
+struct node{
+	int a[10];
+}u[N];
+bool cmp(node a, node b)
+{
+	for (int i = 2; i <= n; i++)
+	{
+		int x = a.a[i] - a.a[i - 1], y = b.a[i] - b.a[i - 1];
+		if (x != y)
+			return x < y;
+	}
+	return false;
+}
+
+void dfs(int d)
+{
+	if (!k)
+		return;
+	if (d == n)
+	{
+		k--;
+		if (!k)
+		{
+			printf("%d ", n);
+			for (int i = 1; i <= n - 1; i++)
+				printf("%d%c", b[i], i == n - 1 ? '\n' : ' ');
+			return;
+		}
+	}
+	else
+	{
+		for (int i = 1; i <= n - 1; i++)
+			if (!vis[i])
+				vis[i] = 1, b[d] = i, dfs(d + 1), vis[i] = 0;
+	}
+}
+void dfs9(int d)
+{
+	if (d == n + 1)
+	{
+	//	cout << "NO" << endl;
+		++cnt;
+		for (int i = 1; i <= n; i++)
+		{
+			u[cnt].a[i] = b[i];
+		}
+	}
+	else
+	{
+		for (int i = 1; i <= n; i++)
+			if (!vis[i])
+				vis[i] = 1, b[d] = i, dfs9(d + 1), vis[i] = 0;
+	}
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(vis, false, sizeof vis);
+		cin >> n >> k;
+		if (n <= 9)
+		{
+			cnt = 0;
+			dfs9(1);
+			sort(u + 1, u + cnt + 1, cmp);
+			for (int i = 1; i <= n; i++)
+				printf("%d%c", u[k].a[i], i != n ? ' ' : '\n');
+		}
+		else
+		{
+			memset(vis, false, sizeof vis);
+			dfs(1);
+		}
+	}
+	return 0;
+}
+/*
+#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int N = 362880 + 10;
+int n, k;
+int cnt;
+int a[30];
+bool vis[30];
+int b[30];
+ll fac[30];
+struct node{
+	int a[10];
+}u[N];
+bool cmp(node a, node b)
+{
+	for (int i = 2; i <= n; i++)
+	{
+		int x = a.a[i] - a.a[i - 1], y = b.a[i] - b.a[i - 1];
+		if (x != y)
+			return x < y;
+	}
+	return false;
+}
+void init()
+{
+	fac[0] = 1;
+	for (int i = 1; i <= 20; i++)
+		fac[i] = fac[i - 1] * i;
+}
+void ReContor(int *a, int n, ll k)
+{
+	int vis[30] = { 0 };
+	for (int i = 1; i <= n; i++)
+	{
+		int cnt = k / fac[n - i], j;
+		for (j = 1; j <= n; j++) //未使用的数字中第cnt大的
+			if (!vis[j])
+			{
+				if (!cnt) //找到数字
+					break;
+				cnt--;
+			}
+		vis[j] = 1;
+		a[i] = j;
+		k %= fac[n - i]; //对当前阶乘取模
+	}
+}
+void dfs9(int d)
+{
+	if (d == n + 1)
+	{
+		//    cout << "NO" << endl;
+		++cnt;
+		for (int i = 1; i <= n; i++)
+		{
+			u[cnt].a[i] = b[i];
+		}
+	}
+	else
+	{
+		for (int i = 1; i <= n; i++)
+			if (!vis[i])
+				vis[i] = 1, b[d] = i, dfs9(d + 1), vis[i] = 0;
+	}
+}
+int main(){
+	init();
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(vis, false, sizeof vis);
+		cin >> n >> k;
+		if (n <= 9)
+		{
+			cnt = 0;
+			dfs9(1);
+			sort(u + 1, u + cnt + 1, cmp);
+			for (int i = 1; i <= n; i++)
+				printf("%d%c", u[k].a[i], i != n ? ' ' : '\n');
+		}
+		else
+		{
+			ReContor(a, n - 1, k - 1);
+			printf("%d ", n);
+			for (int i = 1; i <= n - 1; i++)
+				printf("%d%c", a[i], i != n - 1 ? ' ' : '\n');
+		}
+	}
+	return 0;
+}
+*/

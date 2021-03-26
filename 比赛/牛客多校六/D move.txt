@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define break(y, x) {y;x; break;}
+const int N = 1e3 + 10;
+int a[N];
+multiset<int>s;
+int k;
+bool check(int r)
+{
+	multiset<int> f = s;
+	for (int i = 1; i <= k; i++) // 箱子数
+	{
+		int tot = r;
+		for (;;)
+		{
+			if (f.empty()) // 已经全装
+				return true;
+			auto it = f.lower_bound(tot); // 第一个大于等于
+			if (it == f.begin() && *it != tot)
+				break(;);
+			if (it == f.end() || *it > tot)
+				it--;
+			tot -= *it;
+			f.erase(it);
+		}
+	}
+	if (f.empty())
+		return true;
+	return false;
+}
+int main(){
+	int t;
+	cin >> t;
+	int kcase = 0;
+	while (t--)
+	{
+		printf("Case #%d: ", ++kcase);
+		int sum = 0;
+		s.clear();
+		int n;
+		cin >> n >> k;
+		for (int i = 1; i <= n; i++)
+			scanf("%d", &a[i]), s.insert(a[i]), sum += a[i];
+		for (int i = sum / k;; i++)
+		{
+			if (check(i))
+				break(cout << i << endl);
+		}
+	}
+	return 0;
+}

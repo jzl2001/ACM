@@ -1,0 +1,30 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int N = 1e8 + 10;
+const int mod = 998244353;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+int d[N];
+int b[3];
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int b, g, n;
+	scanf("%d%d%d", &b, &g, &n);// 20 100 10
+	cout << min(n, b) - max(n - g, 0) + 1 << endl; // n， b先取个最小， n - g是男生至少要多少个
+	return TIME;
+}

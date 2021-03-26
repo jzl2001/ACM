@@ -1,0 +1,208 @@
+链接：https://ac.nowcoder.com/acm/contest/7882/H
+来源：牛客网
+
+Harder Gcd Problem
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+Special Judge, 64bit IO Format: %lld
+题目描述 
+After solving the Basic Gcd Problem, ZYB gives you a more difficult one:
+
+Given an integer {n}n, find two subset {A}A and {B}B of \{1,2,\dots,n\}{1,2,…,n} such that:
+{​|A|=|B|=m}​∣A∣=∣B∣=m and A \cap B = \emptysetA∩B=∅
+Let A=\{a_1,a_2,\dots,a_{m}\}A={a 
+1
+​	
+ ,a 
+2
+​	
+ ,…,a 
+m
+​	
+ } and B=\{b_1,b_2,\dots,b_m\}B={b 
+1
+​	
+ ,b 
+2
+​	
+ ,…,b 
+m
+​	
+ }, there exists two permutations p_1,p_2,\dots,p_mp 
+1
+​	
+ ,p 
+2
+​	
+ ,…,p 
+m
+​	
+  and q_1,q_2,\dots,q_mq 
+1
+​	
+ ,q 
+2
+​	
+ ,…,q 
+m
+​	
+  such that for each 1 \le i \le m1≤i≤m, \gcd(a_{p_i}, b_{q_i}) > 1gcd(a 
+p 
+i
+​	
+ 
+​	
+ ,b 
+q 
+i
+​	
+ 
+​	
+ )>1.
+Please find two subsets with maximum value of {m}m.
+输入描述:
+There are multiple test cases. The first line of input contains an integer {T}T, indicating the number of test cases. 
+For each test case, there is only one line containing an integer {n}n (4 \le n \le 2 \times 10^54≤n≤2×10 
+5
+ ) 
+It's guaranteed that the sum of {n}n of all test cases will not exceed 2 \times 10^52×10 
+5
+ .
+输出描述:
+For each test case, output an integer {m}m in the first line. In the next {m}m lines, each contains two integers a_ia 
+i
+​	
+  and b_ib 
+i
+​	
+  (\gcd(a_i, b_i) > 1gcd(a 
+i
+​	
+ ,b 
+i
+​	
+ )>1), denoting the {i}i-th element in subset {A}A and {B}B.
+If there are multiple solutions, you can output any of them.
+示例1
+输入
+复制
+2
+4
+10
+输出
+复制
+1
+2 4
+4
+3 9
+5 10
+8 2
+4 6
+构造，将1~n的数字分成两部分，使得能配对的数目最多，配对的要求是GCD大于1。
+倒序处理质因子，如果是偶数则任意配对，否则将2*p留下，最后配对偶数。大于n/2
+的p肯定不能配对。
+#include <iostream>
+#include <set>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+#include <assert.h>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+#include <string>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int vis[N];
+int use[N];
+int p[N];
+int cnt;
+void isprime()
+{
+	vis[1] = 1;
+	for (int i = 2; i <= 200000; i++)
+	{
+		if (vis[i])
+			continue;
+		p[++cnt] = i;
+		for (int j = 2 * i; j <= 200000; j += i)
+		{
+			vis[j] = 1;
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	isprime();
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		scanf("%d", &n);
+		for (int i = 1; i <= n; i++)
+		{
+			use[i] = 0;
+		}
+		vector<pair<int, int>>ans;
+		for (int i = n; i >= 3; i--)
+		{
+			if (vis[i])
+				continue;
+			vector<int>now;
+			for (int j = 2 * i; j <= n; j += i)
+			{
+				if (!use[j])
+					now.push_back(j);
+			}
+			now.push_back(i);
+			if (now.size() % 2 != 0)
+				now.erase(now.begin());
+			for (int i = 0; i < (int)now.size() - 1; i += 2)
+			{
+				use[now[i]] = use[now[i + 1]] = 1;
+				ans.push_back({ now[i], now[i + 1] });
+			}
+		}
+		vector<int>now;
+		for (int i = 2; i <= n; i++)
+		{
+			if (!use[i] && i % 2 == 0)
+			{
+				now.push_back(i);
+			}
+		}
+		for (int i = 0; i < (int)now.size() - 1; i += 2)
+		{
+			use[now[i]] = use[now[i + 1]] = 1;
+			ans.push_back({ now[i], now[i + 1] });
+		}
+		cout << ans.size() << endl;
+		for (auto &i : ans)
+		{
+			printf("%d %d\n", i.first, i.second);
+		}
+	}
+	return TIME;
+}

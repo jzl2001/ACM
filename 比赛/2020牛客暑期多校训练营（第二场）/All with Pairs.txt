@@ -1,0 +1,193 @@
+链接：https://ac.nowcoder.com/acm/contest/7669/A
+来源：牛客网
+
+时间限制：C/C++ 3秒，其他语言6秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+Given {n}n strings s_1, s_2, \cdots, s_ns 
+1
+​	
+ ,s 
+2
+​	
+ ,⋯,s 
+n
+​	
+ . Now define {f(s, t)}f(s,t) as the maximum {i}i that satisfy s_{1\dots i} = t_{|t|-i+1 \dots |t|}s 
+1…i
+​	
+ =t 
+∣t∣−i+1…∣t∣
+​	
+ , and if such {i}i doesn't exist, {f(s, t) = 0}f(s,t)=0.
+The Problem is to calculate:
+\sum_{i=1}^{n}\sum_{j=1}^{n}f(s_i, s_j)^2 \pmod{998244353}∑ 
+i=1
+n
+​	
+ ∑ 
+j=1
+n
+​	
+ f(s 
+i
+​	
+ ,s 
+j
+​	
+ ) 
+2
+ (mod998244353)
+输入描述:
+The first line contains one integer n~(1 \leq n \leq 10^5)n (1≤n≤10 
+5
+ ), denoting the number of given strings.
+The following {n}n lines each contains a string s_i~(i = 1, 2, \cdots, n)s 
+i
+​	
+  (i=1,2,⋯,n).
+It's guaranteed that 1\leq |s_i|, \sum|s_i| \leq 10^61≤∣s 
+i
+​	
+ ∣,∑∣s 
+i
+​	
+ ∣≤10 
+6
+  and all strings only contain lowercase letters.
+输出描述:
+Only one line containing one integer, denoting the answer.
+示例1
+输入
+复制
+3
+ab
+ba
+aba
+输出
+复制
+29
+说明
+
+So the answer is 4\times 1^2 + 4\times 2^2 + 1\times 3^2 = 294×1 
+2
+ +4×2 
+2
+ +1×3 
+2
+ =29.
+题意：给出n个串，求每个串跟这n个串的最长公共前后缀的平方之和。
+思路先把所有后缀hash值都存入map，然后直接统计个数，求出每个串的
+nxt数组，然后遍历cnt[nxt[i]] -= cnt[i]，因为求的是最长，所以短的肯定不会去选了。
+比如
+3
+abaa
+ba
+aaba
+比如第一个串的aba，在最后一个串是后三个字符aba。
+因为求的是最长，所以查询在第一个串aba的前缀，最后一个串的后缀中
+最长公共前后缀的长度，然后这个最长公共前后缀肯定不会被取了，被当前这个长度给替代了。
+aba肯定不会去减去ab的cnt，因为他在最后一个串aba中ab不是一个后缀。
+算出后直接计算就可以了。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+string s[N];
+ull base[N];
+char u[N];
+int nxt[N];
+ull ha[N];
+unordered_map<ull, ll>mp;
+ll cnt[N];
+void get_nxt(string s)
+{
+	nxt[0] = -1;
+	int i = 0;
+	int j = -1;
+	int len = s.size();
+	while (i < len)
+	{
+		if (j == -1 || s[i] == s[j])
+			i++, j++, nxt[i] = j;
+		else
+			j = nxt[j];
+	}
+	return;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	base[0] = 1;
+	for (int i = 1; i < N; i++)
+	{
+		base[i] = base[i - 1] * hash_;
+	}
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%s", u);
+		s[i] = string(u);
+		int len = strlen(u);
+		ull all = 0, now = 0;
+		for (int j = 0; j < len; j++)
+		{
+			all = all * hash_ + u[j];
+		}
+		mp[all]++;
+		for (int j = 0; j < len; j++)
+		{
+			now = now * hash_ + u[j];
+			mp[all - now * base[(len - j - 1)]]++;
+		}
+	}
+	ll ans = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		int len = s[i].size();
+		for (int j = 0; j <= len; j++)
+		{
+			cnt[j] = 0;
+		}
+		get_nxt(s[i]);
+		ull now = 0;
+		for (int j = 0; j < len; j++)
+		{
+			now = now * hash_ + s[i][j];
+			cnt[j + 1] += mp[now];
+		}
+		cout << endl;
+		for (int i = 1; i <= len; i++)
+		{
+			cnt[nxt[i]] -= cnt[i]; // i有的，nxt[i]也含有，但因为取最长，在有i长度的情况下，肯定不会去选nxt[i]长度的。
+		}						//cnt[i]包含所有能使得nxt[i]作为公共前后缀的串的个数。所以减去cnt[i]即是真实个数。
+		for (int i = 1; i <= len; i++)
+		{
+			ans = (ans + 1LL * cnt[i] * i * i % mod) % mod;
+		}
+	}
+	cout << ans << endl;
+	return TIME;
+}

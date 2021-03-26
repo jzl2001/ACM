@@ -1,0 +1,61 @@
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 10;
+string ans[N];
+int get_num(string s)
+{
+	int k = 0, i = 0, j = 1;
+	int n = s.size();
+	while (k < n&&i < n&&j < n)
+	{
+		if (s[(i + k) % n] == s[(j + k) % n])
+		{
+			k++;
+		}
+		else
+		{
+			s[(i + k) % n] > s[(j + k) % n] ? i = i + k + 1 : j = j + k + 1; // 最大表示法把 > 换成 <
+			if (i == j) i++;
+			k = 0;
+		}
+	}
+	i = min(i, j);
+	return i;
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int cnt = 0;
+		string s;
+		cin >> s;
+		int len = s.size();
+		int i = len; // 从后往前的位置
+		for (;;)
+		{
+			if (i <= 0)   // i是已经到的位置
+				break;
+			int wz = get_num(s); 
+			string now = s.substr(wz);
+			int nwz = 0;
+			while (true)
+			{
+				nwz = get_num(now); // 当前串最小表示的位置
+				now = now.substr(nwz);
+				if (nwz == 0)  // 为当前最小串
+					break;
+			}
+			ans[++cnt] = now;
+			int len1 = now.size();
+			i -= len1;
+			s = s.substr(0, i);
+		}
+		for (int i = cnt; i >= 1; i--)
+			if (i != 1)
+				cout << ans[i] << " ";
+			else
+				cout << ans[i] << endl;
+	}
+	return 0;
+}

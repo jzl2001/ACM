@@ -1,0 +1,63 @@
+/*
+题意: k个人聚会， 求最大值最小
+即求树的直径
+*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int N = 1e5 + 10;
+vector<int>G[N];
+bool vis[N];
+bool re[N];
+int d;
+int flag;
+int MT;
+struct node
+{
+	int x, t;
+};
+void bfs(int x, int t)
+{
+	queue<node>q;
+	q.push({ x, t });
+	while (!q.empty())
+	{
+		int x = q.front().x;
+		int t = q.front().t;
+		q.pop();
+		if (vis[x])
+			continue;
+		vis[x] = true;
+		if (flag && re[x])
+			MT = max(MT, t);
+		if (re[x] && t > MT && flag == 0)
+		{
+			MT = t;
+			d = x;
+		}
+		for (auto &i : G[x])
+			q.push({ i, t + 1 });
+	}
+}
+int main(){
+	//freopen("D:/input.txt", "r", stdin);
+	int n, k;
+	cin >> n >> k;
+	for (int i = 1; i <= n - 1; i++)
+	{
+		int L, R;
+		scanf("%d%d", &L, &R);
+		G[L].push_back(R);
+		G[R].push_back(L);
+	}
+	int num = 0;
+	for (int i = 1; i <= k; i++)
+		scanf("%d", &num), re[num] = true;
+	bfs(num, 0);
+	flag = 1;
+	MT = 0;
+	memset(vis, 0, sizeof vis);
+	bfs(d, 0);
+	cout << (MT / 2) + MT % 2 << endl;
+	return 0;
+}

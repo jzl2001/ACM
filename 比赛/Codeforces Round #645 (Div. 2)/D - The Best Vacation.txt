@@ -1,0 +1,114 @@
+D. The Best Vacation
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+You've been in love with Coronavirus-chan for a long time, but you didn't know where she lived until now. And just now you found out that she lives in a faraway place called Naha.
+
+You immediately decided to take a vacation and visit Coronavirus-chan. Your vacation lasts exactly x days and that's the exact number of days you will spend visiting your friend. You will spend exactly x consecutive (successive) days visiting Coronavirus-chan.
+
+They use a very unusual calendar in Naha: there are n months in a year, i-th month lasts exactly di days. Days in the i-th month are numbered from 1 to di. There are no leap years in Naha.
+
+The mood of Coronavirus-chan (and, accordingly, her desire to hug you) depends on the number of the day in a month. In particular, you get j hugs if you visit Coronavirus-chan on the j-th day of the month.
+
+You know about this feature of your friend and want to plan your trip to get as many hugs as possible (and then maybe you can win the heart of Coronavirus-chan).
+
+Please note that your trip should not necessarily begin and end in the same year.
+
+Input
+The first line of input contains two integers n and x (1≤n≤2⋅105) — the number of months in the year and the number of days you can spend with your friend.
+
+The second line contains n integers d1,d2,…,dn, di is the number of days in the i-th month (1≤di≤106).
+
+It is guaranteed that 1≤x≤d1+d2+…+dn.
+
+Output
+Print one integer — the maximum number of hugs that you can get from Coronavirus-chan during the best vacation in your life.
+
+Examples
+inputCopy
+3 2
+1 3 1
+outputCopy
+5
+inputCopy
+3 6
+3 3 3
+outputCopy
+12
+inputCopy
+5 6
+4 2 3 1 3
+outputCopy
+15
+Note
+In the first test case, the numbers of the days in a year are (indices of days in a corresponding month) {1,1,2,3,1}. Coronavirus-chan will hug you the most if you come on the third day of the year: 2+3=5 hugs.
+
+In the second test case, the numbers of the days are {1,2,3,1,2,3,1,2,3}. You will get the most hugs if you arrive on the third day of the year: 3+1+2+3+1+2=12 hugs.
+
+In the third test case, the numbers of the days are {1,2,3,4,1,2,1,2,3,1,1,2,3}. You will get the most hugs if you come on the twelfth day of the year: your friend will hug you 2+3+1+2+3+4=15 times.
+
+题意：给出n个月，每个月有di天，可以获得连续的x个收益，即是当月第几天
+最终的答案肯定是某个月的一部分包含完整的几个月。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 4e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll a[N];
+ll d[N];
+int n;
+ll s[N];
+ll x;
+ll ans;
+void calc()
+{
+	ll sum = 0;
+	for (int i = n; i <= 2 * n; i++)//假如选定当前块
+	{
+		int id = lower_bound(s + 1, s + 2 * n + 1,  s[i - 1] - (x - a[i]) + 1) - s;//查前缀和，某个月为部分天数或者完整天数
+		ll now = d[i] - d[id];
+		ll last = a[id] - (x - (s[i] - s[id]));
+		now += (a[id] * (a[id] + 1)) / 2 - (last * (last + 1)) / 2;
+		ans = max(ans, now);
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	cin >> n >> x;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%lld", &a[i]);
+		a[i + n] = a[i];
+		s[i] = a[i] + s[i - 1];
+		d[i] = d[i - 1] + (1LL * a[i] * (a[i] + 1) / 2);
+	}
+	for (int i = n + 1; i <= 2 * n; i++)
+	{
+		s[i] = s[i - 1] + a[i];
+		d[i] = d[i - 1] + (1LL * a[i] * (a[i] + 1) / 2);
+	}
+	calc();
+	cout << ans << endl;
+	return TIME;
+}

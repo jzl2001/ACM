@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 10;
+int a[N];
+int main(){
+	a[1] = 1;
+	a[2] = 1;
+	a[3] = 1;
+	for (int i = 4; i <= 100000; i++)
+		a[i] = (a[i - 1] + a[i - 3]) % 998244353;
+ 	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		cin >> n;
+		int x, y;
+		cin >> x >> y;
+		if (x == 1 && y == n)
+			cout << a[n] << endl;
+		else
+			if (x == 1 || y == n)
+				cout << a[y - x] << endl;
+			else
+				cout << a[y - x - 1] << endl;
+	}
+	return 0;
+}

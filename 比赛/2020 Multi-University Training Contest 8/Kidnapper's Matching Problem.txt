@@ -1,0 +1,197 @@
+Kidnapper's Matching Problem
+Time Limit: 2000/2000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 491    Accepted Submission(s): 198
+
+
+Problem Description
+It is preferrable to read the pdf statment.
+
+One day when you were sitting in the couch and eating chips, a guy called you, who claimed that his name was Cuber QQ and he had your girlfriend kidnapped. This seems quite unlikely to you because you do not even have a girlfriend. However, to kill the boring time of Sunday afternoon, you asked how much the ransom is. Surprisingly, Cuber QQ is not interested in your money, the ransom is the answer to a matching problem. It turns out that Cuber QQ is a lover of binary operators, xor especially.
+
+First of all, he shall give you a pair of sequences a and b, with length n and m respectively.
+
+Given that a and b do not necessarily have the same length, they do not exactly make a pair. Therefore consecutive subsequences of a are used to make pairs with b, That makes n−m+1 pairs: al,al+1,…,al+m−1 and b for all 1≤l≤n−m+1.
+
+For each pair (al,al+1,…,al+m−1;b), we say they are xor-matched if their pairwise-xor's are all available in a pre-defined set S. Concretely, the pair is a match if and only if al+i−1⊕bi∈2S⊕ of all 1≤i≤m. 2S⊕ is defined as the set of all possible xor-sum of S's subsets, i.e.,
+
+2S⊕={t|t=⨁w∈Xw,X⊆S}
+
+
+Note that, since {} is always a valid subset of S, 0 is always included in 2S⊕.
+
+Now Cuber QQ wants you to tell him, for which l's, al,al+1,⋯,al+m−1 makes a match with b. He is not sending your illusory girlfriend back before you correctly answer his question.
+ 
+
+Input
+The first line contains an integer T (1≤T≤2⋅104), denotes the number of test cases.
+
+Each test case begins with three space-separated integers n (1≤n≤2⋅105), m (1≤m≤min(n,5⋅104)) and k (1≤k≤100), denoting the lengths of a, b and the size of S.
+
+The next line contains n space-separated integers a1,a2,⋯,an (0≤ai<230).
+
+The next line contains m space-separated integers b1,b2,⋯,bm (0≤bi<230).
+
+The last line contains k space-separated integers S1,S2,⋯,Sk (0≤Si<230).
+
+It is guaranteed that ∑n≤1.2⋅106,∑m≤3⋅105,∑k≤6⋅105.
+ 
+
+Output
+For each case, you should output:
+
+∑i=1n−m+1[(ai,ai+1,⋯,ai+m−1) matches b]⋅2i−1mod(109+7)
+
+
+where [condition] equals 1 if condition holds and 0 otherwise.
+ 
+
+Sample Input
+2
+4 2 2
+2 5 7 6
+3 4
+5 6
+13 3 3
+1 1 4 5 1 4 1 9 1 9 8 1 0
+2 5 1
+1 2 15
+ 
+
+Sample Output
+2
+80
+ 
+
+Source
+2020 Multi-University Training Contest 8
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+题意：给出长度为n的序列A，长度为m的序列B，k个数的集合C，设集合S为C中
+任意元素异或得到的值。求A中所有长度为m的序列满足Ai⨁Bi使得结果在S中。
+线性基，先求出S的集合，再将两个序列中的元素都插入里面，得到不能异或的部分
+如果能匹配比然Ai=Bi，因为剩下的不能被S中异或出来。求出处理后的序列后使用
+KMP计算贡献，题目中贡献是从A的i位置开始则贡献是2^(i - 1)。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 2e5 + 10;
+int a[N], b[N], nxt[N];
+int p[31];
+void insert(int num)
+{
+	for (int j = 30; j >= 0; j--)
+	{
+		if (!(num >> j))
+			continue;
+		if (!p[j])
+		{
+			p[j] = num;
+			break;
+		}
+		num ^= p[j];
+	}
+}
+void get_nxt(int m)
+{
+	int j = -1, i = 0;
+	nxt[0] = -1;
+	while (i < m)
+	{
+		if (j == -1 || b[i] == b[j])
+			i++, j++, nxt[i] = j;
+		else
+			j = nxt[j];
+	}
+	return;
+}
+ll kmp(int n, int m)
+{
+	get_nxt(m);
+	ll ans = 0;
+	int i = 0, j = 0;
+	while (i < n)
+	{
+		if (j == -1 || a[i] == b[j])
+			i++, j++;
+		else
+			j = nxt[j];
+		if (j == m)
+			ans = (ans + fpow(2, i - m, mod)) % mod, j = nxt[j];
+	}
+	return ans;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+	//freopen("E:/output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(p, 0, sizeof p);
+		int n, m, k;
+		scanf("%d%d%d", &n, &m, &k);
+		for (int i = 0; i < n; i++)
+		{
+			scanf("%d", &a[i]);
+		}
+		for (int i = 0; i < m; i++)
+		{
+			scanf("%d", &b[i]);
+		}
+		int num;
+		for (int i = 1; i <= k; i++)
+		{
+			scanf("%d", &num);
+			insert(num);
+		}
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 30; j >= 0; j--)
+			{
+				if (a[i] >> j & 1)
+				{
+					a[i] ^= p[j];
+				}
+			}
+		}
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 30; j >= 0; j--)
+			{
+				if (b[i] >> j & 1)
+				{
+					b[i] ^= p[j];
+				}
+			}
+		}
+		cout << kmp(n, m) << endl;
+	}
+	return TIME;
+}

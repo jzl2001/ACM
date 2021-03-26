@@ -1,0 +1,140 @@
+http://acm.hdu.edu.cn/showproblem.php?pid=6769
+Time Limit: 4000/4000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 550    Accepted Submission(s): 184
+
+
+Problem Description
+Sunset got a map about an abandoned gold mine in the border town. The map shows that the gold mine consists of n rooms connected by n−1 bidirectional tunnels, forming a tree structure. The map is so strange that on the i-th tunnel, there are two numbers ai and bi. The only thing Sunset knows is that there are exactly k tunnels whose lengths are taken from a while the lengths of other n−k−1 tunnels are taken from b.
+
+Tomorrow Sunset will explore that gold mine. He is afraid of getting lost in the gold mine, so can you please tell him the diameter of the gold mine if he is lucky enough? In other words, please calculate the minimum possible length of the diameter from the information Sunset has.
+ 
+
+Input
+The first line of the input contains a single integer T (1≤T≤10000), the number of test cases.
+
+For each case, the first line of the input contains two integers n and k (2≤n≤20000, 0≤k≤n−1, k≤20), denoting the number of rooms and the parameter k.
+
+Each of the following n−1 lines contains four integers ui,vi,ai and bi (1≤ui,vi≤n, ui≠vi, 1≤ai,bi≤109), denoting an bidirectional tunnel between the ui-th room and the vi-th room, the length of which is either ai or bi.
+
+It is guaranteed that the sum of all n is at most 200000.
+ 
+
+Output
+For each test case, output a single line containing an integer, the minimum possible length of the diameter.
+ 
+
+Sample Input
+1
+4 1
+1 2 1 3
+2 3 4 2
+2 4 3 5
+ 
+
+Sample Output
+6
+ 
+
+Source
+2020 Multi-University Training Contest 2
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6774 6773 6772 6771 6770 
+ 
+
+Statistic | Submit | Discuss | Note
+<树形dp><二分>
+题意：每条边有a，b两个值，问你选精确k个a的最小直径。
+设d[i][j]表示以1为根在点i的子树中选了j条的a且直径小于等于mid的方案中最长距离最小值是多少。
+二分答案即可。
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+ll d[N][21];
+int k;
+int sz[N];
+struct node
+{
+	int v, a, b;
+};
+vector<node>G[N];
+ll mid;
+int n, flag;
+ll tmp[22];
+void dfs(int x, int fa)
+{
+	sz[x] = 0;
+	d[x][0] = 0;
+	for (auto &q : G[x])
+	{
+		int y = q.v, a = q.a, b = q.b;
+		if (y == fa)
+			continue;
+		dfs(y, x);
+		for (int i = 0; i <= min(sz[x] + sz[y] + 1, k); i++)
+			tmp[i] = LINF;
+		for (int i = 0; i <= sz[x] && i <= k; i++)
+		{
+			for (int j = 0; i + j <= k && j <= sz[y]; j++)
+			{
+				if (d[x][i] + d[y][j] + a <= mid)
+					tmp[i + j + 1] = min(tmp[i + j + 1], max(d[x][i], d[y][j] + a));
+				if (d[x][i] + d[y][j] + b <= mid)
+					tmp[i + j] = min(tmp[i + j], max(d[x][i], d[y][j] + b));
+			}
+		}
+		sz[x] += sz[y] + 1;
+		for (int i = 0; i <= min(sz[x], k); i++)
+			d[x][i] = tmp[i];
+	}
+	return;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		scanf("%d%d", &n, &k);
+		ll L = 0, R = 0;
+		for (int i = 1; i <= n - 1; i++)
+		{
+			int u, v, a, b;
+			scanf("%d%d%d%d", &u, &v, &a, &b);
+			G[u].push_back({ v, a, b });
+			G[v].push_back({ u, a, b });
+			R += max(a, b);
+		}
+		ll ans = 0;
+		while (L <= R)
+		{
+			mid = L + R >> 1;
+			dfs(1, 0);
+			if (d[1][k] != LINF)
+				ans = mid, R = mid - 1;
+			else
+				L = mid + 1;
+		}
+		printf("%lld\n", ans);
+		for (int i = 1; i <= n; i++)
+		{
+			G[i].clear();
+		}
+	}
+	return TIME;
+}

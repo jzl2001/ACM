@@ -1,0 +1,18 @@
+https://ac.nowcoder.com/acm/problem/18992
+判断区间内多少数字满足%7=1
+def calc(num):
+    ans = num // 7
+    if (ans * 7 + 1) % 7 == 1 and ans * 7 < num:
+        ans += 1
+    return ans
+n, m = map(int, input().split())
+res1 = 1
+res2 = 1;
+for i in range(1, n + 1):
+    res1 *= 2
+for i in range(1, m + 1):
+    res2 *= 2
+ans1 = calc(res1 - 1)
+ans2 = calc(res2 - 1)
+ans = ans2 - ans1
+print(ans)

@@ -1,0 +1,119 @@
+链接：https://ac.nowcoder.com/acm/contest/1072/I
+来源：牛客网
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 32768K，其他语言65536K
+64bit IO Format: %lld
+题目描述 
+Bessie's grandfather was a pirate who accumulated a great treasure chest of golden plunder. He hid the treasure chest in a cave that Bessie has recently discovered right on Farmer John's land! Just inside the cave's entrance she found a map that told her how to get the treasure.
+The cave has P passages (3 <= P <= 5,000) conveniently numbered 1..P. The entrance is passage 1; the treasure is located in some reachable passage T (2 <= T <= P), whose value is supplied. Passages are all approximately the same length; each one leads to a split where hitherto unexplored numbered passages take the inquisitive cow deeper underground. No passage appears as the split from more than one passage, and the map contains a total of NS splits (1 <= NS <= 5,000).
+Bessie wants to know both how far away from the entrance the treasure lies and also which passage numbers to take to get to the treasure. 
+Consider the schematic representation of a cave shown below. Passage numbers are shown close to the passage they name. For this example, the treasure is at the end of passage number 7:
+                   3/
+                   /
+                  +
+                 / \   /5
+               2/  4\ /
+           1   /     +
+          ----+      6\   #7    /11
+               \       \ /     /
+              13\       +     +
+                        8\ 10/ \
+                          \ /   \12
+                           +
+                           9\
+                             \
+Bessie would have to traverse passages 1, 2, 4, 6, and 7 to get to the treasure, a total distance of 5 (which is simply the passage count).
+The input file includes a set of lines, each with a passage number N (1 <= N <= P) and the two passages (B1 and B2; 1 <= B1 <= P; 1 <= B2 <= P) that branch off from it. Some line in the input file will include passage number 1 and its two branches (for our example, passages 2 and 13; likewise, passage number 8 has two branches: 9 and 10).
+Tell Bessie how to get to the treasure.
+输入描述:
+* Line 1: Line 1 contains three space-separated integers: P, NS, and T
+* Lines 2..NS+1: Each line contains three space-separated integers: N, B1, and B2
+输出描述:
+* Line 1: The distance D from the entrance to the treasure
+* Lines 2..D+1: Line i+1 contains a single integer that is next passage Bessie takes to get to the treasure.
+示例1 
+输入
+复制 
+13 6 7
+6 7 8
+2 3 4
+10 11 12
+8 9 10
+1 2 13
+4 5 6
+输出
+复制 
+5
+1
+2
+4
+6
+7
+
+<最短路输出路径>
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+inline char nc() { static char buf[1000000], *p1 = buf, *p2 = buf; return p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++; }
+inline int read() { int x = 0; bool sign = 0; char ch = nc(); for (; ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t'; ch = nc()); if (ch == EOF) return EOF; if (ch == '-') sign = 1, ch = nc(); for (; ch >= '0' && ch <= '9'; ch = nc()) x = x * 10 + ch - '0'; return sign ? -x : x; }
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e4 + 10;
+vector<int>G[N];
+int d[N];
+int a[N];
+int ans[N];
+struct node{
+	int pos, v;
+	bool operator < (const node &oth)const
+	{
+		return v > oth.v;
+	}
+};
+priority_queue<node>pq;
+void dijkstra()
+{
+	memset(d, 0x3f, sizeof d);
+	pq.push({ 1, 1 });
+	while (!pq.empty())
+	{
+		int now = pq.top().pos;
+		int v = pq.top().v;
+		pq.pop();
+		for (auto &i : G[now])
+		{
+			if (v + 1 < d[i])
+				d[i] = v + 1, a[i] = now, pq.push({i, d[i]});
+		}
+	}
+}
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif 
+	int n, m, bx;
+	scanf("%d%d%d", &n, &m, &bx);
+	for (int i = 1; i <= m; i++)
+	{
+		int x, y, z;
+		scanf("%d%d%d", &x, &y, &z);
+		G[x].push_back(y);
+		G[x].push_back(z);
+	}
+	dijkstra();
+	cout << d[bx] << endl;
+	int i = bx;
+	int cnt = 0;
+	while (a[i] != 0)
+		ans[++cnt] = a[i], i = a[i];
+	ans[0] = bx;
+	for (int i = cnt; i >= 0; --i)
+		cout << ans[i] << endl;
+	return TIME;
+}

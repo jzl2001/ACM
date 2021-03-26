@@ -1,0 +1,103 @@
+链接：https://ac.nowcoder.com/acm/contest/4370/K
+来源：牛客网
+
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+You are given a simple graph with \mathbf{N}N vertices and \mathbf{M}M edges. A simple graph is an undirected graph that has no self-loops (edges connected at both ends to the same vertex) and no more than one edge between any two different vertices. Initially, each edge is colored white. Each round you can pick a white edge and paint it in red. You are not allowed to generate an odd-length cycle that consists only of red edges. What's the maximum number of edges that can be painted to red?
+输入描述:
+The first line of the input gives the number of test case, \mathbf{T}T (1 \leq \mathbf{T} \leq 301≤T≤30). \mathbf{T}T test cases follow.
+For each case, the first line contains only two integers \mathbf{N}N and \mathbf{M}M (2 \leq \mathbf{N} \leq 162≤N≤16, 1 \leq \mathbf{M} \leq \mathbf{N}(\mathbf{N}-1)/21≤M≤N(N−1)/2). 
+The i-th line of the next \mathbf{M}M lines describes the i-th edge: two integers {u}u, {v}v denotes an edge between {u}u and {v}v. It's guaranteed that there are no self-loops and multiple edges.
+输出描述:
+For each test case, output one line containing "Case #x: y", where x is the test case number (starting from 1) and y is the maximum number of edges that can be painted to red.
+示例1
+输入
+复制
+2
+4 5
+1 2
+1 3
+1 4
+2 4
+3 4
+5 6
+1 2
+2 3
+3 1
+1 4
+4 5
+3 5
+输出
+复制
+Case #1: 4
+Case #2: 5
+题意：给出一张图，选择最多数目的边，染成红色，使得红色边不能形成奇数环。
+二进制枚举，哪些边是红，哪些是白色，然后看二分图最大匹配。
+二分图就算形成环也是偶数环。
+#include <iostream>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[20][20];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    int kcase = 0;
+    while (t--)
+    {
+        memset(a, 0, sizeof a);
+        printf("Case #%d: ", ++kcase);
+        int n, m;
+        cin >> n >> m;
+        for (int i = 1; i <= m; i++)
+        {
+            int u, v;
+            cin >> u >> v;
+            u--, v--;
+            a[u][v] = a[v][u] = 1;
+        }
+        int ans = 0;
+        for (int i = 0; i < (1 << n); i++)
+        {
+            int tot = 0;
+            for (int j = 0; j < n; j++)
+                for (int k = j + 1; k < n; k++)
+                {
+                    if (a[j][k] && ((i >> j) & 1) != ((i >> k) & 1))
+                    	tot++;
+                }
+            ans = max(ans, tot);
+        }
+        cout << ans << endl;
+    }
+	return TIME;
+}

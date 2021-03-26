@@ -1,0 +1,60 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+using namespace std;
+int dir[4][2] = { 0, 1, 0, -1, 1, 0, -1, 0 };
+char map[35][35];
+int cnt = 0, ans = 0x3f3f3f3f;
+int vis[35][35];
+int n, m;
+struct node 
+{
+	int x, y, t;
+};
+void bfs(int x, int y, int t)
+{
+	queue<node>q;
+	q.push({ x, y, t });
+	while (!q.empty())
+	{
+		int x = q.front().x, y = q.front().y, t = q.front().t;
+		q.pop();
+		if (vis[x][y])
+			continue;
+		vis[x][y] = 1;
+		if (map[x][y] == 'e')
+		{
+			ans = min(ans, t);
+			cnt++;
+			continue;
+		}
+		for (int i = 0; i < 4; i++)
+		{
+			int xx = x + dir[i][0];
+			int yy = y + dir[i][1];
+			if (!vis[xx][yy] && xx <= n && xx >= 1 && yy <= m && yy >= 1 && map[xx][yy] != '*')
+			{
+				q.push({ xx, yy, t + 1 });
+			}
+		}
+	}
+}
+int main(){
+	cin >> n >> m;
+	for (int i = 1; i <= n; i++)
+		scanf("%s", map[i] + 1);
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= m; j++)
+		{
+			if (map[i][j] == 'k')
+			{
+				bfs(i, j, 0);
+				if (cnt == 0)
+					cout << -1 << endl;
+				else
+					cout << cnt << " " << ans << endl;
+				return 0;
+			}
+		}
+	return 0;
+}

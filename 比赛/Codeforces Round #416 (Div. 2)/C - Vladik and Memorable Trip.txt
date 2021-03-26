@@ -1,0 +1,69 @@
+<dp>
+#include <iostream>
+#include <algorithm>
+#include <ctime>
+#include <cstdio>
+#include <bits/stdc++.h>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res % mod; }
+const int mod = 1e9 + 7;
+const int N = 5000 + 10;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+int a[N];
+int d[N]; 
+int l[N];
+int r[N];
+bool vis[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 0; i <= 5000; i++)
+		l[i] = 0x3f3f3f3f, r[i] = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d", &a[i]);
+		l[a[i]] = min(l[a[i]], i);
+		r[a[i]] = max(r[a[i]], i);
+	}
+	/*
+	5 6 9 8
+	*/
+	for (int i = 1; i <= n; i++) // d[i] 前i个数字合理分配的最大值
+	{
+		memset(vis, 0, sizeof vis);
+		int u = 0;
+		d[i] = d[i - 1];
+		int MI = l[a[i]];
+		for (int j = i; j >= 1; j--) 
+		{
+			if (r[a[j]] > i)
+				break;
+			MI = min(MI, l[a[j]]);
+			if (!vis[a[j]])
+				vis[a[j]] = 1, u ^= a[j];
+			if (MI >= j)
+				d[i] = max(d[i], d[j - 1] + u);
+		}
+	}
+	cout << d[n] << endl;
+	return TIME;
+}

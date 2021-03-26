@@ -1,0 +1,142 @@
+Are you tired of city life? Have you ever had illusions of pastoral peace? The clean atmosphere, the closeness to nature and the gentle pace of living, all made Setsuna yearn for the pastoral life more.
+
+In order to experience the simple pastoral life, Setsuna has moved to Star Valley and started her farming journey.
+
+Soon, she discovers the problem: overgrown weeds are harming her farm. In Chinese, we call it “Sheng Cao”. She realized that weeding should be put at the top priority.
+
+T12_p1
+
+The farm can be described as an  matrix. The growth rate of weed in row  and column  is denoted as , indicating that the weed will grow  units every beginning of the moment. At the end of moment , there is no weed on the farm.
+
+Setsuna will use mower  times, where the -th use occurs at the end of moment . Each use of the mower completely removes weeds in a row or column.
+
+Setsuna wonders how many units of weed she will remove.
+
+The answer might be very large, so please output the desired answer modulo .
+
+输入格式
+The first line contains three integers .
+
+The next  lines contains  integers each, where the -th integer of the -th line is .
+
+The -th of the next  lines contains one character and two integers.
+
+ - Setsuna clears the weeds in row  at the end of moment .
+
+ - Setsuna clears the weeds in column  at the end of moment .
+
+It is guaranteed that  hold for  and  is strictly increasing.
+
+输出格式
+Output one integer indicating the answer modulo .
+
+样例
+input
+2 2 3
+1 2
+3 4
+r 1 5
+c 2 6
+r 1 7
+output
+45
+input
+3 4 1
+1 2 3 4
+5 6 7 8
+9 10 11 12
+r 1 1000000000000000000
+output
+172998509
+提示
+Sample :
+
+At the end of moment , the farm looks like
+
+ 
+
+At the end of moment , Setsuna has cleared row  and  units of weed has been cut, so the farm looks like
+
+ 
+
+At the end of moment , Setsuna has cleared column  and  units of weed has been cut, so the farm looks like
+
+ 
+
+At the end of moment , Setsuna has cleared row  and  units of weed has been cut, so the farm looks like
+
+ 
+
+So the answer is  units.
+
+思路：
+预处理取min
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 3e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll a[510][510];
+ll b[510][510];
+ll c[N];
+ll r[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m, k;
+	cin >> n >> m >> k;
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= m; j++)
+		{
+			scanf("%lld", &a[i][j]);
+			a[i][j] %= mod;
+		}
+	}
+	ll ans = 0;
+	for (int i = 1; i <= k; i++)
+	{
+		getchar();
+		char s;
+		int x;
+		ll t;
+		scanf("%c%d%lld", &s, &x, &t);
+		if (s == 'r')
+		{
+			r[x] = t;
+		}
+		else
+		{
+			c[x] = t;
+		}
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= m; j++)
+		{
+			ll t = max(r[i], c[j]);
+			ans = (ans + t % mod * a[i][j] % mod) % mod;
+		}
+	}
+	cout << ans << endl;
+	return TIME;
+}

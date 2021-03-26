@@ -1,0 +1,26 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define continue(x) { x; continue; }
+int a[30];
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		cin >> n;
+		for (int i = n; i >= 0; i--)
+			scanf("%d", &a[i]);
+		if (n > 2)
+			cout << "No" << endl;
+		else
+		{
+			if (n == 1)
+				continue(cout << "Yes" << endl);
+			if (a[1] * a[1] < 4 * a[2] * a[0])
+				continue(cout << "Yes" << endl);
+			continue(cout << "No" << endl);
+		}
+	}
+	return 0;
+}

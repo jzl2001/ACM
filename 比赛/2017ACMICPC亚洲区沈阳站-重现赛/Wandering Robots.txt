@@ -1,0 +1,92 @@
+题意:n * n的矩阵，m个陷阱， 每个位置默认有跟他相连的块 + 1 的权值
+有一个陷阱连着， 则其权值--
+先把没有陷阱的时候算出总权值
+然后把修改的点记录， 最后减去即可
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 100000;
+const int N = 1e4 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+map<int, int>mp[N];
+map<int, int>vis[N];
+int dir[4][2] = { 1, 0, -1, 0, 0, 1, 0, -1 };
+int n;
+int calc(int x, int y)
+{
+    if (x == 1 && y == n || x == 1 && y == 1 || x == n && y == 1 || x == n && y == n)
+        return 3;
+    if (x == 1 || y == 1 || x == n || y == n)
+        return 4;
+    return 5;
+}
+ll gcd(ll a, ll b)
+{
+    return b == 0 ? a : gcd(b, a % b);
+}
+int main()
+{
+#ifdef LOCAL
+    freopen("D:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    int kcase = 0;
+    while (t--)
+    {
+        int k;
+        cin >> n >> k;
+        ll sum = 5 * n * (n + 1) / 2 - 2 * n - 2;
+        ll tot = (n - 2) * (n - 2) * 5LL + 12 + 16LL * (n - 2);
+        for (int i = 1; i <= k; i++)
+        {
+            int x, y;
+            scanf("%d%d", &x, &y);
+            x++, y++;
+            for (int j = 0; j < 4; j++)
+            {
+                int xx = x + dir[j][0];
+                int yy = y + dir[j][1];
+                if (xx >= 1 && xx <= n && yy >= 1 && yy <= n)
+                    mp[xx][yy] = min(mp[xx][yy] + 1, calc(xx, yy));
+            }
+            vis[x][y] = 1;
+            tot -= calc(x, y);
+            if (x + y >= n + 1)
+                sum -= calc(x, y);
+        }
+        for (int i = 1; i <= n; i++)
+        {
+            for (auto &j : mp[i])
+            {
+                if (vis[i][j.first])
+                    continue;
+                if (i + j.first >= n + 1)
+                    sum -= j.second;
+                tot -= j.second;
+            }
+            mp[i].clear();
+            vis[i].clear();
+        }
+        ll ys = gcd(sum, tot);
+        printf("Case #%d: ", ++kcase);
+        cout << sum / ys << "/" << tot / ys << endl;
+    }
+    return TIME;
+}

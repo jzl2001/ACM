@@ -1,0 +1,196 @@
+Time Limit: 5000/2500 MS (Java/Others)    Memory Limit: 65536/65536 K (Java/Others)
+Total Submission(s): 1199    Accepted Submission(s): 454
+
+
+Problem Description
+An undirected connected graph has n nodes and m edges, The i-th edge’s length is 2i. Each node i has a value ai, which is either 0 or 1. You need to calculate:
+
+∑i=1n∑j=1nd(i,j)×[ai=1∧aj=0]
+
+
+d(i,j) indicates the shortest distance between i and j. [ ] is the Iverson bracket. ∧ indicates AND.
+
+Because the answer may be too large, please output the answer modulo 109+7.
+ 
+
+Input
+The first line contains one integer T(1≤T≤8)，indicating the number of test cases.
+
+The second line contains two ingeters n,m(1≤n≤105,1≤m≤2×105).
+
+The third line contains n positive integers a1,a2,...,an(ai=0 or 1) —— the value of the nodes.
+
+The following m lines contain two ingeters u,v(1≤u,v≤n), and the i-th line represents the i-th undirected edge’s length is 2i, between node u and v.
+
+The sum of n,m is no more than 2×105.
+ 
+
+Output
+Print a single integer—— the value of the answer modulo 109+7.
+ 
+
+Sample Input
+1
+3 2
+0 1 0 
+3 1
+3 2
+ 
+
+Sample Output
+10
+ 
+
+Source
+2020 Multi-University Training Contest 6
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | NoteTime Limit: 5000/2500 MS (Java/Others)    Memory Limit: 65536/65536 K (Java/Others)
+Total Submission(s): 1199    Accepted Submission(s): 454
+
+
+Problem Description
+An undirected connected graph has n nodes and m edges, The i-th edge’s length is 2i. Each node i has a value ai, which is either 0 or 1. You need to calculate:
+
+∑i=1n∑j=1nd(i,j)×[ai=1∧aj=0]
+
+
+d(i,j) indicates the shortest distance between i and j. [ ] is the Iverson bracket. ∧ indicates AND.
+
+Because the answer may be too large, please output the answer modulo 109+7.
+ 
+
+Input
+The first line contains one integer T(1≤T≤8)，indicating the number of test cases.
+
+The second line contains two ingeters n,m(1≤n≤105,1≤m≤2×105).
+
+The third line contains n positive integers a1,a2,...,an(ai=0 or 1) —— the value of the nodes.
+
+The following m lines contain two ingeters u,v(1≤u,v≤n), and the i-th line represents the i-th undirected edge’s length is 2i, between node u and v.
+
+The sum of n,m is no more than 2×105.
+ 
+
+Output
+Print a single integer—— the value of the answer modulo 109+7.
+ 
+
+Sample Input
+1
+3 2
+0 1 0 
+3 1
+3 2
+ 
+
+Sample Output
+10
+ 
+
+Source
+2020 Multi-University Training Contest 6
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+题意:给出一个图，每个边的边权是2的i次方，求所有属性1到属性0的最短路径之和。
+因为2^0+2^1+2^2...<2^n
+所以先求个最小生成树，算贡献是对每条边算贡献，1的个数*剩余0+0的个数*剩余1。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+vector<pair<int, int>>G[N];
+int b[N];
+int pre[N];
+ll ans;
+int totw, totb;
+int find(int x)
+{
+	return x == pre[x] ? x : pre[x] = find(pre[x]);
+}
+int d[N], f[N];
+void dfs(int x, int fa)
+{
+	for (auto &i : G[x])
+	{
+		if (fa == i.first)
+			continue;
+		dfs(i.first, x);
+		ans = (ans + 1LL * i.second * d[i.first] % mod * (totw - f[i.first]) % mod) % mod;
+		ans = (ans + 1LL * i.second * f[i.first] % mod * (totb - d[i.first]) % mod) % mod;
+		d[x] = d[x] + d[i.first]; 
+		f[x] = f[x] + f[i.first];
+	}
+	return;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ans = 0;
+		int n, m;
+		scanf("%d%d", &n, &m);
+		totb = totw = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			pre[i] = i;
+			scanf("%d", &d[i]), f[i] = !d[i];
+			if (!d[i])
+				++totw;
+			else
+				++totb;
+		}
+		for (int i = 1; i <= m; i++)
+		{
+			int u, v;
+			scanf("%d%d", &u, &v);
+			int uu = u, vv = v;
+			u = find(u);
+			v = find(v);
+			if (u == v)
+				continue;
+			pre[u] = v;
+			G[uu].push_back({ vv, fpow(2, i, mod) });
+			G[vv].push_back({ uu, fpow(2, i, mod) });
+		}
+		dfs(1, 0);
+		for (int i = 1; i <= n; i++)
+		{
+			G[i].clear();
+		}
+		cout << ans << endl;
+	}
+	return TIME;
+}

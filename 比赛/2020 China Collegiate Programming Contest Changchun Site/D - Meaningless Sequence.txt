@@ -1,0 +1,105 @@
+7-4 D - Meaningless Sequence
+Once there was a mathematician, who was obsessed with meaningless number sequences. Here is one of them.
+
+a
+​n
+​​ ={
+​1,
+​c⋅max
+​0≤i<n
+​​ a
+​n & i
+​​ ,
+​​ 
+​n=0
+​otherwise
+​​ ,
+
+where & denotes the bitwise AND operation.
+
+As a mathematician, he could easily tell what a
+​n
+​​  was for any n, but he wanted to test you. You are required to tell him
+
+(
+​i=0
+​∑
+​n
+​​ a
+​i
+​​ )mod(10
+​9
+​​ +7)
+
+to convince him that you have a deep understanding of this (although meaningless) sequence.
+
+Input
+The only line contains two integers n and c (0≤n<2
+​3000
+​​ ,0≤c≤10
+​9
+​​ ).
+
+Specially, n is given in binary presentation. c is given in decimal presentation normally.
+
+Output
+Print what you are expected to tell the mathematician normally in decimal presentation.
+
+Example
+Input
+
+1000 3
+Output
+
+67
+https://pintia.cn/problem-sets/1325328163585343488/problems/1325343094703611907
+
+数位dp。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 3e3 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+char s[N];
+ll res[N];
+ll fpow(ll a, ll b, ll mod)
+{
+	ll res = 1;
+	while (b)
+	{
+		if (b & 1)
+			res = res * a % mod;
+		b >>= 1;
+		a = a * a % mod;
+	}
+	return res % mod;
+}
+ll c;
+int d[3030][3030][2][2];
+int dfs(int x, int one, int zero, int lim)
+{
+	if (d[x][one][zero][lim] != -1)
+		return d[x][one][zero][lim];
+	if (x == 0)
+		return d[x][one][zero][lim] = fpow(c, one, mod);
+	ll res = 0;
+	int up = lim ? s[x] - '0' : 1;
+	for (int i = 0; i <= up; i++)
+	{
+		res = (res + dfs(x - 1, one + i, zero || i, lim && up == i)) % mod;
+	}
+	return d[x][one][zero][lim] = res;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	memset(d, -1, sizeof d);
+	scanf("%s%lld", s + 1, &c);
+	int len = strlen(s + 1);
+	reverse(s + 1, s + len + 1);
+	cout << dfs(len, 0, 0, 1) << endl;
+	return 0;
+}

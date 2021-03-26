@@ -1,0 +1,61 @@
+/*
+给出一个数a， 找3的倍数 | 成这个数
+考虑这个数的二进制数， 取余为1， 2
+a % 3 == 1时
+如果1的数目大于二，a - p， a - q
+只有一个1时， q为2 则a - p, p + q
+若没有时， 则 a - p - q, p + q + r 
+*/
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+vector<int>x, y;
+int main(){
+	int t;
+	while (cin >> t)
+	{
+		while (t--)
+		{
+			x.clear();
+			y.clear();
+			ll a;
+			cin >> a;
+			int cnt1 = 0, cnt2 = 0;
+			for (ll i = 0; i <= 63; i++)
+			{
+				if (a & (1LL << i))
+				{
+					if (i % 2 == 0)
+						x.push_back(i);
+					else
+						y.push_back(i);
+				}
+			}
+			if (a % 3 == 0)
+				cout << 1 << " " << a << endl;
+			else
+				if (a % 3 == 1)
+				{
+					if (x.size() >= 2)
+						cout << 2 << " " << a - (1L << x[0]) << " " << a - (1L << x[1]) << endl;
+					else
+						if (x.size() == 1)
+							cout << 2 << " " << a - (1L << x[0]) << " " << (1L << x[0]) + (1L << y[0]) << endl;
+						else
+							cout << 2 << " " << a - (1L << y[0]) - (1L << y[1]) << " " << (1L << y[0]) + (1L << y[1]) + (1L << y[2]) << endl;
+				}
+				else
+				{
+					if (y.size() >= 2)
+						cout << 2 << " " << a - (1L << y[0]) << " " << a - (1L << y[1]) << endl;
+					else
+						if (y.size() == 1)
+							cout << 2 << " " << a - (1L << y[0]) << " " << (1L << x[0]) + (1L << y[0]) << endl;
+						else
+							cout << 2 << " " << a - (1L << x[0]) - (1L << x[1]) << " " << (1L << x[0]) + (1L << x[1]) + (1L << x[2]) << endl;
+				}
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,25 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+using namespace std;
+typedef long long ll;
+int n, q;
+const int N = 1e5 + 10;
+int a[N];
+int b[N];
+int main(){
+	cin >> n >> q;
+	for (int i = 1; i <= q; i++)
+	{
+		int x, y;
+		cin >> x >> y;
+		a[x]++, a[y + 1]--;
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		b[i] = b[i - 1] + a[i];
+	}
+	for (int i = 1; i <= n; i++)
+		printf("%d ", b[i]);
+	return 0;
+}

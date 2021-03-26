@@ -1,0 +1,72 @@
+链接：https://ac.nowcoder.com/acm/contest/1072/J
+来源：牛客网
+题目描述 
+Farmer John has so very many jobs to do! In order to run the farm efficiently, he must make money on the jobs he does, each one of which takes just one time unit.
+His work day starts at time 0 and has 1,000,000,000 time units (!). He currently can choose from any of N (1 <= N <= 100,000) jobs conveniently numbered 1..N for work to do. It is possible but extremely unlikely that he has time for all N jobs since he can only work on one job during any time unit and the deadlines tend to fall so that he can not perform all the tasks.
+Job i has deadline Di (1 <= Di <= 1,000,000,000). If he finishes job i by then, he makes a profit of Pi (1 <= Pi <= 1,000,000,000).
+What is the maximum total profit that FJ can earn from a given list of jobs and deadlines? The answer might not fit into a 32-bit integer.
+输入描述:
+* Line 1: A single integer: N
+* Lines 2..N+1: Line i+1 contains two space-separated integers: Di and Pi
+输出描述:
+* Line 1: A single number on a line by itself that is the maximum possible profit FJ can earn.
+示例1 
+输入
+复制 
+3 
+2 10 
+1 5 
+1 7 
+输出
+复制 
+17
+说明
+Complete job 3 (1,7) at time 1 and complete job 1 (2,10) at time 2 to maximize the earnings (7 + 10 -> 17).
+题意: 给出任务截止日期跟价值， 问最大收益
+<单调队列>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e6 + 10;
+struct node{
+	ll x, y;
+	bool operator<(const node &oth)const
+	{
+		if (x != oth.x)
+			return 	x < oth.x;
+		return y > oth.y;
+	}
+}a[N];
+priority_queue<ll, vector<ll>, greater<ll>>pq;
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	ll num1, num2;
+	for (int i = 1; i <= n; i++)
+		scanf("%lld%lld", &a[i].x, &a[i].y);
+	sort(a + 1, a + n + 1);
+	ll ans = 0;
+	int cnt = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		if (a[i].x > cnt)
+			ans += a[i].y, pq.push(a[i].y), cnt++;
+		else
+			if (a[i].y > pq.top())
+				ans += a[i].y - pq.top(), pq.pop(), pq.push(a[i].y);
+	}
+	cout << ans << endl;
+	return TIME;
+}

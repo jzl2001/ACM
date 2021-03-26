@@ -1,0 +1,179 @@
+There is a rectangular grid of size n×m. Each cell of the grid is colored black ('0') or white ('1'). The color of the cell (i,j) is ci,j. You are also given a map of directions: for each cell, there is a direction si,j which is one of the four characters 'U', 'R', 'D' and 'L'.
+
+If si,j is 'U' then there is a transition from the cell (i,j) to the cell (i−1,j);
+if si,j is 'R' then there is a transition from the cell (i,j) to the cell (i,j+1);
+if si,j is 'D' then there is a transition from the cell (i,j) to the cell (i+1,j);
+if si,j is 'L' then there is a transition from the cell (i,j) to the cell (i,j−1).
+It is guaranteed that the top row doesn't contain characters 'U', the bottom row doesn't contain characters 'D', the leftmost column doesn't contain characters 'L' and the rightmost column doesn't contain characters 'R'.
+
+You want to place some robots in this field (at most one robot in a cell). The following conditions should be satisfied.
+
+Firstly, each robot should move every time (i.e. it cannot skip the move). During one move each robot goes to the adjacent cell depending on the current direction.
+Secondly, you have to place robots in such a way that there is no move before which two different robots occupy the same cell (it also means that you cannot place two robots in the same cell). I.e. if the grid is "RL" (one row, two columns, colors does not matter there) then you can place two robots in cells (1,1) and (1,2), but if the grid is "RLL" then you cannot place robots in cells (1,1) and (1,3) because during the first second both robots will occupy the cell (1,2).
+The robots make an infinite number of moves.
+
+Your task is to place the maximum number of robots to satisfy all the conditions described above and among all such ways, you have to choose one where the number of black cells occupied by robots before all movements is the maximum possible. Note that you can place robots only before all movements.
+
+You have to answer t independent test cases.
+
+Input
+The first line of the input contains one integer t (1≤t≤5⋅104) — the number of test cases. Then t test cases follow.
+
+The first line of the test case contains two integers n and m (1<nm≤106) — the number of rows and the number of columns correspondingly.
+
+The next n lines contain m characters each, where the j-th character of the i-th line is ci,j (ci,j is either '0' if the cell (i,j) is black or '1' if the cell (i,j) is white).
+
+The next n lines also contain m characters each, where the j-th character of the i-th line is si,j (si,j is 'U', 'R', 'D' or 'L' and describes the direction of the cell (i,j)).
+
+It is guaranteed that the sum of the sizes of fields does not exceed 106 (∑nm≤106).
+
+Output
+For each test case, print two integers — the maximum number of robots you can place to satisfy all the conditions described in the problem statement and the maximum number of black cells occupied by robots before all movements if the number of robots placed is maximized. Note that you can place robots only before all movements.
+
+Example
+inputCopy
+3
+1 2
+01
+RL
+3 3
+001
+101
+110
+RLL
+DLD
+ULL
+3 3
+000
+000
+000
+RRD
+RLD
+ULL
+outputCopy
+2 1
+4 3
+2 2
+每一块是个环
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+vector<int>G[N];
+int vis[N];
+int dfn[N];
+int a[N];
+int nxt[N], vis1[N];
+int record[N];
+int time1;
+int ans1, ans2;
+void bfs(int x, int len)
+{
+	queue<pair<int, int>>q;
+	q.push({ 0, x });
+	for (int i = 0; i <= len; i++)
+		record[i] = 0;
+	while (!q.empty())
+	{
+		int id = q.front().first;
+		int f = q.front().second;
+		q.pop();
+		if (vis1[f])
+			continue;
+		vis1[f] = 1;
+		if (a[f] == 0)
+			record[id % len] = 1;
+		for (auto &i : G[f])
+		{
+			q.push({ id + 1, i });
+		}
+	}
+	ans1 += len;
+	for (int i = 0; i < len; i++)
+	{
+		if (record[i])
+			ans2++;
+	}
+}
+void cl(int x)
+{
+	if (vis[x])
+		return;
+	vis[x] = 1;
+	cl(nxt[x]);
+	for (auto &i : G[x])
+	{
+		cl(i);
+	}
+}
+void dfs(int x)
+{
+	if (dfn[x])
+	{
+		bfs(x, time1 + 1 - dfn[x]); //环的大小为time1 + 1- dfn[x]
+	}
+	else
+		dfn[x] = ++time1, dfs(nxt[x]);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		time1 = ans1 = ans2 = 0;
+		int n, m ;
+		cin >> n >> m;
+		for (int i = 0; i < n * m; i++)
+		{
+			vis[i] = dfn[i] = vis1[i] = 0;
+			G[i].clear();
+		}
+		char s;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				int pos = i * m + j;
+				cin >> s;
+				a[pos] = s - '0';
+			}
+		}
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				int pos = i * m + j;
+				cin >> s;
+				if (s == 'L')
+					nxt[pos] = pos - 1, G[pos - 1].push_back(pos);
+				else
+					if (s == 'R')
+						nxt[pos] = pos + 1, G[pos + 1].push_back(pos);
+					else
+						if (s == 'U')
+							nxt[pos] = pos - m, G[pos - m].push_back(pos);
+						else
+							nxt[pos] = pos + m, G[pos + m].push_back(pos);
+			}
+		}
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				int pos = i * m + j;
+				if (!vis[pos])
+					dfs(pos);
+				cl(pos); //标记该联通块
+			}
+		}
+		cout << ans1 << " " << ans2 << endl;
+	}
+	return 0;
+}

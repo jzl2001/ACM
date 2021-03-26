@@ -1,0 +1,154 @@
+链接：https://ac.nowcoder.com/acm/contest/5477/I
+来源：牛客网
+
+纸牌
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+桌上有一叠共N张牌，从顶向下标号为1~N。张老师打算对这一叠牌做k次操作，其中第i次操作会将牌堆顶的牌放在牌堆中的某个位置，从而满足这张牌成为自顶向下第(i - 1) % (N - 1) + 2张牌，其中%表示取模操作。张老师想知道k次操作以后这叠牌自顶向下的编号情况，你能告诉他吗？
+
+输入描述:
+一行，两个整数N和k（2≤N≤106, 0≤k≤1018）。
+
+输出描述:
+一行共N个数，第i个数为操作k次后自顶向下第i张牌的编号。数字间用空格间隔。
+
+示例1
+输入
+复制
+5 3
+输出
+复制
+3 2 4 1 5
+说明
+以样例为例 
+第1次操作后的结果：2 1 3 4 5 
+第2次操作后的结果：1 3 2 4 5 
+第3次操作后的结果：3 2 4 1 5
+n - 1次操作后的序列是p[i]， 再操作n-1次，序列变为p[p[i]],所以置换，并用快速幂加速
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 2e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+int vis[N];
+int res[N];
+int b[N];
+ll n, k;
+void c(int* a, int x)
+{
+	memset(vis, 0, sizeof vis);
+	for (int i = 1; i <= n; i++)
+	{
+		vis[2 * i - 1] = a[i];
+	}
+	int now = 1;
+	for (int i = 1; i <= x; i++)
+	{
+		while (!vis[now])
+			now++;
+		swap(vis[now], vis[(i + 1) * 2]);
+	}
+	int cnt = 0;
+	for (int i = 1; i <= 2 * n; i++)
+	{
+		if (vis[i])
+			a[++cnt] = vis[i];
+	}
+}
+void change(int* a, int* b)
+{
+	for (int i = 1; i <= n; i++)
+	{
+		res[i] = a[b[i]];
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		a[i] = res[i];
+	}
+}
+void pow()
+{
+	for (int i = 1; i <= n; i++)
+	{
+		a[i] = b[i] = i;
+	}
+	c(b, n - 1); //前n - 1次直接算
+	ll u = k / (n - 1); // 这一部分置换，并用矩阵快速幂加速
+	int last = k % (n - 1);//剩余的再直接算
+	while (u)
+	{
+		if (u & 1)
+			change(a, b);
+		u >>= 1;
+		change(b, b);
+	}
+	if (last)
+		c(a, last);
+	for (int i = 1; i <= n; i++)
+	{
+		printf("%d ", a[i]);
+	}
+	cout << endl;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	cin >> n >> k;
+	pow();
+// 	for (int i = 1; i <= n; i++)
+// 	{
+// 		a[i] = i;
+// 	}
+// 	for (int i = 1; i <= 25; i++)
+// 	{
+// 		int now = (i - 1) % (n - 1) + 2;
+// 		int temp = a[1];
+// 		for (int j = 1; j < now; j++)
+// 		{
+// 			a[j] = a[j + 1];
+// 		}
+// 		a[now] = temp;
+// 		for (int j = 1; j <= n; j++)
+// 		{
+// 			cout << a[j] << " ";
+// 		}
+// 		cout << endl;
+// 	}
+	return TIME;
+}/*
+ 1 2 3 4 5
+ 2 1 3 4 5
+ 1 3 2 4 5
+ 3 2 4 1 5
+ 2 4 1 5 3
+ 4 2 1 5 3
+ */ //(j + 1) * 2
+/*
+1 0 2 0 3 0 4 0 5 0
+0 0 2 1 3 0 4 0 5 0
+0 0 0 1 3 2 4 0 5 0
+0 0 0 0 3 2 4 1 5 0
+0 0 0 0 0 2 4 1 5 3
+*/

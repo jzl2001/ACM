@@ -1,0 +1,59 @@
+#pragma GCC optimize(2)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef long double ld;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ld eps = 1e-10;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+unordered_map<string, int>mp;
+string t[1010];
+bool cmp(string a, string b)
+{
+	return a.size() < b.size();
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	cin >> n >> m;
+	set<char>st;
+	int cnt = 0;
+	for (int i = 1; i <= m; i++)
+	{
+		string s;
+		cin >> s;
+		if (mp[s] == 0)
+		{
+			mp[s] = 1;
+			t[++cnt] = s;
+		}
+	}
+	sort(t + 1, t + cnt + 1, cmp);
+	int tot = 0, ans = 0;
+	for (int i = 1; i <= cnt; i++)
+	{
+		if (tot + t[i].size() <= n)
+		{
+			tot += t[i].size();
+			ans++;
+		}
+		else
+			break;
+		tot++;
+	}
+	cout << ans << endl;
+	return TIME;
+}

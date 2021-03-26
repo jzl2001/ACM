@@ -1,0 +1,106 @@
+链接：https://ac.nowcoder.com/acm/contest/889/E
+来源：牛客网
+题目描述 
+Amy asks Mr. B  problem E. Please help Mr. B to solve the following problem.
+
+There are n people, who don't know each other at the beginning. 
+There are m turns. In each turn, 2 of them will make friends with each other. 
+The friend relation is mutual and transitive.
+If A is a friend of B, then B is also a friend of A.
+For example, if A is a friend of B, B is a friend of C, then A and C are friends.
+At the beginning and after each turn, please calculate the number of ways to select four people from, such that any two of these four are not friends. 
+
+输入描述:
+The first line contains two integers, n and m (n <= 100000, m <= 200000), which are the number of people, and the number of turns.
+
+In the following m lines, the i-th line contains two integers x and y ( 1 <= x <= n, 1 <= y <= n, x ≠ y), which means the x-th person and the y-th person make friends in the i-th turn.
+
+The x-th person and y-th person might make friends in several turns.
+输出描述:
+Output m+1 lines, each line contains an integer, which is the number of quadruples.
+
+Output at the beginning and after each turn, so there are m+1 lines.
+示例1 
+输入
+复制 
+6 6
+1 2
+3 4
+4 5
+3 5
+3 6
+2 4
+输出
+复制 
+15
+9
+4
+0
+0
+0
+0
+示例2 
+输入
+复制 
+100000 0
+输出
+复制 
+4166416671249975000
+说明
+Don't use int.
+/*
+题意：给出n个人，最开始都不认识，每次给出两个人认识，问每次选四个人互不认识的方案数。
+<并查集><贡献>
+*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef unsigned long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+ll mod = 1e9 + 7;
+ll fpow(ll a, ll b) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+int pre[N];
+ll cnt[N];
+int find(int x) { return pre[x] == x ? x : pre[x] = find(pre[x]); };
+void join(int a, int b) { pre[a] = pre[find(b)]; }
+int main()
+{
+#ifdef LOCAL
+    freopen("D:/input.txt", "r", stdin);
+#endif
+    ll n, m;
+    cin >> n >> m;
+    for (int i = 1; i <= n; i++)
+        pre[i] = i, cnt[i] = 1;
+    ll ans = n * (n - 1) / 2 * (n - 2) / 3 * (n - 3) / 4; // 总的方案数
+    ll x = n * (n - 1) / 2; // 任意集合选俩
+    cout << ans << endl;
+    while (m--)
+    {
+        int a, b;
+        cin >> a >> b;
+        a = find(a);
+        b = find(b);
+        if (a == b || !ans)
+            continue(cout << ans << endl);
+        // cnt[a] * cnt[b]  两个选的是a, b 集合中的元素
+        // 考虑其他俩不在同一集合
+        // 一共选四个人，这个时候两个两个一选一共4种情况 1 a b 2 o o 3 a o 4 b o
+        // o = n - a - b
+        // 剩下 x = o o        所以 - a * b - （a + b） * (n - a - b)
+        x -= cnt[a] * cnt[b] + (cnt[a] + cnt[b]) * (n - cnt[a] - cnt[b]);
+        ans -= x * cnt[a] * cnt[b];
+        x += (cnt[a] + cnt[b]) * (n - cnt[a] - cnt[b]); // 对于选两个 a o b o 合法， 再加上
+        join(a, b);
+        cnt[b] += cnt[a];
+        cout << ans << endl;
+    }
+    return TIME;
+}

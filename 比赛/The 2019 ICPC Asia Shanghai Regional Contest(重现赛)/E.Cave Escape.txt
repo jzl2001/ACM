@@ -1,0 +1,277 @@
+链接：https://ac.nowcoder.com/acm/contest/4370/E
+来源：牛客网
+
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+Bob is stuck in a cave represented by a matrix of \mathbf{N}N rows and \mathbf{M}M columns, where rows are numbered from \mathbf{1}1 to \mathbf{N}N from top to buttom, and columns are numbered from \mathbf{1}1 to \mathbf{M}M from left to right. The cell at the i-th row and the j-th column is denoted by {(i, j)}(i,j).
+
+Bob is currently at the cell (\mathbf{S_R}, \mathbf{S_C})(S 
+R
+​	
+ ,S 
+C
+​	
+ ), and the exit of the save is located at the cell (\mathbf{T_R}, \mathbf{T_C})(T 
+R
+​	
+ ,T 
+C
+​	
+ ).
+
+Each cell in this cave contains a number, which is called the magic value. The magic value of cell {(i, j)}(i,j) is \mathbf{V_{ij}}V 
+ij
+​	
+ .
+
+When Bob moves from one cell to an unvisited cell, he gains energy points equals to the product of two magic values. It means, if Bob moves from cell {(i, j)}(i,j) to cell {(x, y)}(x,y), and cell (x, y) is unvisited, he will gain \mathbf{V_{ij} \times V_{xy}}V 
+ij
+​	
+ ×V 
+xy
+​	
+  energy points.
+
+Bob can move between cells that share an edge (not just a corner). On the exit cell, Bob can choose not to exit the cave and continue to explore the cave if he want to. Can you help him find the maximum number of energy points he can gain when he exits the cave.
+输入描述:
+The first line of the input gives the numbers of test cases, \mathbf{T}T. \mathbf{T}T test cases follow.
+Each test case contains two lines.
+The first line contains six integers \mathbf{N}N, \mathbf{M}M, \mathbf{S_R}S 
+R
+​	
+ , \mathbf{S_C}S 
+C
+​	
+ , \mathbf{T_R}T 
+R
+​	
+  and \mathbf{T_C}T 
+C
+​	
+  as described above. 
+The next line contains fix integers in the following format, respectively:
+\mathbf{X_1}X 
+1
+​	
+  \mathbf{X_2}X 
+2
+​	
+  \mathbf{A}A \mathbf{B}B \mathbf{C}C \mathbf{P}P
+These values are used to generate \mathbf{V_{ij}}V 
+ij
+​	
+  as follows:
+We define:
+\mathbf{X_i} = (\mathbf{A} \times \mathbf{X_{i-1}} + \mathbf{B} \times \mathbf{X_{i-2}} + \mathbf{C})\ module\ \mathbf{P}X 
+i
+​	
+ =(A×X 
+i−1
+​	
+ +B×X 
+i−2
+​	
+ +C) module P, for i = 3 to \mathbf{N} \times \mathbf{M}N×M.
+We also define:
+\mathbf{V_{ij}} = \mathbf{X_{(i-1)*M+j}}V 
+ij
+​	
+ =X 
+(i−1)∗M+j
+​	
+ , for {i=1}i=1 to \mathbf{N}N, and {j=1}j=1 to \mathbf{M}M.
+1 \leq \mathbf{T} \leq 101≤T≤10.
+1 \leq \mathbf{N}, \mathbf{M} \leq 10001≤N,M≤1000.
+1 \leq \mathbf{S_R}, \mathbf{T_R} \leq \mathbf{N}1≤S 
+R
+​	
+ ,T 
+R
+​	
+ ≤N.
+1 \leq \mathbf{S_C}, \mathbf{T_C} \leq \mathbf{M}1≤S 
+C
+​	
+ ,T 
+C
+​	
+ ≤M.
+0 \leq \mathbf{X_1},\mathbf{X_2},\mathbf{A},\mathbf{B},\mathbf{C} \leq \mathbf{P}0≤X 
+1
+​	
+ ,X 
+2
+​	
+ ,A,B,C≤P.
+1 \leq \mathbf{P} \leq 1001≤P≤100.
+输出描述:
+For each test case, output one line containing "Case #x: y", where x is the test case number (starting from 1) and y is the maximum energy points that Bob can gain.
+示例1
+输入
+复制
+2
+1 4 1 2 1 3
+1 2 2 3 1 5
+6 1 2 1 4 1
+0 1 2 3 0 4
+输出
+复制
+Case #1: 17
+Case #2: 8
+备注:
+In Sample Case \#1, The matrix is:
+\left[
+  \begin{matrix}
+   1 & 2 & 3 & 3
+  \end{matrix}
+  \right][ 
+1
+​	
+  
+2
+​	
+  
+3
+​	
+  
+3
+​	
+ ]
+one way to get 17 energy points is:
+(1, 2) \rightarrow→ (1, 1), get 1 \times 21×2 energy points.
+(1, 1) \rightarrow→ (1, 2), get 0 energy points.
+(1, 2) \rightarrow→ (1, 3), get 2 \times 32×3 energy points.
+(1, 3) \rightarrow→ (1, 4), get 3 \times 33×3 energy points.
+(1, 4) \rightarrow→ (1, 3), get 0 energy points.
+In Sample Case \#2, The matrix is:
+\left[
+  \begin{matrix}
+   0 \\
+   1 \\
+   2 \\
+   3 \\
+   0 \\
+   1
+  \end{matrix}
+  \right] 
+⎣
+⎢
+⎢
+⎢
+⎢
+⎢
+⎢
+⎡
+​	
+  
+0
+1
+2
+3
+0
+1
+​	
+  
+⎦
+⎥
+⎥
+⎥
+⎥
+⎥
+⎥
+⎤
+​	
+ 
+one way to get 8 energy points is:
+(2, 1) \rightarrow→ (3, 1), get 1 \times 21×2 energy points.
+(3, 1) \rightarrow→ (4, 1), get 2 \times 32×3 energy points.
+给出n*m的图，询问从起点到终点的最大收益，每次移动的收益是起点乘以终点的权值。
+每个点只能走一次。
+建边，求最大生成树。
+#include <iostream>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int n, m;
+int x[N];
+int p[N];
+struct node
+{
+    int u,v;
+    ll w;
+}a[2000000 + 10];
+int id(int i, int j)
+{
+    return (i - 1) * m + j;
+}
+int find(int x)
+{
+    return p[x] == x ? x : p[x] = find(p[x]);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    int kcase = 0;
+    while (t--)
+    {
+        int sr, sc, tr, tc, A, B, C, P;
+        printf("Case #%d: ", ++kcase);
+        cin >> n >> m >> sr >> sc >> tr >> tc;
+        cin >> x[1] >> x[2] >> A >> B >> C >> P;
+        for (int i = 3; i <= n * m; i++)
+            x[i] = (A * x[i - 1] + B * x[i - 2] + C) % P;
+        int cnt = 0;
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= m; j++)
+            {
+                p[id(i, j)] = id(i, j);
+                if (j - 1 >= 1)
+                    a[++cnt].u = id(i, j - 1), a[cnt].v = id(i, j), a[cnt].w = x[id(i, j - 1)] * x[id(i, j)];
+                if (i - 1 >= 1)
+                    a[++cnt].u = id(i - 1, j), a[cnt].v = id(i, j), a[cnt].w = x[id(i - 1, j)] * x[id(i, j)];
+            }
+        sort(a + 1, a + cnt + 1, [] (node x, node y) { return x.w > y.w; } );
+        ll ans = 0;
+        for (int i = 1; i <= cnt; i++)
+        {
+            int u = a[i].u, v = a[i].v;
+            u = find(u), v = find(v);
+            if (u == v)
+                continue;
+            ans += a[i].w;
+            p[u] = v;
+        }
+        cout << ans << endl;
+    }
+	return TIME;
+}
+

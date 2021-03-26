@@ -1,0 +1,143 @@
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Ashish has a tree consisting of n nodes numbered 1 to n rooted at node 1. The i-th node in the tree has a cost ai, and binary digit bi is written in it. He wants to have binary digit ci written in the i-th node in the end.
+
+To achieve this, he can perform the following operation any number of times:
+
+Select any k nodes from the subtree of any node u, and shuffle the digits in these nodes as he wishes, incurring a cost of k⋅au. Here, he can choose k ranging from 1 to the size of the subtree of u.
+He wants to perform the operations in such a way that every node finally has the digit corresponding to its target.
+
+Help him find the minimum total cost he needs to spend so that after all the operations, every node u has digit cu written in it, or determine that it is impossible.
+
+Input
+First line contains a single integer n (1≤n≤2⋅105) denoting the number of nodes in the tree.
+
+i-th line of the next n lines contains 3 space-separated integers ai, bi, ci (1≤ai≤109,0≤bi,ci≤1)  — the cost of the i-th node, its initial digit and its goal digit.
+
+Each of the next n−1 lines contain two integers u, v (1≤u,v≤n, u≠v), meaning that there is an edge between nodes u and v in the tree.
+
+Output
+Print the minimum total cost to make every node reach its target digit, and −1 if it is impossible.
+
+Examples
+inputCopy
+5
+1 0 1
+20 1 0
+300 0 1
+4000 0 0
+50000 1 0
+1 2
+2 3
+2 4
+1 5
+outputCopy
+4
+inputCopy
+5
+10000 0 1
+2000 1 0
+300 0 1
+40 0 0
+1 1 0
+1 2
+2 3
+2 4
+1 5
+outputCopy
+24000
+inputCopy
+2
+109 0 1
+205 0 1
+1 2
+outputCopy
+-1
+Note
+The tree corresponding to samples 1 and 2 are:
+
+
+In sample 1, we can choose node 1 and k=4 for a cost of 4⋅1 = 4 and select nodes 1,2,3,5, shuffle their digits and get the desired digits in every node.
+
+In sample 2, we can choose node 1 and k=2 for a cost of 10000⋅2, select nodes 1,5 and exchange their digits, and similarly, choose node 2 and k=2 for a cost of 2000⋅2, select nodes 2,3 and exchange their digits to get the desired digits in every node.
+
+In sample 3, it is impossible to get the desired digits, because there is no node with digit 1 initially.
+题意：给出一棵树，每个点初始有期望值跟初始值。
+每次可以重排列某个点子树的k个点，代价是k * a[i]。
+记录每个点子树中需要改变的0跟1，然后从上往下传的时候取min。
+思维，树
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+int b[N];
+int c[N];
+vector<int>G[N];
+int d[N][2];
+int vis[N];
+ll ans;
+void dfs(int x)
+{
+	vis[x] = 1;
+	if (b[x] != c[x])
+		d[x][b[x]]++;
+	for (auto &i : G[x])
+	{
+		if (vis[i])
+			continue;
+		a[i] = min(a[x], a[i]);
+		dfs(i);
+		d[x][0] += d[i][0];
+		d[x][1] += d[i][1];
+	}
+	ll now = min(d[x][0], d[x][1]);//本次去掉的个数
+	ans += 2LL * now * a[x];
+	d[x][0] -= now;
+	d[x][1] -= now;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d%d%d", &a[i], &b[i], &c[i]);
+	}
+	for (int i = 1; i < n; i++)
+	{
+		int u, v;
+		scanf("%d%d", &u, &v);
+		G[u].push_back(v);
+		G[v].push_back(u);
+	}
+	dfs(1);
+	if (d[1][0] || d[1][1])
+		puts("-1");
+	else
+		cout << ans << endl;
+	return TIME;
+}

@@ -1,0 +1,88 @@
+<欧拉序><DFS序>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 100;
+int pre[N];
+vector<int>G[N];
+int ans[2 * N + 100];
+int cnt = 0;
+int find(int x)
+{
+	return x == pre[x] ? x : pre[x] = find(pre[x]);
+}
+void dfs(int x, int fa)
+{
+	ans[++cnt] = x;
+	for (auto &i : G[x])
+	{
+		if (i == fa)
+			continue;
+		dfs(i, x);
+		ans[++cnt] = x;
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n, m, k;
+	scanf("%d%d%d", &n, &m, &k);
+	for (int i = 1; i <= n; i++)
+		pre[i] = i;
+	for (int i = 1; i <= m; i++)
+	{
+		int u, v;
+		scanf("%d%d", &u, &v);
+		int uu = find(u), vv = find(v);
+		if (uu == vv)
+			continue;
+		pre[vv] = uu;
+		G[u].push_back(v);
+		G[v].push_back(u);
+	}
+	dfs(1, 0);
+	int num = cnt;
+	int x = 1;
+	int w = cnt / k + bool(cnt % k);
+	int flag = 0;
+	for (int i = 1; i <= k; i++)
+	{
+		if (x + w <= cnt)
+		{
+			printf("%d", w);
+			for (int j = x; j <= x + w - 1; j++)
+				printf(" %d", ans[j]);
+			x = x + w;
+		}
+		else
+			if (!flag)
+			{
+				printf("%d", cnt - x + 1);
+				for (int j = x; j <= cnt; j++)
+				{
+					printf(" %d", ans[j]);
+				}
+				flag = 1;
+				x = cnt;
+			}
+			else
+				printf("1 1");
+		cout << endl;
+	}
+	return TIME;
+}

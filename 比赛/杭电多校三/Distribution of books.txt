@@ -1,0 +1,104 @@
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int maxn = 2e5 + 10;
+ll a[maxn], n, k;
+ll sum[maxn];
+ll d[maxn];
+ll v[maxn];
+int len;
+map<ll, int>mp;
+ll t[maxn << 2];
+#define ls(x)((x) << 1)
+#define rs(x)((x) << 1 | 1) 
+void push_up(ll x)
+{
+	t[x] = max(t[ls(x)], t[rs(x)]);
+}
+void update(ll x, ll L, ll R, ll tar, ll val)
+{
+	ll mid = (L + R) >> 1;
+	if (L == R)
+		t[x] = val;
+	else
+	{
+		if (tar <= mid)
+			update(ls(x), L, mid, tar,val);
+		else
+			update(rs(x), mid + 1, R, tar, val);
+		push_up(x);
+	}
+}
+ll query(ll x, ll L, ll R, ll ql, ll qr)
+{
+	if (ql > qr)
+		return -0x3f3f3f3f;
+	if (ql <= L && R <= qr)
+		return t[x];
+	ll res = -0x3f3f3f3f;
+	ll mid = (L + R) >> 1;
+	if (ql <= mid)
+		res = max(res, query(ls(x), L, mid, ql, qr));
+	if (qr > mid)
+		res = max(res, query(rs(x), mid + 1, R, ql, qr));
+	return res;
+}
+#undef ls
+#undef rs
+bool check(ll mid)
+{
+	ll ans = 0;
+	memset(t, -0x3f, sizeof t);
+	for (int i = 1; i <= n; i++)
+	{
+		ll x = lower_bound(v + 1, v + 1 + len, a[i] - mid) - v;
+		ll now = query(1, 1, len, x, len) + 1;
+		if (a[i] <= mid)
+			now = max(now, 1LL);
+		if (now >= k)
+			return true;
+		if (now > 0)
+			update(1, 1, len, mp[a[i]], now);
+	}
+	return false;
+}
+int main(){
+	int T;
+	cin >> T;
+	while (T--)
+	{
+		len = 0;
+		mp.clear();
+		memset(sum, 0, sizeof sum);
+		memset(v, 0, sizeof v);
+		ll L = 0, R = 0;
+		cin >> n >> k;
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%lld", &a[i]);
+			if (a[i] > 0)
+				R += a[i];
+			else
+				L += a[i];
+			v[i] = v[i - 1] + a[i];
+			a[i] = v[i];
+		}
+		ll INF = 0x3f3f3f3f3f3f3f3f;
+		sort(v + 1, v + n + 1);
+		len = unique(v + 1, v + 1 + n) - v - 1;
+		v[len + 1] = INF;
+		ll ans = 0;
+		for (int i = 1; i <= len; i++)
+			mp[v[i]] = i;
+		while (L <= R)
+		{
+			ll mid = (L + R) >> 1;
+			if (check(mid))
+				R = mid - 1, ans = mid;
+			else
+				L = mid + 1;
+		}
+		cout << ans << endl;
+	}
+	return 0;
+}

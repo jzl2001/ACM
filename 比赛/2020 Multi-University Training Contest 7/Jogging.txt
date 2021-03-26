@@ -1,0 +1,149 @@
+Jogging
+Time Limit: 6000/5000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 970    Accepted Submission(s): 385
+
+
+Problem Description
+Notice：Don't output extra spaces at the end of one line.
+
+Dodo bird is jogging on an infinite 2-d plane, starting from (x0,y0). For a point(x,y), it is regarded as good if and only if gcd(x,y)>1.
+
+Dodo bird will walk infinite steps on the plane under the following strategy:
+
+Assume he is currently at (x,y), let S be the set of good points among (x−1,y−1),(x−1,y),(x−1,y+1),(x,y−1),(x,y+1),(x+1,y−1),(x+1,y),(x+1,y+1), z be the size of S. He has a probability of 1z+1 to stay in (x,y), and he also has a probility of zz+1 to move to a point in S. If he chooses to move, the probility of going to any point in S is equal.
+
+Define pt as the probability of coming back to (x0,y0) after walking t steps, please calculate limt→∞pt. It is guaranteed that the answer always exists.
+ 
+
+Input
+The first line contains an integer T(1≤T≤1000), indicating the number of test cases.
+
+Each test case has one line, which contains two integers x,y(2≤x0,y0≤1012), indicating the position of the start point. It is guaranteed that gcd(x0,y0)>1.
+ 
+
+Output
+T lines, each line contains an irreducible fraction, indicating the answer.
+ 
+
+Sample Input
+3
+18 16
+18 6
+18 8
+ 
+
+Sample Output
+0/1
+1/1
+2/7
+ 
+
+Source
+2020 Multi-University Training Contest 7
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+/*
+http://acm.hdu.edu.cn/showproblem.php?pid=6853
+题意：给出一个坐标可以走八个方向，但坐标gcd(x, y)需要＞1，问
+回到起点的期望是多少？打gcd的表可以发现任意一个点走的是个联通
+块不会太大，所以从起点求出所有的点，然后等于起点在里面随机游走。
+如果走到对角线即x=y会一直走，答案即为0。否则期望为（起点度数+1）
+/（总度数+联通块大小）
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+int ans[N];
+int dir[8][2] = { 0, 1, 1, 0, -1, 0, 0, -1, 1, 1, -1, -1, 1, -1, -1, 1 };
+map<pair<ll, ll>, int>mp;
+int flag;
+int st;
+int tot, sum;
+void bfs(ll x, ll y)
+{
+	queue<pair<ll, ll>>q;
+	q.push({ x, y });
+	while (!q.empty())
+	{
+		ll x = q.front().first, y = q.front().second;
+		q.pop();
+		if (mp.find({ x, y}) != mp.end())
+			continue;
+		mp[{ x, y }] = 1;
+		sum++;
+		if (x == y)
+		{
+			flag = 0;
+			return;
+		}
+		int cnt = 0;
+		for (int i = 0; i < 8; i++)
+		{
+			ll xx = x + dir[i][0];
+			ll yy = y + dir[i][1];
+			if (abs(gcd(xx, yy)) > 1)
+			{
+				q.push({ xx, yy });
+				tot++;
+				cnt++;
+			}
+		}
+		if (st == -1)
+		{
+			st = tot;
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll x, y;
+		scanf("%lld%lld", &x, &y);
+		flag = 1;
+		st = -1;
+		tot = sum = 0;
+		bfs(x, y);
+		mp.clear();
+		if (flag == 0)
+		{
+			puts("0/1");
+		}
+		else
+		{
+			int g = gcd(st + 1, tot + sum);
+			printf("%d/%d\n", (st + 1) / g, (tot + sum) / g);
+		}
+	}
+	return TIME;
+}

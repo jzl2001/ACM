@@ -1,0 +1,142 @@
+ Time Limit: 6000/3000 MS (Java/Others)  Memory Limit: 32768/32768 K (Java/Others)
+Problem Description
+这是一个回合制游戏，每一回合开始前会进行上一回合的结算。
+
+有一张 n*nn∗n 的棋盘，我们出生在一个初始位置 (x, y)(x,y)，现在我们要选择一个位置建设城市。
+
+你的人物每回合可以移动到距离你曼哈顿距离不超过 2 的位置，移动完成后可以选择是否建立城市。
+
+建立城市后，你的人物消失，成为一个人口为 1 的城市，这个人口要下回合才可以工作。如果不移动，直接在 (x,y) 建城，第 1 回合就可以开始工作。
+
+对于城市的每个居民，你可以安排他到距离城市曼哈顿距离小于等于 3 的位置进行工作，此居民可以瞬间到达该位置，每个位置最多安排一个居民，失业的人口不会生产任何食物。
+
+注意，城市位置上必须有一个居民在工作。
+
+结算按照如下顺序：
+
+如果位置 (i, j)(i,j) 上有一个工作居民，则获得 a[i][j]a[i][j] 的食物。
+如果当前城市人口为 ii，且食物达到 8*i^28∗i 
+2
+  时，你获得一个新的居民，下一回合可以进行操作。
+当结算后城市总人口达到 9 游戏结束。
+
+初始食物数量为 0，人口上涨不会导致之前积累的食物消失。输出最少几个回合能让游戏结束。
+
+Input
+第一行一个正整数 test(1 \le test \le 10)test(1≤test≤10) 表示数据组数。
+
+对于每组数据，第一行三个正整数 n(2 \le n \le 500), x(1 \le x \le n), y(1 \le y \le n)n(2≤n≤500),x(1≤x≤n),y(1≤y≤n)，分别表示棋盘大小和起始位置。
+
+接下来 nn 行，每行 nn 个整数，第 ii 行第 jj 列的整数表示 a[i][j](1 \le a[i][j] \le 3)a[i][j](1≤a[i][j]≤3)。
+
+Output
+对于每组数据，一行一个整数表示答案。
+
+Sample Input
+1
+10 9 8
+1 2 2 1 2 3 1 1 2 1
+2 1 3 3 3 2 3 2 3 1
+1 1 3 1 1 3 2 2 1 2
+3 1 3 1 3 3 1 3 1 3
+3 2 3 1 3 1 2 2 2 1
+2 3 2 3 2 2 3 1 2 3
+3 1 3 3 2 2 3 2 3 3
+1 3 3 2 3 2 2 2 1 1
+3 3 1 2 3 2 1 2 1 2
+1 1 3 1 3 1 1 1 3 3
+Sample Output
+39
+Statistic | Submit | Clarifications | Back
+BestCoder Contest System 2.0
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+const int N = 1e5 + 10;
+
+int a[510][510];
+int n, sx, sy;
+int qzh[N];
+pair<int, int>food[N];
+int dis(int x, int y, int x1, int y1)
+{
+    return abs(x - x1) + abs(y - y1);
+}
+bool cmp(pair<int, int>p1, pair<int, int>p2)
+{
+    return a[p1.first][p1.second] > a[p2.first][p2.second];
+}
+int calc(int x, int y)
+{
+    int ans = 0;
+    ans = (dis(x, y, sx, sy) + 1) / 2;//先移动到这个地方。
+    int cnt = 0;
+    food[++cnt] = { x, y };
+    for (int i = -3; i <= 3; i++)
+    {
+        for (int j = -3; j <= 3; j++)
+        {
+            int xx = x + i;
+            int yy = y + j;
+            if (i == 0 && j == 0)
+                continue;
+            if (xx >= 1 && xx <= n && yy >= 1 && yy <= n && dis(x, y, xx, yy) <= 3)
+            {
+                food[++cnt] = { xx, yy };
+            }
+        }
+    }
+    sort(food + 2, food + cnt + 1, cmp);
+    for (int i = 1; i <= cnt; i++)
+    {
+        qzh[i] = qzh[i - 1] + a[food[i].first][food[i].second];
+    }
+    int people = 1, sum = 0;
+    for (;;)
+    {
+        sum += qzh[min(cnt, people)];
+        ans++;
+        while (sum >= people * people * 8 && people < 9)
+            people++;
+        //结算
+        if (people >= 9)
+            break;
+    }
+    return ans;
+}
+int main()
+{
+#ifdef LOCAL
+    freopen("E:\input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        cin >> n >> sx >> sy;
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+                scanf("%d", &a[i][j]);
+            }
+        }
+        int ans = 0x3f3f3f3f;
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= n; j++)
+            {
+                ans = min(ans, calc(i, j));
+            }
+        cout << ans << endl;
+    }
+    return TIME;
+}

@@ -1,0 +1,116 @@
+链接：https://ac.nowcoder.com/acm/contest/4370/D
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 524288K，其他语言1048576K
+Special Judge, 64bit IO Format: %lld
+题目描述 
+Bob has recently learned algorithms on finding spanning trees and wanted to give you a quiz.
+
+To recap, a spanning tree is a subset of graph {G}G, which has all the vertices covered with minimum possible number of edges. Hence, a spanning tree does not have cycles and it cannot be disconnected. Given an arbitrary undirected simple graph (without multiple edges and loops), a spanning tree removal is defined as: retrieve one spanning tree of the graph, and remove all the edges selected by the spanning tree from the original graph, obtaining a new graph.
+
+Bob found "spanning tree removal'' so fun that he wanted to do it over and over again. In particular, he began with a complete graph, i.e., a graph with every pair of distinct vertices connected by a unique edge. Your goal, is to smartly choose spanning trees to remove so that you can repeat as many times as possible until there is no longer a spanning tree in the graph.
+输入描述:
+The input file starts with an integer \mathbf{T}T (1 \le \mathbf{T} \le 5001≤T≤500), denoting the number of test cases.
+Each test case is one line: \mathbf{N}N (2 \le \mathbf{N} \le 10002≤N≤1000), which the number of vertices of the graph to begin with.
+The sum of \mathbf{N}N over all test cases in a single input does not exceed {1000}1000.
+输出描述:
+For each test case, output one line containing "Case #x: y", where x is the test case number starting from 1, and y is how many times at most you can do the removal.
+Then follows y \times (\mathbf{N}-1)y×(N−1) lines. From line (\mathbf{N}-1) \times (i-1)+1(N−1)×(i−1)+1 to line (\mathbf{N}-1) \times i(N−1)×i, you should print a spanning tree you decided to remove at i-th time, in the format that everyone should be familiar with. Namely, each line contains two numbers u and v (1 \le u, v \le \mathbf{N}1≤u,v≤N, u \ne vu 
+
+​	
+ =v). (u, v) should be valid tree edge, and does not coincide with edges that have been removed before. If there are several solutions, output any of them.
+示例1
+输入
+复制
+3
+2
+3
+4
+输出
+复制
+Case #1: 1
+1 2
+Case #2: 1
+3 1
+1 2
+Case #3: 2
+1 3
+3 4
+2 4
+3 2
+1 4
+2 1
+构造题，完全图输出所有最小生成树。
+#include <iostream>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int n;
+int pre(int x)
+{
+    if (x == 1)
+        return n;
+    else
+        return x - 1;
+}
+int nxt(int x)
+{
+    if (x == n)
+        return 1;
+    else
+        return x + 1;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    int kcase = 0;
+    while (t--)
+    {
+        printf("Case #%d: ", ++kcase);
+        cin >> n;
+        cout << n / 2 << endl;
+        for (int i = 1; i <= n / 2; i++)
+        {
+            int u = i, v = i + 1;
+            cout << u << " " << v << endl;
+            for (int j = 1; j < n - 1; j++)
+            {
+                swap(u, v);
+                if (j & 1)
+                    v = pre(v);
+                else
+                    v = nxt(v);
+                cout << u << " " << v << endl;
+            }
+        }
+    }
+	return TIME;
+}

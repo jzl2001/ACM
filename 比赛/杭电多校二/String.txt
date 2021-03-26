@@ -1,0 +1,80 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define N 100010
+char s[N];
+int l[30], r[30];
+int cnt[N][30];//每个位置， 二十六个字母的个数
+int num[30]; // 答案串中， 26个字符
+int main(){
+    int k;
+    while (~scanf("%s%d", s + 1, &k))
+    {
+        string ans;
+        queue<int>q[30];
+        int len = strlen(s + 1);
+        for (int i = 0; i < 26; i++)
+        {
+            cnt[len + 1][i] = 0;
+            num[i] = 0;
+        }
+        for (int i = 0; i < 26; i++)
+            cin >> l[i] >> r[i];
+        for (int i = 1; i <= len; i++)
+            q[s[i] - 'a'].push(i);  // 存26个字母的位置下标
+        for (int i = len; i >= 1; i--)
+            for (int j = 0; j < 26; j++)
+                cnt[i][j] = cnt[i + 1][j] + (s[i] == j + 'a');
+        int now = 0; // 已经摆到的位置
+        int flag = 0;
+        int tot = 0;
+        for (int i = 1; i <= k; i++)
+        {
+            for (int j = 0; j < 26; j++)
+            {
+                if (num[j] == r[j]) // 放的数目不能超过最大
+                    continue;
+                while (!q[j].empty() && now >= q[j].front())
+                    q[j].pop();
+                if (!q[j].empty())
+                {
+                    int f = 0;
+                    int x = q[j].front();
+                    num[j]++;
+                    for (int u = 0; u < 26; u++)
+                    {
+                        if (num[u] + cnt[x + 1][u] < l[u])
+                        {
+                            num[j]--;
+                            f = 1;
+                            break;
+                        }
+                    }
+                    if (f)
+                        continue;
+                    int MI = 0, MX = 0;
+                    for (int u = 0; u < 26; u++)
+                    {
+                        MI += max(l[u] - num[u], 0); // 剩余至少要摆的
+                        MX += min(r[u] - num[u], cnt[x + 1][u]); // 最多能摆的， 要≥k
+                    }
+                    if (MI + i <= k && MX + i >= k)
+                    {
+                        tot++;
+                        ans.push_back('a' + j);
+                        now = q[j].front();
+                        break;
+                    }
+                    else
+                        num[j]--;
+                }
+            }
+        if (tot != i)
+            break;
+    }
+        if (ans.size() == k)
+            cout << ans << endl;
+        else
+            cout << -1 << endl;
+    }
+    return 0;
+}

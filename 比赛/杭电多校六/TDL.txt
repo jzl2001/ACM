@@ -1,0 +1,44 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const ll N = 1e5 + 10;
+template<typename S, typename T> inline bool Max(S &a, const T &b){ return a < b ? a = b, true : false; }
+template<typename S, typename T> inline bool Min(S &a, const T &b){ return a > b ? a = b, true : false; }
+ll a[N];
+ll gcd(ll a, ll b)
+{
+	return b == 0 ? a : gcd(b, a % b);
+}
+bool check(ll k, ll m, ll n) 
+{
+	ll cnt = 0;
+	for (ll i = n + 1; i <= k + n; i++)
+	{
+		if (gcd(i, n) == 1)
+			cnt++;
+		if (cnt == m)
+			return k + n == i;
+	}
+	return false;
+}
+int main(){
+	ll t;
+	cin >> t;
+	while (t--)
+	{
+		ll k, m;
+		cin >> k >> m;
+		ll ans = 0x3f3f3f3f3f3f3f3f;
+		for (ll i = m; i <= 400; i++)
+		{
+			ll n = i ^ k;
+			if (check(i, m, n))
+				Min(ans, n);
+		}
+		if (ans == 0x3f3f3f3f3f3f3f3f)
+			cout << "-1" << endl;
+		else
+			cout << ans << endl;
+	}
+	return 0;
+}

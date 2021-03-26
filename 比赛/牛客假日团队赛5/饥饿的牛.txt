@@ -1,0 +1,20 @@
+#includebitsstdc++.h
+using namespace std;
+typedef long long ll;
+const ll N = 1e5 + 10;
+ll a[N], d[N];
+int main(){
+	ll n;
+	cin  n;
+	memset(d, 0x3f, sizeof d);
+	for (ll i = 1; i = n; i++)
+		scanf(%d, &a[i]);
+	for (ll i = 1; i = n; i++)
+	{
+		ll j = lower_bound(d + 1, d + n + 1, a[i]) - d;
+		d[j] = a[i];
+	}
+	ll len = lower_bound(d + 1, d + n + 1, 0x3f3f3f3f3f3f3f3f) - d - 1;
+	cout  len  endl;
+	return 0;
+}

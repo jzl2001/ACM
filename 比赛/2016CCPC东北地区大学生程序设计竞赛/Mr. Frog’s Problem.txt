@@ -1,0 +1,87 @@
+Problem Description
+One day, you, a clever boy, feel bored in your math class, and then fall asleep without your control. In your dream, you meet Mr. Frog, an elder man. He has a problem for you.
+
+He gives you two positive integers A and B, and your task is to find all pairs of integers (C, D), such that A≤C≤B,A≤D≤B and AB+BA≤CD+DC
+ 
+
+Input
+first line contains only one integer T (T≤125), which indicates the number of test cases. Each test case contains two integers A and B (1≤A≤B≤1018).
+ 
+
+Output
+For each test case, first output one line "Case #x:", where x is the case number (starting from 1).
+
+Then in a new line, print an integer s indicating the number of pairs you find.
+
+In each of the following s lines, print a pair of integers C and D. pairs should be sorted by C, and then by D in ascending order.
+ 
+
+Sample Input
+2
+10 10
+9 27
+ 
+
+Sample Output
+Case #1:
+1
+10 10
+Case #2:
+2
+9 27
+27 9
+ 
+
+Source
+2016CCPC东北地区大学生程序设计竞赛 - 重现赛
+签到
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+#define cel cout << endl;
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int kcase = 0;
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        ll a, b;
+        cin >> a >> b;
+        if (a > b)
+        {
+            swap(a, b);
+        }
+        printf("Case #%d:\n", ++kcase);
+        if (a == b)
+        {
+            cout << 1 << endl << a << " " << b << endl;
+        }
+        else
+            cout << 2 << endl << a << " " << b << endl << b << " " << a << endl;
+    }
+    return TIME;
+}

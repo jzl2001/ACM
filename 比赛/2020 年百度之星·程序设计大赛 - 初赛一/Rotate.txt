@@ -1,0 +1,95 @@
+Time Limit: 2000/1000 MS (Java/Others)    Memory Limit: 32768/32768 K (Java/Others)
+Total Submission(s): 153    Accepted Submission(s): 100
+
+
+Problem Description
+我们有一个圈，从内到外一共被分成了 n 个环，中间是空的。
+
+我们把从外到内第 i 层环平分成 a[i] 份，其中 a[i] 是偶数，我们把这 a[i] 份黑白染色，第奇数个染成黑色，第偶数个染成白色。
+
+现在我们旋转每一层，每一层都会等概率随机到一个中止位置。
+
+问黑色的联通块数目的期望。两块黑色的区域有交点即算联通。层之间的旋转是相互独立的。
+ 
+
+Input
+第一行一个正整数 test(1≤test≤10) 表示数据组数。
+
+对于每组数据，第一行一个正整数 n(1≤n≤10)。
+
+接下来一行 n 个正整数 a[i](2≤a[i]≤1000)，a[i] 为偶数，另外保证 a 序列不降。
+ 
+
+Output
+对于每组数据，一行一个数表示答案，由于答案 A/B 中的 AB 可能很大，请输出 A/Bmod109+7，假设 A/B 为最简分数，A/Bmod109+7=A∗B−1mod109+7，B−1 为满足 B−1∗Bmod109+7=1 的整数。
+ 
+
+Sample Input
+3
+2
+2 2
+2
+2 6
+4
+10 230 666 1000
+ 
+
+Sample Output
+1
+2
+500000256
+
+样例解释
+对于第一组样例，第一个环和第二个环各有一半是黑的，他们的黑色部分必然有交点，所以期望的联通块数目为 1。
+对于第二组样例，旋转第一个环，只在几个特定角度上第一个环的黑色部分和第二个环的三个黑色部分都有交点，大部分情况下都只和两个黑色部分有交点，因为算期望，所以几个特定角度对答案没有影响，答案为 2。
+ 
+
+Source
+2020 年百度之星·程序设计大赛 - 初赛一
+ 
+
+Recommend
+liuyiding
+ 
+
+Statistic | Submit | Discuss | Note
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 6e3 + 10;
+const int M = 5e4 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+int main()
+{
+#ifdef LOCAL
+    freopen("E:\\input.txt", "r", stdin);
+    //freopen("E:\\output.txt", "w", stdout);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        int sum = 0;
+        for (int i = 0; i < n; i++)
+        {
+            scanf("%d", &a[i]);
+            if (i)
+                sum += a[i] - a[i - 1];
+        }
+        printf("%lld\n", ((sum / 2) * fpow(2, mod - 2, mod) + a[0] / 2) % mod);
+    }
+    return TIME;
+}

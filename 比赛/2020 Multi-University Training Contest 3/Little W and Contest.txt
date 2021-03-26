@@ -1,0 +1,152 @@
+Little W and Contest
+Time Limit: 2000/2000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 1370    Accepted Submission(s): 469
+
+
+Problem Description
+There are n members in our ACM club. Little W wants to select three persons from our club to form a new team taking part in provincial ACM contests, as it is known by all of us that any ACM contest requires a normal team to have three members.
+
+Little W has divided our club members into two role groups. The first group contains only readers who dedicate themselves to reading problems during contests, though sometimes they may also prepare drinking and food for the team. For the sake of measurement, we define the power of a reader as 1. The second part contains only coders who code and test programs all the time, and similarly, we define the power of a coder as 2.
+
+Little W thinks it will be a tremendous disaster when a team has two readers because in that case, the total power of this team is less than 5 and thus it has a high risk to fail the contest. To avoid that, Little W thinks a new team must have at least two coders.
+
+Additionally, Little W defines the relationship between club members with transitivity. That is, for every three members A, B, and C, if A is familiar with B, and B is familiar with C, then A will be familiar with C through B instantly. Based on the definition, it is forbidden for the team to have any two members familiar with each other.
+
+At first, no member of our club is familiar with any other, and then Little W will repeatedly make an introduction between two members who are currently strangers to each other until each member is familiar with all the others. During this process, there will be exactly (n−1) introductions.
+
+Now, for i=1,2,…,n, Little W wants you to count the combinations of three club members that can form a new team after the first (i−1) introductions have been made. However, the numbers of combinations may be quite gigantic, so you just need to report each number in modulo (109+7).
+ 
+
+Input
+There are several test cases.
+
+The first line contains an integer T (1≤T≤10), denoting the number of test cases. Then follow all the test cases.
+
+For each test case, the first line contains an integer n (1≤n≤105), denoting the number of members in this club.
+
+The second line contains n integers consisting of only 1 and 2, where the i-th integer represents the power of the i-th member.
+
+The next (n−1) lines describe all introductions in chronological order of occurrence, where each line contains two integers u and v (1≤u,v≤n,u≠v), representing an introduction between the u-th member and the v-th member, who are currently strangers to each other.
+
+It is guaranteed that the sum of n is no larger than 106.
+ 
+
+Output
+For each test case, output n lines, where the i-th line contains an integer, denoting the number of combinations of three club members, in modulo (109+7), that can form a new team after the first (i−1) introductions have been made.
+ 
+
+Sample Input
+1
+5
+2 2 2 1 1
+4 5
+1 4
+2 1
+3 2
+ 
+
+Sample Output
+7
+7
+3
+0
+0
+ 
+
+Source
+2020 Multi-University Training Contest 3
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6826 6825 6824 6823 6822 
+ 
+
+Statistic | Submit | Discuss | Note
+题意：有n个人，每个人是2跟1，问你选三个人总和超过5的方案数，但是要求选的三个人都不认识，
+输入n - 1次，表示u跟v会认识，认识是相互的且会传递。
+<并查集><贡献>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const ll INV2 = 500000004;
+const ll INV6 = 166666668;
+int a[N];
+int b[N];
+int pre[N];
+int find(int x) 
+{
+    return x == pre[x] ? x : pre[x] = find(pre[x]); 
+}
+ll two(ll x)
+{
+    return x * (x - 1) % mod * INV2 % mod;
+}
+ll three(ll x)
+{
+    return x * (x - 1) * (x - 2) % mod * INV6 % mod;
+} 
+int main()
+{
+#ifdef LOCAL
+//    freopen("C:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        ll cnt1 = 0, cnt2 = 0;
+        for (int i = 1; i <= n; i++)
+            a[i] = b[i] = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            int num;
+            pre[i] = i;
+            scanf("%d", &num);
+            num == 2 ? ++a[i], ++cnt2 : (++b[i], ++cnt1);
+        }
+        ll ans = (cnt2 * (cnt2 - 1) / 2 % mod * cnt1 % mod + cnt2 * (cnt2 - 1) * (cnt2 - 2) / 6 % mod) % mod;
+        printf("%lld\n", ans);
+        for (int i = 1; i <= n - 1; i++)
+        {
+            int u, v;
+            scanf("%d%d", &u, &v);
+            u = find(u);
+            v = find(v);
+            if (u == v || !ans)
+                Continue(printf("%lld\n", ans))
+            ll a1 = a[u], b1 = b[u], a2 = a[v], b2 = b[v];
+            ll c1 = cnt1 - b1 - b2;
+            ll c2 = cnt2 - a1 - a2;  
+            ans = (ans - c2 * a1 * a2 % mod + mod) % mod;//2 2 2
+            ans = (ans - c2 * b1 * a2 % mod + mod) % mod;//2 1 2
+            ans = (ans - c2 * a1 * b2 % mod + mod) % mod;//2 2 1
+            ans = (ans - c1 * a1 * a2 % mod + mod) % mod;//1 2 2
+            printf("%lld\n", ans);    
+            pre[u] = v;
+            a[v] += a[u];
+            b[v] += b[u];
+        }
+    }
+    return TIME;
+}

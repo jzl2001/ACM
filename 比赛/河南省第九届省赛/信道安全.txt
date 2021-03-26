@@ -1,0 +1,59 @@
+#includeiostream
+#includequeue
+#includestring.h
+#includevector
+using namespace std;
+typedef long long ll;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+double dis[N];
+bool vis[N];
+int n, m;
+struct node{
+    ll v;
+    double w;
+    bool operator  (const node &oth)const
+    {
+        return w  oth.w;
+    }
+};
+vectornodeE[N];
+void dijkstra()
+{
+    memset(dis, 0 , sizeof dis);
+    priority_queuenodepq;
+    dis[1] = 1;
+    pq.push({ 1, 1 });
+    while (!pq.empty())
+    {
+        node t = pq.top();
+        pq.pop();
+        ll u = t.v;
+        double w = t.w;
+        vis[u] = 1;
+        for (node &i  E[u])
+            if (!vis[i.v] && w  i.w  dis[i.v])
+                dis[i.v] = w  i.w, pq.push({i.v,dis[i.v]});
+    }
+}
+int main(){
+    int t;
+    cin  t;
+    while (t--)
+    {
+        memset(vis, 0, sizeof vis);
+        cin  n  m;
+        for (int i = 1; i = n; i++)
+            E[i].clear();
+        for (int i = 1; i = m; i++)
+        {
+            int u, v;
+            double w;
+            cin  u  v  w;
+            E[u].push_back({ v, w  100 });
+            E[v].push_back({ u, w  100 });
+        }
+        dijkstra();
+        printf(%.6fn, dis[n]100);
+    }
+}

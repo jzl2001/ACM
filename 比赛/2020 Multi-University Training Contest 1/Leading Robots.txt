@@ -1,0 +1,118 @@
+Time Limit: 2000/1000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 2116    Accepted Submission(s): 583
+
+
+Problem Description
+Sandy likes to play with robots. He is going to organize a running competition between his robots. And he is going to give some presents to the winners. Robots are arranged in a line. They have their initial position (distance from the start line) and acceleration speed. These values might be different. When the competition starts, all robots move to the right with speed:
+
+
+
+Here a is acceleration speed and t is time from starting moment.
+
+Now, the problem is that, how many robots can be the leader from the starting moment?
+
+Here leader means the unique rightmost robot from the start line at some moment. That is, at some specific time, if a robot is rightmost and unique then it is the leading robot at that time. There can be robots with same initial position and same acceleration speed.
+
+The runway is so long that you can assume there's no finish line.
+ 
+
+Input
+The input consists of several test cases. The first line of input consists of an integer T(1≤ T≤50), indicating the number of test cases. The first line of each test case consists of an integer N(0 < N≤ 50000), indicating the number of robots. Each of the following N lines consist of two integers: p,a (0 < p,a < 231) indicating a robot's position and its acceleration speed.
+ 
+
+Output
+For each test case, output the number of possible leading robots on a separate line.
+ 
+
+Sample Input
+1
+3
+1 1
+2 3
+3 2
+ 
+
+Sample Output
+2
+ 
+
+Source
+2020 Multi-University Training Contest 1
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6782 6781 6780 6779 6778 
+ 
+
+Statistic | Submit | Discuss | Note
+题意：有n个机器人，有初始位置跟加速度，问多少个机器人可以当第一，并列第一不能算。
+思路：单调栈，先按照加速度从小到大排序，相同则按初始位置排序。
+每次首先比较栈首跟当前机器人，如果当前机器人初始位置大于栈首元素，即加速度跟初始位置都大于栈首则永远不可能超过当前机器人，
+出栈。或者当前机器人跟栈里头两个元素比较，a，b，c。b超越a的时间需要小于c超越b的时间，不然永远不能当第一了，出栈。
+还要处理重复元素，即加速度跟初始位置相同的元素。
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 5e4 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int stk[N];
+struct node
+{
+	int p, a;
+	bool operator < (const node& oth)const
+	{
+		if (a != oth.a)
+			return a < oth.a;
+		return p < oth.p;
+	}
+}x[N];
+map<node, int>mp;
+bool calc(node a, node b, node c)
+{
+	return 1LL * (a.p - b.p) * (c.a - b.a) >= 1LL * (b.p - c.p) * (b.a - a.a);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("C:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	int top = 0;
+	while (t--)
+	{
+		mp.clear();
+		int n;
+		scanf("%d", &n);
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%d%d", &x[i].p, &x[i].a); 
+			mp[x[i]]++;
+		}
+		sort(x + 1, x + n + 1);
+		for (int i = 1; i <= n; i++)
+		{
+			while (top > 0 && x[i].p >= x[stk[top]].p || (top > 1 && calc(x[stk[top - 1]], x[stk[top]], x[i])))
+				top--;
+			stk[++top] = i;
+		}
+		int ans = top;
+		while (top)
+		{
+			if (mp[x[stk[top]]] != 1)
+				ans--;
+			top--;
+		}
+		printf("%d\n", ans);
+	}
+	return TIME;
+}

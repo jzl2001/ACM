@@ -1,0 +1,85 @@
+链接：https://ac.nowcoder.com/acm/contest/5477/A
+来源：牛客网
+
+天才程序员菜哭武和张老师有一天到一个城市旅游，旅途中菜哭武觉得无聊就想和张老师玩一个游戏。菜哭武有n个石子，每个石子都标有1到n之间到数，且各不相同，一开始他们会随机从这堆石子选一个石子放置到一个集合中，张老师选的数是a，菜哭武选的是b（a和b不相同）。接下来菜哭武和张老师轮流按照如下规则拿走一个石子：当石子x能被拿走时，当且仅当集合存在y和z，满足x等于y+z或者y-z，当x被拿走时，把它放到集合中。谁完成最后一轮操作时，谁获胜。张老师总是先手，于是张老师就好奇当决定好a和b时，他是否总是能获胜，你能帮助一下张老师吗？
+
+输入描述:
+第一行一个整数T（1≤T≤500），表示共有T组测试数据。
+对于每组测试数据，第一行三个整数n（2≤n≤20000）、a和b（1≤a,b≤n, a≠b）。
+
+输出描述:
+若张老师能获胜输出Yes，反之No。
+
+示例1
+输入
+复制
+16
+2 1 2
+3 1 3
+67 1 2
+100 1 2
+8 6 8
+9 6 8
+10 6 8
+11 6 8
+12 6 8
+13 6 8
+14 6 8
+15 6 8
+16 6 8
+1314 6 8
+1994 1 13
+1994 7 12
+输出
+复制
+No
+Yes
+Yes
+No
+No
+No
+Yes
+Yes
+No
+No
+Yes
+Yes
+No
+Yes
+No
+No
+#pragma GCC optimize(2)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n, b, a;
+        cin >> n >> a >> b;
+        int d = __gcd(a, b);
+        if ((n / d) % 2 != 0)
+            puts("Yes");
+        else
+            puts("No");
+    }
+    return TIME;
+}

@@ -1,0 +1,159 @@
+链接：https://ac.nowcoder.com/acm/contest/4370/B
+来源：牛客网
+
+时间限制：C/C++ 5秒，其他语言10秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+A prefix code is a type of code system distinguished by its possession of the "prefix property'', which requires that there is no whole code word in the system that is a prefix (initial segment) of any other code word in the system. It is trivially true for fixed-length code, so only a point of consideration in variable-length code.
+For example, a code with code words{\{9, 55\}}{9,55}has the prefix property; a code consisting of {\{9, 5, 59, 55\}}{9,5,59,55} does not, because "5'' is a prefix of "59'' and also of "55''. A prefix code is a uniquely decodable code: given a complete and accurate sequence, a receiver can identify each word without requiring a special marker between words. However, there are uniquely decodable codes that are not prefix codes; for instance, the reverse of a prefix code is still uniquely decodable (it is a suffix code), but it is not necessarily a prefix code.
+Prefix codes are also known as prefix-free codes , prefix condition codes and instantaneous codes. Although Huffman coding is just one of many algorithms for deriving prefix codes, prefix codes are also widely referred to as "Huffman codes'', even when the code was not produced by a Huffman algorithm. The term comma-free code is sometimes also applied as a synonym for prefix-free codes but in most mathematical books and articles a comma-free code is used to mean a self-synchronizing code, a subclass of prefix codes.
+Using prefix codes, a message can be transmitted as a sequence of concatenated code words, without any out-of-band markers or (alternatively) special markers between words to frame the words in the message. The recipient can decode the message unambiguously, by repeatedly finding and removing sequences that form valid code words. This is not generally possible with codes that lack the prefix property, for example {\{0, 1, 10, 11\}}{0,1,10,11}: a receiver reading a "1'' at the start of a code word would not know whether that was the complete code word "1'', or merely the prefix of the code word "10'' or "11''; so the string "10'' could be interpreted either as a single codeword or as the concatenation of the words "1" then "0".
+The variable-length Huffman codes, country calling codes, the country and publisher parts of ISBNs, the Secondary Synchronization Codes used in the UMTS W-CDMA 3G Wireless Standard, and the instruction sets (machine language) of most computer microarchitectures are prefix codes.
+Prefix codes are not error-correcting codes. In practice, a message might first be compressed with a prefix code, and then encoded again with channel coding (including error correction) before transmission.
+For any uniquely decodable code there is a prefix code that has the same code word lengths. Kraft's inequality characterizes the sets of code word lengths that are possible in a uniquely decodable code.
+In this problem, you can give a code with \mathbf{N}N code words. Each word contains only numbers {\{0, 1, 2, 3, 4, 5, 6, 7, 8, 9\}}{0,1,2,3,4,5,6,7,8,9}. You need to check whether the code can meet the prefix property: there is no whole code word in the system that is a prefix of any other code word.
+
+输入描述:
+The first line of the input gives the numbers of test cases, \mathbf{T}T (1 \leq \mathbf{T} \leq 1001≤T≤100). \mathbf{T}T test cases follow.
+Each test case consists of one line with one integer \mathbf{N}N (1 \leq \mathbf{N} \leq 10,0001≤N≤10,000), the number of code words. 
+Then follows \mathbf{N}N lines with one code word on each line. A code word is a
+sequence of at most ten digits.
+输出描述:
+For each test case, output one line containing "Case #x: y", where x is the test case number (starting from 1) and y is "Yes" if the code is a prefix code, or "No" if not.
+示例1
+输入
+复制
+3
+2
+9
+55
+4
+9
+5
+59
+55
+4
+01
+01
+123
+321
+输出
+复制
+Case #1: Yes
+Case #2: No
+Case #3: No
+字典树或者暴力
+#include <iostream>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int record[N];
+int flag;
+string c[N];
+struct tire
+{
+    int nxt[N << 1][10];
+    int sed[N << 1];
+    int tot = 0, rt;
+    int new_node()
+    {
+        ++tot;
+        memset(nxt[tot], 0, sizeof nxt[tot]);
+        sed[tot] = 0;
+        return tot;
+    }
+    void init()
+    {
+        tot = 0;
+        memset(nxt[0], 0, sizeof nxt[0]);
+    }
+    void insert(string s)
+    {
+        int rk = 0;
+        int len = s.size();
+        for (int i = 0; i < len; i++)
+        {
+            int x = s[i] - '0';
+            if (!nxt[rk][x])
+                nxt[rk][x] = new_node();
+            if (i != len - 1)
+                record[nxt[rk][x]] = 1;
+            rk = nxt[rk][x];
+        }
+        if (record[rk])
+            flag = 0;
+        record[rk] = 1;
+        sed[rk]++;
+        return;
+    }
+    int search(string s)
+    {
+        int rk = 0;
+        int len = s.size();
+        for (int i = 0; i < len; i++)
+        {
+            int x = s[i] - '0';
+            if (!nxt[rk][x])
+                return 0;
+            rk = nxt[rk][x];
+        }
+        //cout << sed[rk] << endl;
+        return sed[rk];
+    }
+}tr;
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    int kcase = 0;
+    while (t--)
+    {
+        tr.init();
+        memset(record, 0, sizeof record);
+        printf("Case #%d: ", ++kcase);
+        flag = 1;
+        int n;
+        cin >> n;
+        for (int i = 1; i <= n; i++)
+        {
+            string s;
+            cin >> s;
+            c[i] = s;
+        }
+        sort(c + 1, c + n + 1, [] (string a, string b) { return a.size() > b.size(); });
+        for (int i = 1; i <= n; i++)
+            tr.insert(c[i]);
+        if (!flag)
+            puts("No");
+        else
+            puts("Yes");
+    }
+    return TIME;
+}

@@ -1,0 +1,62 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+void Mi(int a, int b, int c, int d, int n)
+{
+	int num = (c - 1) * a;
+	if (n <= num)
+		cout << 0 << " ";
+	else
+	{
+		n -= (c - 1) * a;
+		num = (d - 1) * b;
+		if (n <= num)
+			cout << 0 << " ";
+		else
+			cout << n - num << " ";
+	}
+}
+void MX(int a, int b, int c, int d, int n)
+ 
+{
+	int num = d * b;
+	if (num >= n)
+		cout << n / d << endl;
+	else
+	{
+		n -= d * b;
+		cout << b + n / c << endl;
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif//c是大的
+	int a, b, c, d, n;
+	cin >> a >> b >> c >> d >> n;
+	int ans = 0;
+	if (c < d)
+		swap(a, b), swap(c, d);
+	Mi(a, b, c, d, n);
+	MX(a, b, c, d, n);
+	return TIME;
+}

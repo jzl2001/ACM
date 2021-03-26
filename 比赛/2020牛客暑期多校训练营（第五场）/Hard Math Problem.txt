@@ -1,0 +1,46 @@
+链接：https://ac.nowcoder.com/acm/contest/8075/I
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+You are a player of the game Mine Craft. As a lawful good player, instead of droping TNT everywhere you want to build your village on a vast plain.
+
+The game map could be recognized as a rectangle grid. In one grid, you can set up a gold miner, or an elixir collector, or a headquarter. You also can leave some grids green and vibrant.
+However, one restriction for some good reasons is that a headquarter must be next to at least one gold miner and at least one elixir collector. 'Next to' means that their grids share one side -- every grid is next to up, down, left, and right grids.
+
+"Effeciecy!" A good old man said to you. You, the vast plain holder, want to be the most effecient player in the server. You want to maximize the number of headquarters in your village. Formally, If the village is a grid of size n \times mn×m, we define the max number of headquarters can be built as . For example, since there should be at least 3 grids for setting up a headquarter; and one possible solution is (G,\ H,\ E,\ G,\ H,\ E)(G, H, E, G, H, E).
+To prove that you really understand the problem very well, print the efficiency on the infinite plain. Formally, you need to calculate  \lim_{n\to\infty} \lim_{m\to\infty} \frac{f(n,m)}{n\cdot m}lim 
+n→∞
+​	
+ lim 
+m→∞
+​	
+  
+n⋅m
+f(n,m)
+​	
+ .
+输入描述:
+No input.
+输出描述:
+A real number denoting the answer to the question. Round the answer to 6 decimal places. For example, if your answer is 0.123456789, print 0.123457.
+题意：给出一个n跟一个m，现在有GHE三种字符，摆放到n*m个格子内，每一个H周围至少有一个G跟一个E。
+n，m趋向于∞时，H的个数/(n * m)是多少。
+因为是无穷，不考虑边界情况。
+可以摆成
+GHHGHHGHH
+HHEHHEHHE
+HGHHGHHGH
+EHHEHHEHH
+斜着放，大概就是两列斜着的H跟着一列斜着的H跟G。所以是2/3。
+#include <stdio.h>
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	printf("%.6f", 1.0 * 2 / 3);
+	return 0;
+}

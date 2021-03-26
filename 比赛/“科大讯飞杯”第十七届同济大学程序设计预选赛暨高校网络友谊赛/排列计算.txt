@@ -1,0 +1,45 @@
+差分，贪心
+#pragma GCC optimize(2)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int a[N];
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int n, m;
+    cin >> n >> m;
+    for (int i = 1; i <= m; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+        a[u]++;
+        a[v + 1]--;
+    }
+    for (int i = 1; i <= n; i++)
+    {
+        a[i] += a[i - 1];
+    }
+    sort(a + 1, a + n + 1);
+    ll ans = 0;
+    for (int i = n; i >= 1; i--)
+    {
+        ans += 1LL * i * a[i];
+    }
+    cout << ans << endl;
+    return TIME;
+}

@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#define SZ(x) ((int)(x).size())
+#define ALL(x) (x).begin(), (x).end()
+ 
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int MOD = 1e9 + 7;
+template<typename S, typename T> inline bool Min(S &a, const T &b){ return a > b ? a = b, true : false; }
+template<typename S, typename T> inline bool Max(S &a, const T &b){ return a < b ? a = b, true : false; }
+template<typename S, typename T> inline void Adm(S &a, const T &b){ a = (a + b) % MOD; if (a < 0) a += MOD; }
+//emplace pair
+ 
+bool pri(int x)
+{
+    if (x <= 1)
+        return false;
+    for (int i = 2; i * i <= x; ++i)
+        if (x % i == 0)
+            return false;
+    return true;
+}
+int main()
+{
+#ifdef LOCAL
+    //freopen("C:/input.txt", "r", stdin);
+#endif
+    ll x, w[] = { 0, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 100000000 };
+    int d;
+    cin >> d >> x;
+    while (true)
+    {
+        string s = to_string(x);
+        int flag = 0;
+        for (int i = d; i <= SZ(s) - d; ++i)
+        {
+            string a = s.substr(0, i), b = s.substr(i);
+            bool A = pri(stod(a)), B = b[0] == '0' ? 0 : pri(stod(b));
+            if (A && B)
+                cout << x << endl, exit(0);
+            if (A)
+                flag = 1;
+        }
+        if (flag)
+            x += 1;
+        else
+            x += w[d];
+    }
+ 
+    return 0;
+}

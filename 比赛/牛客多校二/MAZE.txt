@@ -1,0 +1,118 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+char s[N][20];
+int n, q, m;
+struct M
+{
+	ll m[12][12];
+}c[N << 2];
+#define ls ((x) << 1)
+#define rs ((x) << 1 | 1)
+#define mid ((L) + (R) >> 1)
+M mul(M a, M b)
+{
+	M ans;
+	for (int i = 1; i <= m; i++)
+		for (int j = 1; j <= m; j++)
+		{
+			ans.m[i][j] = 0;
+			for (int k = 1; k <= m; k++)
+				ans.m[i][j] = (ans.m[i][j] + a.m[i][k] * b.m[k][j] % mod) % mod;
+		}
+	return ans;
+}
+void M_update(int idx, int x)
+{
+	memset(c[idx].m, 0, sizeof c[idx].m);
+	for (int i = 1; i <= m; i++) 
+	{
+			for (int j = i; j >= 1 && s[x][j] != '1'; j--)
+				c[idx].m[j][i] = 1;
+			for (int j = i; j <= m && s[x][j] != '1'; j++)
+				c[idx].m[j][i] = 1;
+	}
+}
+void push_up(int x)
+{
+	c[x] = mul(c[ls], c[rs]);
+}
+void build(int x, int L, int R)
+{
+	if (L == R)
+	{
+		M_update(x, L);
+		return;
+	}
+	build(ls, L, mid);
+	build(rs, mid + 1, R);
+	push_up(x);
+}
+void update(int x, int L, int R, int pos)
+{
+	if (L == R)
+	{
+		M_update(x, L);
+		return;
+	}
+	if (pos <= mid)
+		update(ls, L, mid, pos);
+	else
+		update(rs, mid + 1, R, pos);
+	push_up(x);
+}
+#undef mid
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	cin >> n >> m >> q;
+	for (int i = 1; i <= n; i++)
+		scanf("%s", s[i] + 1);
+	build(1, 1, n);
+	while (q--)
+	{
+		int op;
+		int x, y;
+		scanf("%d%d%d", &op, &x, &y);
+		if (op == 1)
+		{
+			s[x][y] = (s[x][y] == '1' ? '0' : '1');
+			update(1, 1, n, x);
+		}	
+		else
+			printf("%lld\n", c[1].m[x][y]);
+	}
+	return TIME;
+}
+/*
+线段树维护M1 * M2 * M3 * M4 *... *Mn
+*/
+/*
+A矩阵: 第i行j位置表上上一行j位置可以到当前的这个第i个位置
+B矩阵: 列数i, k位置, 表示上一行的i位置可以到达当前行的第k个位置
+所以 A * B = j -> k；
+一直合并即是0位置j到达n行k位置的方案数
+*/
+/*
+设矩阵A 表示从0, i 到 n, j的方案数, B表示从n, j 到 n + 1, j 的方案数
+则A = A * B * C, 即 0, i 到n, j 位置的方案数
+*/

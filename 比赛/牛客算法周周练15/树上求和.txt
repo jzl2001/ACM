@@ -1,0 +1,209 @@
+链接：https://ac.nowcoder.com/acm/contest/8018/D
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+给你一棵根为1的有N个节点的树，以及Q次操作。
+每次操作诸如:
+1 x y：将节点x所在的子树的所有节点的权值加上y
+2 x：询问x所在子树的所有节点的权值的平方和，答案模23333后输出
+输入描述:
+第一行两个整数N,Q
+第二行N个整数，第i个表示节点i的初始权值
+接下来N-1行每行两个整数u,v，表示u和v之间存在一条树边
+接下来Q行每行一个操作，格式如题目描述
+输出描述:
+对于每个询问操作，输出一行一个整数，表示答案在模23333后的结果
+示例1
+输入
+复制
+5 5
+0 0 0 0 0
+1 2
+1 3
+3 4
+3 5
+1 1 3
+1 3 7
+1 4 5
+1 5 6
+2 1
+输出
+复制
+599
+备注:
+1. 数据范围
+一共有10个测试点，对于第i个测试点保证，N=10000 x i
+对于100 \%100%的数据，有1 ≤ N,Q,y ≤ 105,1 ≤ x ≤ N
+2. 注
+平方和的意思是：a2+b2+c2
+(a+b+c)^2(a+b+c) 
+2
+ 是和的平方
+题意：两种操作，第一种操作，某个点的子树都加1，第二种操作求某个点的子树的所有点的平方和。
+(x + y) * (x + y) = x * x + 2 * x * y + y * y
+维护一个sum表示区间和，一个c表示区间平方和，build的时候注意是对dfs序建，所以要求个pos。
+#include <iostream>
+#include <set>
+#include <bits/stdc++.h>
+#include <unordered_map>
+#include <assert.h>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+#include <string>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 23333;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+ll a[N];
+vector<int>G[N];
+
+ll c[N * 4];
+ll sum[N * 4];
+ll lzy[N * 4];
+int st[N];
+int ed[N];
+int pos[N];
+#define ls ((x) << 1)
+#define rs ((x) << 1 | 1)
+#define mid ((L) + (R) >> 1)
+void Modify(ll x, ll L, ll R, ll val)
+{
+	c[x] += ((R - L + 1) * val % mod * val % mod + 2 * sum[x] * val % mod) % mod;
+	c[x] %= mod;
+	sum[x] += (R - L + 1) * val % mod;
+	sum[x] %= mod;
+	lzy[x] = (lzy[x] + val) % mod;
+}
+void push_up(int x)
+{
+	c[x] = (c[ls] + c[rs]) % mod;
+	sum[x] = (sum[ls] + sum[rs]) % mod;
+}
+void push_down(int x, int L, int R)
+{
+	if (lzy[x])
+	{
+		Modify(ls, L, mid, lzy[x]);
+		Modify(rs, mid + 1, R, lzy[x]);
+		lzy[x] = 0;
+	}
+}
+void build(int x, int L, int R)
+{
+	if (L == R)
+	{
+		c[x] = a[pos[L]] * a[pos[L]] % mod;
+		sum[x] = a[pos[L]] % mod;
+		return;
+	}
+	build(ls, L, mid);
+	build(rs, mid + 1, R);
+	push_up(x);
+}
+void update(int x, int L, int R, int ql, int qr, ll val)
+{
+	if (ql > qr)
+		return;
+	if (ql <= L && qr >= R)
+	{
+		Modify(x, L, R, val);
+		return;
+	}
+	push_down(x, L, R);
+	if (ql <= mid)
+		update(ls, L, mid, ql, qr, val);
+	if (qr > mid)
+		update(rs, mid + 1, R, ql, qr, val);
+	push_up(x);
+}
+ll query(int x, int L, int R, int ql, int qr)
+{
+	if (ql <= L && qr >= R)
+	{
+		return c[x];
+	}
+	push_down(x, L, R);
+	ll res = 0;
+	if (ql <= mid)
+		res += query(ls, L, mid, ql, qr), res %= mod;
+	if (qr > mid)
+		res += query(rs, mid + 1, R, ql, qr), res %= mod;
+	push_up(x);
+	return res % mod;
+}
+int cnt;
+void dfs(int x, int fa)
+{
+	st[x] = ++cnt, pos[cnt] = x;
+	for (auto &i : G[x])
+	{
+		if (fa == i)
+			continue;
+		dfs(i, x);
+	}
+	ed[x] = cnt;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, q;
+	scanf("%d%d", &n, &q);
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%lld", &a[i]);
+	}
+	for (int i = 1; i < n; i++)
+	{
+		int u, v;
+		scanf("%d%d", &u, &v);
+		G[u].push_back(v);
+		G[v].push_back(u);
+	}
+	dfs(1, 0);
+	build(1, 1, n);
+	for (int i = 1; i <= q; i++)
+	{
+		int op;
+		scanf("%d", &op);
+		if (op == 1)
+		{
+			int x;
+			ll y;
+			scanf("%d%lld", &x, &y);
+			int L = st[x], R = ed[x];
+			update(1, 1, n, L, R, y);
+		}
+		else
+		{
+			int y;
+			scanf("%d", &y);
+			int L = st[y], R = ed[y];
+			printf("%lld\n", query(1, 1, n, L, R));
+		}
+	}
+	return TIME;
+}

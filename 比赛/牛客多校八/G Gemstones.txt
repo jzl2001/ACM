@@ -1,0 +1,46 @@
+Gromah and LZR have entered the seventh level. There are a sequence of gemstones on the wall.
+
+After some tries, Gromah discovers that one can take exactly three successive gemstones with the same types away from the gemstone sequence each time, after taking away three gemstones, the left two parts of origin sequence will be merged to one sequence in origin order automatically.
+
+For example, as for "ATCCCTTG", we can take three 'C's away with two parts "AT", "TTG" left, then the two parts will be merged to "ATTTG", and we can take three 'T's next time.
+
+The password of this level is the maximum possible times to take gemstones from origin sequence.
+
+Please help them to determine the maximum times.
+三个相同的字母消掉
+<栈>
+#include <stdio.h>
+#include <bits/stdc++.h>
+using namespace std;
+ 
+const int INF = 0x3f3f3f3f;
+const int N = 1e6 + 10;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RunTime: " << clock() << "ms\n", 0
+#else
+#define debug(x) ;
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+int a[N];
+int main()
+{
+#ifdef LOCAL
+    freopen("D:/input.txt", "r", stdin);
+#endif
+    string s;
+    cin >> s;
+    int cnt = 0;
+    int ans = 0;
+    int len = s.size();
+    for (int i = 0; i < len; i++)
+    {
+        a[++cnt] = s[i];
+        if (cnt >= 3 && a[cnt] == a[cnt - 1] && a[cnt - 2] == a[cnt - 1])
+            ans++, cnt -= 3;
+    }
+    cout << ans << endl;
+    return TIME;
+}

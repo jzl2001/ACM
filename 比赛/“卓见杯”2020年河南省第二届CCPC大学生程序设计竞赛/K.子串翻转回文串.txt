@@ -1,0 +1,148 @@
+题目描述
+
+给一个串 s=s1s2⋯sn，你可以选定其一个非空子串，然后将该子串翻转。具体来说，若选定的子串区间为  [l,r]（1≤l≤r≤n），则翻转后该串变为 s1s2⋯sl−1srsr−1⋯slsr+1⋯sn。
+请你回答仅通过一次上述操作后，s 是否能变成回文串。串 s 是回文串，当且仅当它从左至右读出与从右至左读出完全相同，即 s1s2⋯sn=snsn−1⋯s1
+
+输入
+
+注意：本题包含多组测试数据。
+第一行包含一个整数 T（1≤T≤5×105），表示数据组数。
+接下来的 T 行，每行包含一个仅由英文小写字母组成的字符串 s，含义见题目描述，且串长 ∣s∣ 满足1≤∣s∣≤5×105。
+保证字符串总长 ∑∣s∣不超过 5×105。
+
+ 
+
+输出
+
+对于每组测试数据，输出一行一个字符串，若仅通过一次操作后 s 能变成回文串，则输出 Yes，否则输出 No，大小写不敏感。
+
+样例输入 Copy
+
+4
+abba
+bacad
+abacbaa
+aabadcdca
+样例输出 Copy
+
+Yes
+No
+Yes
+Yes
+提示
+
+第一组数据中，abba 翻转带下划线的子串得到回文串 abba。
+第二组数据中，无论如何翻转子串，都不能得到回文串。
+第三组数据中， abacbaa翻转带下划线的子串得到回文串 aabcbaa。
+第四组数据中， aabadcdca翻转带下划线的子串得到回文串 acdabadca。
+
+思路：
+这题观察样例应该就能看出来咋写的了，首先去除掉两端相同的字符，然后得到一个串s，这时候s[1] != s[len]则一定需要反转
+
+一个前缀或者后缀来使得串变成回文，所以思路就是枚举前缀(后缀就是串反转一下再枚举)。
+
+第三个样例，去掉第一个a跟最后一个a之后剩余了bacba，枚举前缀，比如枚举到了长度为2的前缀，这个时候既然反转了前两个
+
+字符，则反转后前两个字符一定与最后两个字符互为回文，所以反转之前应该是一样的，所以先判前两个字符跟最后两个是不是相同
+
+相同之后，如果要求反转之后整体为回文，则中间这部分没有反转，所以本身要求为回文。判下是不是回文就可以了。
+
+如果枚举的前缀长度大于后缀，比如cdcabab，则要求最后的n-i个字符跟前i个字符的最后n-i个字符相同，然后判断最前剩余的串是不是
+
+回文即可。这些操作都可以使用hash来实现，时间复杂度O(n)。
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+ 
+const int mod = 20000311;
+const int INF = 0x3f3f3f3f;
+const int N = 5e5 + 10;
+ 
+struct StringHash 
+{
+    ll h[N], w[N], base, mod; 
+    void Init(ll b, ll m)
+    {
+        h[0] = 0, w[0] = 1, base = b, mod = m;
+    }
+    void Add(char* s)
+    {
+        int len = strlen(s + 1);
+        for (int i = 1; i <= len; i++)
+            h[i] = (h[i - 1] * base + s[i]) % mod, w[i] = w[i - 1] * base % mod;
+    }
+    ll Get(int l, int r)
+    {
+        return (h[r] - h[l - 1] * w[r - l + 1] % mod + mod) % mod;
+    }
+}ha1, ha2;
+char t[N];
+char s[N];
+int n;
+bool check()
+{
+    for (int i = 1; i <= n; i++)
+    {
+        if (i <= n - i)
+        {
+            if (ha1.Get(1, i) == ha1.Get(n - i + 1, n))
+            {
+                if (ha1.Get(i + 1, n - i) == ha2.Get(i + 1, n - i))
+                    return 1;
+            }
+        }
+        else
+        {
+            int len = n - i;
+            if (ha1.Get(n - 2 * len + 1, n - len) == ha1.Get(n - len + 1, n))
+            {
+                if (ha1.Get(1, n - 2 * len) == ha2.Get(2 * len + 1, n))
+                    return 1;
+            }
+        }
+    }
+    return 0;
+}
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    ha1.Init(233, 1e9 + 9);
+    ha2.Init(233, 1e9 + 9);
+    int T;
+    cin >> T;
+    while (T--)
+    {
+        scanf("%s", t + 1);
+        int len = strlen(t + 1);
+        n = 0;
+        for (int i = 1; i <= len; i++)
+        {
+            if (t[i] != t[len - i + 1])
+            {
+                for (int j = i; j <= len - i + 1; j++)
+                    s[++n] = t[j];
+                break;
+            }
+        }
+        if (n == 0)
+        {
+            puts("Yes");
+            continue;
+        }
+        ha1.Add(s);
+        reverse(s + 1, s + n + 1);
+        ha2.Add(s);
+        int ans = check();
+        if (!ans)
+        {
+            ha1.Add(s);
+            reverse(s + 1, s + n + 1);
+            ha2.Add(s);
+            ans = check();
+        }
+        puts(ans ? "Yes" : "No");
+    }
+    return 0;
+}

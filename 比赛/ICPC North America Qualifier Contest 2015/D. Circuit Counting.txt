@@ -1,0 +1,37 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace std;
+using namespace __gnu_pbds;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+ll d[2][820][820]; // 第i个数字和为x， y的方案数
+int base = 405;
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int n;
+    cin >> n;
+    d[0][base][base] = 1;
+    for (int i = 1; i <= n; i++)
+    {
+        int now = i & 1;
+        int pre = now ^ 1;
+        int x, y;
+        scanf("%d%d", &x, &y);
+        for (int j = 0; j <= 810; j++)
+        {
+            for (int k = 0; k <= 810; k++)
+            {
+                d[now][j][k] = d[pre][j][k];
+                if (j - x >= 0 && j - x <= 810 && k - y >= 0 && k - y <= 810)
+                    d[now][j][k] += d[pre][j - x][k - y];
+            }
+        }
+    }
+    cout << d[n & 1][base][base]  - 1 << endl;
+	return 0;
+}

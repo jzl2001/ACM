@@ -1,0 +1,123 @@
+Increasing and Decreasing
+Time Limit: 3000/3000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 971    Accepted Submission(s): 376
+
+
+Problem Description
+Notice：Don't output extra spaces at the end of one line.
+
+Given n,x,y, please construct a permutation of length n, satisfying that:
+
+- The length of LIS(Longest Increasing Subsequence) is equal to x.
+- The length of LDS(Longest Decreasing Subsequence) is equal to y.
+
+If there are multiple possible permutations satisfying all the conditions, print the lexicographically minimum one.
+ 
+
+Input
+The first line contains an integer T(1≤T≤100), indicating the number of test cases.
+
+Each test case contains one line, which contains three integers n,x,y(1≤n≤105,1≤x,y≤n).
+ 
+
+Output
+For each test case, the first line contains ``YES'' or ``NO'', indicating if the answer exists. If the answer exists, output another line which contains n integers, indicating the permutation.
+ 
+
+Sample Input
+4
+10 1 10
+10 10 1
+10 5 5
+10 8 8
+ 
+
+Sample Output
+YES
+10 9 8 7 6 5 4 3 2 1
+YES
+1 2 3 4 5 6 7 8 9 10
+YES
+1 2 3 5 4 10 9 8 7 6
+NO
+ 
+
+Source
+2020 Multi-University Training Contest 7
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+<构造>
+/*
+http://acm.hdu.edu.cn/showproblem.php?pid=6852
+题意：构建1~n的序列使得最长上升子序列长度为x，最长下降子序列长度为y。
+思路：将n个数字分成x组，最后一组是n - 1 ... n - y + 1为长度为y的最长下降子序列。
+其余每组都为一段递减的连续数字，每组提供一个数字，x组就是长度为x，使得前面的段
+尽可能的短，这样反转后字典序最大。
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+int ans[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, x, y;
+		scanf("%d%d%d", &n, &x, &y);
+		if (x + y - 1 > n || 1LL * x * y < n)
+		{
+			puts("NO");
+		}
+		else
+		{
+			puts("YES");
+			int tot = n - y;
+			int block = x - 1;
+			int num = n - y, cnt = 0;
+			for (int i = n - y + 1; i <= n; i++)
+				ans[++cnt] = i;
+			for (int i = 1; i <= block; i++)
+			{
+				int mx = min(y, tot - (block - i));
+				num -= mx;
+				tot -= mx;
+				for (int j = 1; j <= mx; j++)
+				{
+					ans[++cnt] = num + j;
+				}
+			}
+			for (int i = n; i >= 1; i--)
+				printf("%d%c", ans[i], i == 1 ? '\n' : ' ');
+		}
+	}
+	return TIME;
+}

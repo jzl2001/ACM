@@ -1,0 +1,88 @@
+C. Bargain
+time limit per test1 second
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Sometimes it is not easy to come to an agreement in a bargain. Right now Sasha and Vova can't come to an agreement: Sasha names a price as high as possible, then Vova wants to remove as many digits from the price as possible. In more details, Sasha names some integer price n, Vova removes a non-empty substring of (consecutive) digits from the price, the remaining digits close the gap, and the resulting integer is the price.
+
+For example, is Sasha names 1213121, Vova can remove the substring 1312, and the result is 121.
+
+It is allowed for result to contain leading zeros. If Vova removes all digits, the price is considered to be 0.
+
+Sasha wants to come up with some constraints so that Vova can't just remove all digits, but he needs some arguments supporting the constraints. To start with, he wants to compute the sum of all possible resulting prices after Vova's move.
+
+Help Sasha to compute this sum. Since the answer can be very large, print it modulo 109+7.
+
+Input
+The first and only line contains a single integer n (1≤n<10105).
+
+Output
+In the only line print the required sum modulo 109+7.
+
+Examples
+inputCopy
+107
+outputCopy
+42
+inputCopy
+100500100500
+outputCopy
+428101984
+Note
+Consider the first example.
+
+Vova can choose to remove 1, 0, 7, 10, 07, or 107. The results are 07, 17, 10, 7, 1, 0. Their sum is 42.
+
+
+题意：给出一个字符串，每次可以删除连续子串，问所有情况剩下的之和。
+思路：考虑每一位的贡献，比如12345
+到了数字4，删除后面的1位收益就是4，不删除就是40，对于删除前面的4都是最后一位
+收益就是4，前面一共len*(len + 1) / 2种，后面记录一个数组，然后乘以当前位即可。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+ll d[N][2];
+char s[N];
+ll p[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	scanf("%s", s + 1);
+	int len = strlen(s + 1);
+	ll sum = 0, tmp = 0, ans = 0;
+	int cnt = 0;
+	ll w = 1;
+	for (int i = 1; i <= len; i++)
+	{
+		p[i] = (i * fpow(10, i - 1, mod) % mod + p[i - 1])% mod;
+	}
+	for (int i = len; i >= 1; i--)
+	{
+		ans = (ans + 1LL * (i - 1) * i / 2 * (s[i] - '0') % mod * fpow(10LL, len - i, mod) % mod + (s[i] - '0') * p[len - i]) % mod;
+	}
+	cout << ans << endl;
+	return TIME;
+}
+ 

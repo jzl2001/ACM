@@ -1,0 +1,17 @@
+#include bitsstdc++.h
+using namespace std;
+#define sz(a) ((int)(a).size())
+typedef long long ll;
+#define me(a, b) (memset(a, b, sizeof a))
+const int INF = 0x3f3f3f3f;
+const int MAXN = 1e2 + 10;
+
+int main(){
+	ll n, k;
+	cin  n  k;
+	if (n  k & 1)
+		cout  YES  endl;
+	else
+		cout  NO  endl;
+	return 0;
+}

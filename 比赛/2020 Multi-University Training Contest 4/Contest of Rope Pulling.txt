@@ -1,0 +1,126 @@
+Time Limit: 2000/1000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 329    Accepted Submission(s): 174
+Special Judge
+
+Problem Description
+Zhang3 is playing a shooting game with Father. In the game there are two players trying to kill each other to win the game.
+
+The game provides n weapons, each has two properties: Damage and Delay. The ith weapon has Damage Ai and Delay Di. When a player shoots with this weapon, his enemy's HP is reduced by Ai, then he must wait for Di ms before he can shoot again.
+
+The game processes as follows:
+
+1. Before the game starts, Zhang3 and Father choose a weapon respectively. Father always randomly chooses one of the n weapons with equal probabilities. Each player can only use the chosen weapon during the game.
+2. When the game starts, Zhang3 and Father have 100 HP each. They make their first shot at the same time.
+3. They keep shooting as quickly as possible. That means, a player shoots instantly whenever he can shoot, until the game ends.
+4. When a player's HP is reduced to 0 or lower, he dies and the game ends. If the other player is still alive (i.e. has HP higher than 0), then the living player wins the game; otherwise (if the two players die at the same time), each player has 50% probability to win the game.
+
+Zhang3 wants to win the game. Please help her to choose a weapon so that the probability to win is maximized. Print the optimal probability.
+ 
+
+Input
+The first line of the input gives the number of test cases, T(1≤T≤100). T test cases follow.
+
+For each test case, the first line contains an integer n(1≤n≤1000), the number of weapons in the game.
+
+Then n lines follow, the ith of which contains two integers Ai,Di(1≤Ai≤100,1≤Di≤10000), representing the Damage and the Delay of each weapon.
+
+The sum of n in all test cases doesn't exceed 2000.
+ 
+
+Output
+For each test case, print a line with a real number p(0≤p≤1), representing the optimal probability.
+
+Your answers should have absolute or relative errors of at most 10−6.
+ 
+
+Sample Input
+2
+1
+100 100
+4
+50 50
+40 20
+30 10
+20 100
+ 
+
+Sample Output
+0.5
+0.875
+ 
+
+Source
+2020 Multi-University Training Contest 4
+<背包><随机>
+题意两堆物品，求两堆在w相同的情况下，v的和最大。
+随机排列，用第一组来正向更新，第二组负向更新。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 1e3 + 500;
+const int M = 4e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+struct node
+{
+	int w, v;
+}a[2010];
+ll d[200010];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	//cout << sqrt(2000) * 2 * 1000 << endl;
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(d, -0x3f, sizeof d);
+		int n, m;
+		scanf("%d%d", &n, &m);
+		for (int i = 1; i <= n; ++i)
+		{
+			scanf("%d%d", &a[i].w, &a[i].v);
+		}
+		for (int i = n + 1; i <= n + m; ++i)
+		{
+			scanf("%d%d", &a[i].w, &a[i].v);
+			a[i].w = -a[i].w;
+		}
+		n += m;
+		random_shuffle(a + 1, a + n + 1);
+		int mx = sqrt(n) * 1000 * 2;
+		d[mx / 2] = 0;
+		ll ans = 0;
+		for (int i = 1; i <= n; ++i)
+		{
+			if (a[i].w > 0)
+			{
+				for (int j = mx; j >= a[i].w; --j)
+				{
+					d[j] = max(d[j], d[j - a[i].w] + a[i].v);
+				}
+			}
+			else
+			{
+				for (int j = 0; j <= mx - a[i].w; ++j)
+				{
+					d[j] = max(d[j], d[j - a[i].w] + a[i].v);
+				}
+			}
+			ans = max(ans, d[mx / 2]);
+		}
+		cout << ans << endl;
+	}
+	return TIME;
+}

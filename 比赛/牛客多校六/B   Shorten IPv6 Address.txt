@@ -1,0 +1,106 @@
+/*
+模拟， stl
+题意:压缩地址
+*/
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 150;
+char s[N];
+struct node
+{
+	string s;
+	bool operator < (const node & oth) const
+	{
+		if (s.size() != oth.s.size())
+			return s.size() < oth.s.size();
+		return s < oth.s;
+	}
+};
+int main(){
+	//freopen("D:/output1.txt", "w", stdout);
+	int kase = 0;
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		string a[10];
+		scanf("%s", s + 1);
+		string x;
+		int j = 1;
+		for (int i = 1; i <= 8; i++)
+		{
+			for (int k = 1; k <= 4; k++)
+			{
+				int num = (s[j] - '0') * 8 + (s[j + 1] - '0') * 4 + (s[j + 2] - '0') * 2 + s[j + 3] - '0';
+				j += 4;
+				if (num == 0 && a[i] == "0")
+					continue;
+				else
+					if (num < 10)
+						a[i] += num + '0';
+					else
+						a[i] += num - 10 + 'a';
+			
+			}
+			if (a[i][0] == '0' && a[i].size() > 1)
+				a[i] = a[i].substr(1);
+		}
+		string ys;
+		for (int i = 1; i <= 8; i++)
+		{
+			if (i != 8)
+				ys += a[i] + ":";
+			else
+				ys += a[i];
+		}
+		set<node>st;
+		st.insert({ys});
+		int cnt = 0;
+		for (int i = 1; i <= 8; i++)
+		{
+			string u;
+			if (a[i] == "0")
+				cnt++;
+			else
+				cnt = 0;
+			if (cnt >= 2 && (a[i + 1] != "0" || i == 8))
+			{
+				if (i - cnt == 0)
+				{
+					u += ":";
+					for (int j = i + 1; j <= 8; j++)
+						u += ":" + a[j];
+				}
+				else
+					if (i == 8)
+					{
+						for (int j = 1; j <= 8 - cnt; j++)
+							u += a[j] + ":";
+					}
+					else
+					{
+						for (int j = 1; j <= i - cnt; j++)
+							u += a[j] + ":";
+						for (int j = i + 1; j <= 8; j++)
+							u += ":" + a[j];
+					}
+				if (i == 8)
+					u += ":";
+				st.insert({u});
+			}
+		}
+		printf("Case #%d: ", ++kase);
+		cout << (*st.begin()).s << endl;
+	}
+	return 0;
+}
+/*
+3
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000010010001101000101011001111000100110101011000000000000000000000000000000000000000000000000
+00000000000000000000000000000000000000010010001100000000000000000000000000000000000000000000000001000101011001111000100110101011
+*/
+/*
+00000000000000000000000000000000000000000000000001010101011001000000000010101011000000000000000000000000000000000000000000000000
+Case #1: 0:0:0:5564:ab::
+*/

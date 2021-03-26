@@ -1,0 +1,162 @@
+链接：https://ac.nowcoder.com/acm/contest/9925/M
+来源：牛客网
+
+Your git project (you don't need to be familiar with git to solve this problem) has some files that should be ignored from synchronizing. You need to calculate the minimum number of lines needed for gitignore.
+
+Formally, your project is a folder. A folder can have files and sub folders. There are no empty folders (i.e. folders without any files or sub folders inside). Initially, the git software will synchronize all the files in your project. However, you can specify some files and folders in the settings (which is called gitignore) to exclude them from synchronizing. For each line in gitignore, you can specify either a file or all the files in a folder. You can not ignore the whole project folder (i.e. an empty line in gitignore).
+ 
+You are given paths for all the files in the project and whether they should be ignored or shouldn't. Your task is to calculate the minimum number of lines for gitignore.
+输入描述:
+The input contains several test cases. The first line contains a single positive integer {T}T which is the number of test cases. For each test case, you are first given two non-negative numbers {n}n and {m}m. And then {n}n non-empty lines of file paths that should be ignored, and {m}m non-empty lines of file paths that should not be ignored.
+
+The paths are strings containing lower-cased English alphabets and slashes ('/') only. Slashes are used to separate folders, sub folders and file name. For exapmle, "a/b/c/d" indicates folder "a" in the project folder, folder "b" in folder "a", folder "c" in "b" and file "d" in folder "c". All the paths are valid, specifically:
+
+1. The path is non-empty and it always indicates a file (i.e. the path does not end with a slash).
+2. The path does not start with a slash.
+3. Folder names and file names are non-empty (i.e. there are no consecutive slashes).
+4. File paths are always unique (i.e. all the paths in a test case are different).
+5. In a folder, no sub folders and files share the same names. For example, there won't be two files "a/b/a" and "a/b/a/d" in one test case. However, files "a/b/a" and a/b/b"are allowed.
+
+{1\leq n+m\leq 100}1≤n+m≤100 holds and in the whole input there are no more than {1,000}1,000 characters in file paths (i.e. the sum of lengths of file path strings in the whole input file is no more than {1,000}1,000).
+输出描述:
+{T}T lines of non-negative integers, the minimum number of gitignore lines for each test case.
+示例1
+输入
+复制
+2
+3 0
+data/train
+data/test
+model
+3 1
+data/train
+data/test
+model
+data/sample
+输出
+复制
+2
+3
+说明
+In the first sample test case, the corresponding gitignore file contains 2 lines: a folder line "data/" and a file name "model".
+
+In the second sample test case, the corresponding gitignore file contains 3 file lines: "data/train", "data/test" and "model".
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf;  int x = false;  char ch = gc;  bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int N = 1e6 + 10;
+
+vector<int>G[N];
+int a[N];
+int ans;
+int d[N];
+char s[N];
+void dfs1(int x, int fa)
+{
+	d[x] = a[x];
+	for (auto &i : G[x])
+	{
+		if (i == fa)
+			continue;
+		dfs1(i, x);
+		d[x] += d[i];
+	}
+}
+void dfs2(int x, int fa)
+{
+	if (x != 0 && d[x] == 0)
+	{
+		ans++;
+		return;
+	}
+	for (auto &i : G[x])
+	{
+		if (i == fa)
+			continue;
+		dfs2(i, x);
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		cin >> n >> m;
+		unordered_map<string, int>mp;
+		int idx = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			int last = 0;
+			string tmp = "";
+			scanf("%s", s);
+			int len = strlen(s);
+			for (int j = 0; j < len; j++)
+			{
+				tmp += s[j];
+				if (s[j] == '/' || j == len - 1)
+				{
+					int x = mp[tmp];
+					if (!x)
+						mp[tmp] = ++idx, x = idx;
+					a[x] = 0;
+					G[last].push_back(x);
+					G[x].push_back(last);
+					last = x;
+				}
+			}
+		}
+		for (int i = 1; i <= m; i++)
+		{
+			int last = 0;
+			scanf("%s", s);
+			int len = strlen(s);
+			string tmp = "";
+			for (int j = 0; j < len; j++)
+			{
+				tmp += s[j];
+				if (s[j] == '/' || j == len - 1)
+				{
+					int x = mp[tmp];
+					if (!x)
+						mp[tmp] = ++idx, x = idx;
+					a[x] = 1;
+					G[last].push_back(x);
+					G[x].push_back(last);
+					last = x;
+				}
+			}
+		}
+		for (int i = 0; i <= idx; i++)
+			sort(G[i].begin(), G[i].end()), G[i].erase(unique(G[i].begin(), G[i].end()), G[i].end());
+		dfs1(0, -1);
+		ans = 0;
+		dfs2(0, -1);
+		cout << ans << endl;
+		for (int i = 0; i <= idx; i++)
+			G[i].clear();
+	}
+	return TIME;
+}

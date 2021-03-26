@@ -1,0 +1,31 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace std;
+using namespace __gnu_pbds;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+int d[N];
+int a[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; i++)
+    {
+        scanf("%d", &a[i]);
+    }
+    sort(a + 1, a + n + 1);
+    d[1] = a[1];
+    d[2] = a[2];
+    for (int i = 3; i <= n; i++)
+    {
+        d[i] = min(d[i - 1] + a[i] + a[1], d[i - 2] + a[i] + a[1] + 2 * a[2]);
+    }
+    cout << d[n] << endl;
+	return 0;
+}

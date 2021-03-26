@@ -1,0 +1,170 @@
+链接：https://ac.nowcoder.com/acm/contest/5668/E?&headNav=acm
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+A permutation of length n is an array p=[p_1, p_2, \ldots, p_n]p=[p 
+1
+​	
+ ,p 
+2
+​	
+ ,…,p 
+n
+​	
+ ], which contains every integer from 1 to n (inclusive) and each number appears exactly once. For example, p=[3,1,4,6,2,5] is a permutation of length 6.
+
+Let's call a permutation is a matching if and only if p_i \ne ip 
+i
+​	
+  
+
+​	
+ =i and p_{p_i} = ip 
+p 
+i
+​	
+ 
+​	
+ =i for all valid i.
+
+You are given an array a=[a_1, a_2, \ldots, a_n]a=[a 
+1
+​	
+ ,a 
+2
+​	
+ ,…,a 
+n
+​	
+ ] (0 \le a_i \le 10^90≤a 
+i
+​	
+ ≤10 
+9
+ , n \ge 4n≥4 and n is even). Define the cost of a permutation is (\sum\limits_{i=1}^n abs(a_i-a_{p_i})) / 2( 
+i=1
+∑
+n
+​	
+ abs(a 
+i
+​	
+ −a 
+p 
+i
+​	
+ 
+​	
+ ))/2.
+
+Define two matchings p, q are combinable if and only if p_i \ne q_ip 
+i
+​	
+  
+
+​	
+ =q 
+i
+​	
+  for all i from 1 to n.
+
+Please find two combinable matchings such that the sum of the cost of these two matchings is as small as possible. Output the sum.
+输入描述:
+The first line contains one integer t (1 \le t \le 5 \times 10^41≤t≤5×10 
+4
+ ) --- the number of test cases.
+
+Each test contains two lines. The first line contains one integer n (n \ge 4n≥4 and n is even), The second line contains n integers a_1, a_2, \ldots, a_na 
+1
+​	
+ ,a 
+2
+​	
+ ,…,a 
+n
+​	
+  (0 \le a_i \le 10^90≤a 
+i
+​	
+ ≤10 
+9
+ ).
+
+The sum of n across the test cases doesn't exceed 2 \times 10^52×10 
+5
+ .
+输出描述:
+For each test, output one line which contains only one integer representing the answer of this test.
+示例1
+输入
+复制
+2
+4
+0 8 0 0
+6
+3 1 4 1 5 9
+输出
+复制
+16
+16
+说明
+In the first test, one possible combinable matchings with the minimum sum of cost are [2,1,4,3] and [4,3,2,1]. The cost of the first matching is (|0-8| + |8-0| + |0-0| + |0-0|) / 2 = 8, the cost of the second matching is (|0-0| + |8-0| + |0-8| + |0-0|) / 2 = 8. So their sum is 8+8=16.
+
+题意：选两个序列，要求pre[i] != i && pre[pre[i]] = i，且两个序列任意位置不能一样。
+求(∑ abs(a_i - a_pi)) / 2
+dp
+长度为偶数的时候，肯定是排完序，相邻两个之间的距离和最小。
+然后另外一个序列要求不同，假设第一个序列现在是
+1 2 3 4， 1跟2，3跟4
+这时候第二个序列可以为1跟4，2跟3。
+当前如果是1 2 3 4 5 6 
+这个时候1跟6，2跟3，4跟5。
+所以从4个位置前或者6个位置前取min，因为4跟6组合正好覆盖所有偶数。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 2e5 + 10;
+const int mod = 998244353;
+  
+ll a[N];
+ll d[N];
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        for (int i = 1; i <= n; i++)
+        {
+            scanf("%d", &a[i]);
+        }
+        sort(a + 1, a + n + 1);
+        d[0] = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            d[i] = 0x3f3f3f3f3f3f3f3f;
+            if (i >= 4)
+                d[i] = min(d[i], d[i - 4] + 2 * a[i] - 2 * a[i - 3]);
+            if (i >= 6)
+                d[i] = min(d[i], d[i - 6] + 2 * a[i] - 2 * a[i - 5]);
+        }
+        cout << d[n] << endl;
+    }
+    return TIME;
+}

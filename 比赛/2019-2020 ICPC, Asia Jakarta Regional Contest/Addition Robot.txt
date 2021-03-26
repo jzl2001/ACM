@@ -1,0 +1,153 @@
+<线段树>
+题意：
+
+有一个长度为n的只含‘A’ ‘B’的字符串。
+
+两种操作， 1号操作， 将一个区间的内的A与B互换
+
+2号操作询问区间内的值， 给出起始A， B
+
+在该区间内遇到字符A， A = A + B，遇到字符B， B = B + A
+
+问最后A, B的值为多少？
+
+思路:
+
+对于查询操作， 我们可以线段树套个矩阵乘法， 就可以得出答案了
+
+对于修改操作， 我们在线段树内每个节点存两种矩阵，然后遇到修改时
+
+交换两种矩阵即可。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 100;
+struct M
+{
+	ll m[2][2];
+	M()
+	{
+		memset(m, 0, sizeof m);
+	}
+}A, B;
+M c[N * 4][2];
+int lzy[N * 4];
+char s[N];
+M mul(M a, M b)
+{
+	M ans;
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 2; j++)
+			for (int k = 0; k < 2; k++)
+				ans.m[i][j] = (ans.m[i][j] + a.m[i][k] * b.m[k][j] % mod) % mod;
+	return ans;
+}
+#define ls ((x) << 1)
+#define rs ((x) << 1 | 1)
+#define mid  ((L) + (R) >> 1)
+void push_up(int x)
+{
+	c[x][0] = mul(c[ls][0], c[rs][0]);
+	c[x][1] = mul(c[ls][1], c[rs][1]);
+}
+void pushDown(int x)
+{
+	if (lzy[x])
+	{
+		swap(c[ls][0], c[ls][1]);
+		swap(c[rs][0], c[rs][1]);
+		lzy[ls] ^= 1;
+		lzy[rs] ^= 1;
+		lzy[x] = 0;
+	}
+}
+void build(int x, int L, int R)
+{
+	if (L == R)
+	{
+		if (s[L] == 'A')
+			c[x][0] = A, c[x][1] = B;
+		else
+			c[x][0] = B, c[x][1] = A;
+		return;
+	}
+	build(ls, L, mid);
+	build(rs, mid + 1, R);
+	push_up(x);
+}
+void update(int x, int L, int R, int ql, int qr)
+{
+	if (ql <= L && qr >= R)
+	{
+		swap(c[x][0], c[x][1]);
+		lzy[x] ^= 1;
+		return;
+	}
+	pushDown(x);
+	if (ql <= mid)
+		update(ls, L, mid, ql, qr);
+	if (qr > mid)
+		update(rs, mid + 1, R, ql, qr);
+	push_up(x);
+}
+void query(int x, int L, int R, int ql, int qr, M& ans)
+{
+	if (ql <= L && qr >= R)
+	{
+		ans = mul(ans, c[x][0]);
+		return;
+	}
+	pushDown(x);
+	if (ql <= mid)
+		query(ls, L, mid, ql, qr, ans);
+	if (qr > mid)
+		query(rs, mid + 1, R, ql, qr, ans);
+	push_up(x);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	A.m[0][0] = A.m[1][0] = A.m[1][1] = B.m[0][0] = B.m[0][1] = B.m[1][1] = 1;
+	int n, q;
+	scanf("%d%d", &n, &q);
+	scanf("%s", s + 1);
+	build(1, 1, n);
+	while (q--)
+	{
+		int op;
+		cin >> op;
+		if (op == 1)
+		{
+			int L, R;
+			scanf("%d%d", &L, &R);
+			update(1, 1, n, L, R);
+		}
+		else
+		{
+			int L, R, A, B;
+			scanf("%d%d%d%d", &L, &R, &A, &B);
+			M base, ans;
+			ans.m[0][0] = ans.m[1][1] = 1;
+			base.m[0][0] = A; base.m[0][1] = B;
+			query(1, 1, n, L, R, ans);
+			base = mul(base, ans);
+			printf("%lld %lld\n", base.m[0][0], base.m[0][1]);
+		}
+	}
+	return TIME;
+}

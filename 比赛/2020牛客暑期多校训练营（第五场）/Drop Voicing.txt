@@ -1,0 +1,136 @@
+链接：https://ac.nowcoder.com/acm/contest/8075/D
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+Inaka composes music. Today's arrangement includes a chord of nn notes that are pairwise distinct, represented by a permutation p_{1 \dots n}p 
+1…n
+​	
+  of integers from 11 to nn (inclusive) denoting the notes from the lowest to the highest.
+
+Her friend, Miyako, sneaks in and plays a trick by altering the chord with the following two operations:
+
+Drop-2: Take out the second highest note and move it to the lowest position, i.e. change the permutation to p_{n-1}, p_1, p_2, \dots, p_{n-3}, p_{n-2}, p_np 
+n−1
+​	
+ ,p 
+1
+​	
+ ,p 
+2
+​	
+ ,…,p 
+n−3
+​	
+ ,p 
+n−2
+​	
+ ,p 
+n
+​	
+ .
+Invert: Take out the lowest note and move it to the highest position, i.e. change the permutation to p_2, p_3, \dots, p_{n-1}, p_n, p_1p 
+2
+​	
+ ,p 
+3
+​	
+ ,…,p 
+n−1
+​	
+ ,p 
+n
+​	
+ ,p 
+1
+​	
+ .
+Any number of consecutive Drop-2 operations is considered a multi-drop. Miyako would like to change the permutation to an ordered permutation, 1, 2, \dots, n1,2,…,n, in the fewest number of multi-drops possible. Please help her find the number of multi-drops needed.
+
+输入描述:
+The first line contains an integer n (2 \leq n \leq 5002≤n≤500) — the number of notes.
+
+The second line contains n space-separated integers p_1, p_2, \dots, p_np 
+1
+​	
+ ,p 
+2
+​	
+ ,…,p 
+n
+​	
+  — the original permutation of notes.
+
+The input guarantees each integer from 1 to n (inclusive) appears in the permutation exactly once.
+输出描述:
+Output one integer — the number of multi-drops required to change the permutation to an ordered one.
+示例1
+输入
+复制
+6
+2 4 5 1 3 6
+输出
+复制
+2
+说明
+An optimal solution with two multi-drops is:
+- Invert, 5 times, changing the permutation to 6,2,4,5,1,3;
+- Drop-2, 3 times, changing the permutation to 4,5,1,6,2,3;
+- Invert, 4 times, changing the permutation to 2,3,4,5,1,6;
+- Drop-2, 1 time, changing the permutation to 1,2,3,4,5,6.
+示例2
+输入
+复制
+8
+8 4 7 3 6 2 5 1
+输出
+复制
+5
+题意：两种操作，第一种是可以把倒数第二个元素放到最前面，第二种操作是把第一个元素放到最后一个，
+第二种操作不计数，第一种操作连续的算作一次，问最少多少次使得有序，第二种操作和一次连续的第一种
+操作可以改变任意一个数的位置到想要的位置，所以求最长上升子序列即是已经合法的位置，看下需要最少
+几个，因为二号操作可以任意，所以比如45123一次也不需要，所以循环数组计算LIS。
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 1e5 + 10;
+
+int a[N];
+int d[N];
+int mx = 0;
+int main()
+{
+#ifdef LOCAL
+    freopen("E:\input.txt", "r", stdin);
+#endif // LOCAL
+    int n;
+    cin >> n;
+    int mx = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        scanf("%d", &a[i]);
+        mx = max(mx, a[i]);
+    }
+    int ans = 0;
+    for (int k = 1; k <= n; k++)
+    {
+        int tmp = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            d[i] = 1;
+            for (int j = i; j >= 1; j--)
+            {
+                if (a[i] > a[j])
+                {
+                    d[i] = max(d[i], d[j] + 1);
+                }
+            }
+            tmp = max(tmp, d[i]);
+        }
+        ans = max(ans, tmp);
+        rotate(a + 1, a + 2, a + n + 1);
+    }
+    cout << n - ans << endl;
+    return 0;
+}

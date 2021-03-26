@@ -1,0 +1,145 @@
+<线段树>
+题意:
+
+有一个公司有n个员工， 每个员工有n个能力值Ai, Randall的能力值为A1， 现在有m轮淘汰，
+
+每次会淘汰能力值最小的Ri个，用m轮每轮的Ri替换掉被淘汰的Ri，接着会有Q轮预测， 每
+
+次会修改第x轮的第y个元素为z，而且这Q轮修改不是独立的， 问你每轮修改后最终Randall
+
+能否留下来。
+
+思路：
+
+每一轮都有一个Randall的排名， 如果≤0就代表要被淘汰了。
+
+我们先求出Randall的初始排名， 再用数组a记录没有修改时
+
+每轮开始淘汰后Randall的排名变化(还未修改)，得到a数组后就可以建一颗线段树了。
+
+设Randall的值为K，对于Q次修改， 设原始的值为G，当前修改的值为Z
+
+若Z < K，K < G， 意味着Randall的排名可以++
+
+ 若Z > K，K > G， 意味着Randall的排名需要--
+
+修改后， 线段树每个节点取个min， 检测有没有≤0的节点即可。
+
+因为修改是在当前这轮淘汰操作之前执行， 所以每次修改会更新下一轮的ai
+
+update(1, 1, m, x + 1, m, val); // 修改区间为[x + 1, m]
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res % mod; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 100;
+int c[N * 4];
+int lzy[N * 4];
+int a[N];
+#define ls ((x) << 1)
+#define rs ((x) << 1 | 1)
+#define mid ((L) + (R) >> 1)
+void push_up(int x)
+{
+	c[x] = min(c[ls], c[rs]);
+}
+void push_down(int x)
+{
+	if (lzy[x])
+	{
+		c[ls] += lzy[x], c[rs] += lzy[x];
+		lzy[ls] += lzy[x], lzy[rs] += lzy[x];
+		lzy[x] = 0;
+	}
+}
+void build(int x, int L, int R)
+{
+	if (L == R)
+	{
+		c[x] = a[L];
+		return;
+	}
+	build(ls, L, mid);
+	build(rs, mid + 1, R);
+	push_up(x);
+}
+void update(int x, int L, int R, int ql, int qr, int val)
+{
+	if (ql <= L && qr >= R)
+	{
+		c[x] += val;
+		lzy[x] += val;
+		return;
+	}
+	push_down(x);
+	if (ql <= mid)
+		update(ls, L, mid, ql, qr, val);
+	if (qr > mid)
+		update(rs, mid + 1, R, ql, qr, val);
+	push_up(x);
+}
+#undef ls
+#undef rs
+#undef mid
+vector<int>G[N];
+int main()
+{
+#ifdef LOCAL 
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n, m, q, k;
+	int rak = 1;
+	cin >> n >> m >> q;
+	cin >> k;
+	for (int i = 2; i <= n; i++)
+	{
+		int num;
+		scanf("%d", &num);
+		if (num < k)
+			++rak;
+	}
+	for (int i = 1; i <= m; i++)
+	{
+		int num;
+		scanf("%d", &num);
+		G[i].push_back(-1);
+		a[i] = rak - num;
+		int x;
+		for (int j = 1; j <= num; j++)
+		{
+			cin >> x;
+			G[i].push_back(x);
+			if (x > k)
+				--rak;
+		}
+	}
+	build(1, 1, m);
+	while (q--)
+	{
+		int x, y, z;
+		scanf("%d%d%d", &x, &y, &z);
+		if (x < m)
+		{
+			if (z > k && k > G[x][y])
+				update(1, 1, m, x + 1, m, -1);
+			if (z < k && k < G[x][y])
+				update(1, 1, m, x + 1, m, 1);
+		}
+		G[x][y] = z;
+		printf("%d\n", c[1] > 0);
+	}
+	return TIME;
+}

@@ -1,0 +1,145 @@
+https://acm.ecnu.edu.cn/contest/292/problem/D/
+<贪心><后缀数组><哈希><拼数问题>
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef unsigned long long ull;
+typedef long long ll;
+const int N = 1e5 + 10;
+const int mod = 998244353;
+const ull hash_ = 1e9 + 7;
+ull ha[N];
+ull base[N];
+char s[N];
+ll qz[N];
+ull get(int i, int j)
+{
+	return ha[j] - ha[i - 1] * base[j - i + 1];
+}
+ll fpow(ll a, ll b, int mod)
+{
+	ll res = 1;
+	while (b)
+	{
+		if (b & 1)
+			res = res * a % mod;
+		b >>= 1;
+		a = a * a % mod;
+	}
+	return res;
+}
+int n, r;
+int sa[N];
+int rak[N * 2];
+int tmp[N * 2];
+int heig[N];
+int cnt[N];
+int ans[N];
+void radix_sort(int* rank, int* tp)
+{
+	memset(cnt, 0, (sizeof cnt[0]) * (r + 10));
+	for (int i = 1; i <= n; i++)
+		cnt[rank[tp[i]]]++;
+	for (int i = 1; i <= r; i++)
+		cnt[i] += cnt[i - 1];
+	for (int i = n; i >= 1; i--)
+		sa[cnt[rank[tp[i]]]--] = tp[i];
+}
+void suffix()
+{
+	int *rk = rak, *tp = tmp;
+	for (int i = 1; i <= n; i++) //rk[i]不能为0
+		rk[i] = s[i] + 1, tp[i] = i, tp[i + n] = rk[i + n] = 0, r = max(r, rk[i]);
+	radix_sort(rk, tp);
+	for (int p = 0, l = 1, i; p < n; l <<= 1, r = p)
+	{
+		for (p = 0, i = n - l + 1; i <= n; i++)
+			tp[++p] = i;
+		for (int i = 1; i <= n; i++)
+			if (sa[i] > l)
+				p++, tp[p] = sa[i] - l;
+		radix_sort(rk, tp);
+		swap(rk, tp);
+		rk[sa[1]] = 1;
+		p = 1;
+		for (int i = 2; i <= n; i++)
+		{
+			if (tp[sa[i - 1]] != tp[sa[i]] || tp[sa[i] + l] != tp[sa[i - 1] + l])
+				p++;
+			rk[sa[i]] = p;
+		}
+	}
+	for (int i = 1; i <= n; i++)
+		rak[sa[i]] = i;
+}
+void get_heig()
+{
+	int k = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		if (k)
+			k--;
+		int j = sa[rak[i] - 1];
+		while (s[i + k] == s[j + k])
+			k++;
+		heig[rak[i]] = k;
+	}
+}
+bool cmp(int x, int y)
+{
+	int len = x + y;
+	int st = min(x, y), flag = 0;
+	st++;
+	if (x < y)
+		swap(x, y), flag = 1;
+		int cha = x - y;
+		if (get(st, st + cha - 1) != get(1, cha))
+			return (rak[st] > rak[1]) ^ flag;
+		if (get(1, y - cha) != get(1 + cha, x))
+			return (rak[1] > rak[1 + cha]) ^ flag;
+	return false;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	base[0] = 1;
+	for (int i = 1; i < N; i++)
+	{
+		base[i] = base[i - 1] * hash_;
+	}
+	scanf("%s", s + 1);
+	n = strlen(s + 1);
+	for (int i = 1; i <= n; i++)
+	{
+		ha[i] = ha[i - 1] * hash_ + s[i];
+	}
+	suffix();
+	for (int i = 1; i <= n; i++)
+	{
+		qz[i] = (qz[i - 1] * 10 % mod + s[i] - '0') % mod;
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		ans[i] = i;
+	}
+	sort(ans + 1, ans + n + 1, cmp);
+	ll sum = 0, all = (1LL * n  * (n + 1) / 2);
+	for (int i = 1; i <= n; i++)
+	{
+		all -= ans[i];
+		sum = (sum + qz[ans[i]] * fpow(10LL, all, mod) % mod) % mod;
+	}
+	cout << sum << endl;
+	return TIME;
+}

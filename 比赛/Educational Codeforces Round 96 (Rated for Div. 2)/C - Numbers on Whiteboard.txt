@@ -1,0 +1,104 @@
+C. Numbers on Whiteboard
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Numbers 1,2,3,…n (each integer from 1 to n once) are written on a board. In one operation you can erase any two numbers a and b from the board and write one integer a+b2 rounded up instead.
+
+You should perform the given operation n−1 times and make the resulting number that will be left on the board as small as possible.
+
+For example, if n=4, the following course of action is optimal:
+
+choose a=4 and b=2, so the new number is 3, and the whiteboard contains [1,3,3];
+choose a=3 and b=3, so the new number is 3, and the whiteboard contains [1,3];
+choose a=1 and b=3, so the new number is 2, and the whiteboard contains [2].
+It's easy to see that after n−1 operations, there will be left only one number. Your goal is to minimize it.
+
+Input
+The first line contains one integer t (1≤t≤1000) — the number of test cases.
+
+The only line of each test case contains one integer n (2≤n≤2⋅105) — the number of integers written on the board initially.
+
+It's guaranteed that the total sum of n over test cases doesn't exceed 2⋅105.
+
+Output
+For each test case, in the first line, print the minimum possible number left on the board after n−1 operations. Each of the next n−1 lines should contain two integers — numbers a and b chosen and erased in each operation.
+
+Example
+inputCopy
+1
+4
+outputCopy
+2
+2 4
+3 3
+3 1
+
+题意：每次选择两个数字之和/2上取整求操作n-1次后的最小值。
+思路：每次选择俩和为偶数的最大值。
+
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+ll a[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		scanf("%d", &n);
+		set<int>s;
+		for (int i = 1; i <= n; i++)
+			s.insert(i);
+		cout << 2 << endl;
+		if (n == 2)
+		{
+			cout << 1 << " " << 2 << endl;
+			continue;
+		}
+		int cnt = 0;
+		while (true)
+		{
+			if (s.size() == 1)
+				break;
+			cnt++;
+			auto it = s.end();
+			--it;
+			auto se = s.end();
+			--se;
+			--se;
+			if ((*it + *se) % 2 == 0)
+			{
+				int res = (*it + *se) / 2;
+				printf("%d %d\n", *se, *it);
+				if (s.count(res))
+					printf("%d %d\n", res, res), cnt++;
+				else
+					s.insert(res);
+			}
+			else
+			{
+				--se;
+				assert((*it + *se) % 2 == 0);
+				int res = (*it + *se) / 2;
+				printf("%d %d\n", *se, *it);
+				if (s.count(res))
+					printf("%d %d\n", res, res), cnt++;
+				else
+					s.insert(res);
+			}
+			s.erase(it), s.erase(se);
+		}
+		assert(*s.begin() == 2);
+		assert(cnt == n - 1);
+	}
+	return 0;
+}

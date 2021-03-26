@@ -1,0 +1,206 @@
+Time Limit: 3000/3000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 594    Accepted Submission(s): 250
+
+
+Problem Description
+Teitoku loves many different kinds of numbers, and today Little W wants him to classify some positive integers into different categories.
+
+There are 11 categories, numbered from 0 to 10. For each positive integer x, if there exists only one type of digit d (0≤d≤9) that occurs in x with the highest frequency, then we say x should be classified into category d, or otherwise, in case such digit doesn't exist, we say x should be classified into category 10.
+
+For example,
+
+    ● 111223 should be classified into category 1 since digit 1 occurs three times, and digits 2 and 3 occur less than three times respectively, and
+    ● 3345544 should be classified into category 4 since digit 4 occurs three times, and digits 3 and 5 occur less than three times respectively, and
+    ● 112233 should be classified into category 10 since digits 1, 2 and 3 occur twice respectively.
+
+Little W doesn't care about category 10 and he just wants Teitoku to tell him the number of integers ranged from l to r that should be classified to another category d. However, Teitoku can hardly solve this problem, so he asks you for help.
+ 
+
+Input
+There are several test cases.
+
+The first line contains an integer T (1≤T≤1000), denoting the number of test cases. Then follow all the test cases.
+
+For each test case, the only line contains three integers l, r and d (1≤l≤r≤1018,0≤d≤9), representing a problem.
+ 
+
+Output
+For each test case, output in one line the number of integers ranged from l to r that should be classified to category d.
+ 
+
+Sample Input
+3
+1 10 1
+1 11 1
+1 100 0
+ 
+
+Sample Output
+1
+2
+1
+Hint
+For the sample cases, 1 and 11 are in category 1, 100 is in category 0 and 10 is in category 10.
+ 
+ 
+
+Source
+2020 Multi-University Training Contest 3
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6813 6812 6811 6810 6809 
+ 
+
+Statistic | Submit | Discuss | Note
+
+题意：一个数字当数位中出现次数最多的数字是z时，且唯一最多，则这个数字属于z类。
+思路：类似于数位dp，计算到某个数位，计算到当前数位有限制和非限制情况。当非限制时
+后面可以任意选数字，我们可以使用指数型母函数来计算方案数。
+对于这题当计算到某一位，没限制且没前导零，可以直接计算。
+比如计算1000内属于1的数字，由数字正着第一位开始。
+第一位选了0，不满足能直接计算的条件，继续向下展开，第二位选到0了，这个时候仍不满足直接计算条件，
+继续向下展开...第二位选1的时候，这个时候满足计算条件，因为后两位可以任意选，这个时候计算已经含有1个数字1，且
+后面两位任意选的方案数，通过指数型母函数可以算的此时的方案数为19种，第二位选2~9时，每一种方案都是1，共8种。
+当第二位为0向下展开的时候，到了第三位，这个时候如果第三位仍然为0会继续向下展开，而第三位选1的时候
+即剩余1位，要求1为众数，这个时候计算的方案数为1，第三位选2~9的方案数为0。第三位选0继续向下到第四位的
+时候如果选1是一种方案，选2~9没有方案。再回到第一层，第一位选1的时候到了第二位虽然没有前导零，但是仍
+有lim限制，所以继续展开，一直到最后一位的时候都没有能直接计算，到了第0位，check一下z是不是最多的数字。
+总和就是19+8+1+1=29种。
+这样直接计算不记忆化的话，大概是5s，记忆化的时候不需要考虑前面选的哪些数字，只需要这些的数字的个数
+比如z = 3， 前面选了2个1、1个2跟前面选了1个2，2个1的计算结果一样，并不会影响到3的摆法。
+存入vector，用一个map套vector就可以了，时间只需要265ms。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 1e3 + 500;
+const int M = 4e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+map<vector<int>, ll>mp;
+int x[20];
+int a[20];
+long double g[20], f[20];
+int z;
+int cnt;
+long double fac[20];
+void init()
+{
+	fac[0] = 1;
+	for (int i = 1; i <= 18; ++i)
+	{
+		fac[i] = fac[i - 1] * i;
+	}
+}
+ll check()
+{
+	for (int i = 0; i <= 9; ++i)
+	{
+		if (i != z)
+		{
+			if (a[i] >= a[z])
+				return 0;
+		}
+	}
+	return 1;
+}
+ll calc(int pos)
+{
+	int mx = 0;
+	for (int i = 0; i <= 9; ++i)
+	{
+		if (i != z)
+			mx = max(mx, a[i]);
+	}
+	ll tot = 0;
+	int MI = max(mx + 1, a[z]) - a[z]; //最少摆
+	int MX = pos; //最多摆
+	for (int m = MI; m <= MX; ++m) //枚举后面pos个位置摆了多少z
+	{
+		memset(f, 0, sizeof f);
+		f[0] = 1;
+		for (int i = 0; i <= 9; ++i)     //指数型母函数求解
+		{
+			memset(g, 0, sizeof g);
+			int begin = i == z ? m : 0; //强制z选了m个，其余的可以不选
+			int end = i == z ? m : min(pos - (m - a[z]), m + a[z] - a[i] - 1); //选其他的数字不能数目超过z
+			for (int j = 0; j <= pos; ++j)
+			{
+				for (int k = begin; k <= end && j + k <= pos; ++k)
+					g[j + k] += f[j] / fac[k];
+			}
+			memcpy(f, g, sizeof f);
+		}
+		tot += f[pos] * fac[pos] + 0.5; //精损
+	}
+	return tot;
+}
+ll dfs(int pos, int lim, int zero)
+{
+	ll sum = 0;
+	if (pos == 0)
+	{
+		return check();
+	}
+	if (!lim && zero) //没限制且没前导零，可以直接计算
+	{
+		vector<int>v;
+		for (int i = 0; i <= 9; ++i)   //将信息存储用于记忆化
+		{
+			if (i != z && a[i])
+				v.push_back(a[i]);
+		}
+		sort(v.begin(), v.end());
+		v.push_back(a[z]);
+		v.push_back(pos);
+		if (mp.find(v) != mp.end())  
+			return mp[v];
+		return mp[v] = calc(pos);
+	}
+	int up = lim ? x[pos] : 9;
+	for (int i = 0; i <= up; ++i) //需要继续展开的情况
+	{
+		if (zero || i != 0) //前导零不加0的个数
+			a[i]++;
+		sum += dfs(pos - 1, lim && i == up, zero || i);
+		if (zero || i != 0)
+			a[i]--;
+	}
+	return sum;
+}
+ll calc(ll num)
+{
+	cnt = 0;
+	while (num)
+	{
+		x[++cnt] = num % 10;
+		num /= 10;
+	}
+	return dfs(cnt, 1, 0);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	freopen("E:\\output.txt", "w", stdout);
+#endif
+	init();
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll l, r;
+		scanf("%lld%lld%d", &l, &r, &z);
+		printf("%lld\n", calc(r) - calc(l - 1));
+	}
+	return TIME;
+}
+

@@ -1,0 +1,15 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+using namespace std;
+typedef long long ll;
+ll mod = 1e9;
+int main(){
+	ll n, m;
+	ll sum = 1;
+	cin >> n >> m;
+	for (ll i = n; i >= m; i--)
+		sum = sum * i % mod;
+	cout << sum << endl;
+	return 0;
+}

@@ -1,0 +1,175 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 4e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+char str[N];
+char S[N];
+struct SA
+{
+	int n, r;
+	int sa[N];
+	int rak[N];
+	int tmp[N];
+	int heig[N];
+	int cnt[N];
+	void radix_sort(int* rank, int* tp)
+	{
+		memset(cnt, 0, sizeof cnt);
+		for (int i = 1; i <= n; i++)
+			cnt[rank[tp[i]]]++;
+		for (int i = 1; i <= r; i++)
+			cnt[i] += cnt[i - 1];
+		for (int i = n; i >= 1; i--)
+			sa[cnt[rank[tp[i]]]--] = tp[i];
+	}
+	void suffix()
+	{
+		int *rk = rak, *tp = tmp;
+		for (int i = 1; i <= n; i++)
+			rk[i] = str[i], tp[i] = i;
+		r = 127;
+		radix_sort(rk, tp);
+		for (int p = 0, l = 1, i; p < n; l <<= 1, r = p)
+		{
+			for (p = 0, i = n - l + 1; i <= n; i++)
+				tp[++p] = i;
+			for (int i = 1; i <= n; i++)
+				if (sa[i] > l)
+					p++, tp[p] = sa[i] - l;
+			radix_sort(rk, tp);
+			swap(rk, tp);
+			rk[sa[1]] = 1;
+			p = 1;
+			for (int i = 2; i <= n; i++)
+			{
+				if (tp[sa[i - 1]] != tp[sa[i]] || tp[sa[i] + l] != tp[sa[i - 1] + l])
+					p++;
+				rk[sa[i]] = p;
+			}
+		}
+	}
+	void get_heig()
+	{
+		for (int i = 1; i <= n; i++)
+			rak[sa[i]] = i;
+		int k = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			if (k)
+				k--;
+			int j = sa[rak[i] - 1];
+			while (str[i + k] == str[j + k])
+				k++;
+			heig[rak[i]] = k;
+		}
+	}
+}sa;
+struct Palindrome_tree
+{
+	int nxt[N][26];
+	int fail[N];
+	int len[N];
+	int cnt[N];
+	int sed[N];
+	int tot;
+	int last;
+	void init()
+	{
+		tot = 0;
+		memset(fail, 0, sizeof fail);
+		memset(cnt, 0, sizeof cnt);
+		memset(sed, 0, sizeof sed);
+		memset(len, 0, sizeof len);
+		memset(nxt, 0, sizeof nxt);
+	}
+	void build()
+	{
+		len[0] = 0, len[1] = -1;
+		tot = 1, last = 0;
+		fail[0] = 1;
+	}
+	int getfail(char* s, int x, int n)
+	{
+		while (s[n - len[x] - 1] != s[n])
+			x = fail[x];
+		return x;
+	}
+	void insert(char* s, int n)
+	{
+		for (int i = 1; i <= n; i++)
+		{
+			int c = s[i] - 'a';
+			int p = getfail(s, last, i);
+			if (!nxt[p][c])
+			{
+				tot++;
+				len[tot] = len[p] + 2;
+				fail[tot] = nxt[getfail(s, fail[p], i)][c];
+				sed[tot] = sed[fail[tot]] + 1;
+				nxt[p][c] = tot;
+			}
+			last = nxt[p][c];
+			cnt[last]++;
+		}
+	}
+	void get_cnt()
+	{
+		for (int i = tot; i > 0; i--)
+			cnt[fail[i]] += cnt[i];
+	}
+}pdt;
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	scanf("%s", S + 1);
+	pdt.build();
+	int len = strlen(S + 1);
+	pdt.insert(S, len);
+	pdt.get_cnt();
+	str[len + 1] = '$';
+	int idx = len;
+	for (int i = 1; i <= len; i++)
+		str[i] = S[i];
+	for (int i = len + 2; i <= 2 * len + 1; i++)
+		str[i] = S[idx--];
+	sa.n = 2 * len + 1;
+	sa.suffix();
+	sa.get_heig();
+	ll ans = 1LL * (2 * len + 1) * (2 * len + 2) / 2 - 1LL * (len + 1) * (len + 1);
+	for (int i = 1; i <= sa.n; i++)
+	{
+		ans -= sa.heig[i];
+	}
+	cout << (ans + pdt.tot - 1) / 2 << endl;
+	return TIME;
+}
+/*
+a 不等同于 b: a ≠ b     a ≠ rev(b)
+即求a, rev(a) 只出现一次
+求a$rev(a)中本质不同的串再除以2
+等等， 对于回文串, 反过来也只会算一次， 所以算出原串中回文串的个数
+相加后再除2
+设X = a$rev(a)
+X中去掉带$的串， 带$有(len + 1)个, $左边有len个字符, 再加上不加左边的
+所以去掉(len + 1) ^ 2个
+*/

@@ -1,0 +1,123 @@
+B. Suffix Operations
+time limit per test1 second
+memory limit per test512 megabytes
+inputstandard input
+outputstandard output
+Gildong has an interesting machine that has an array a with n integers. The machine supports two kinds of operations:
+
+Increase all elements of a suffix of the array by 1.
+Decrease all elements of a suffix of the array by 1.
+A suffix is a subsegment (contiguous elements) of the array that contains an. In other words, for all i where ai is included in the subsegment, all aj's where i<j≤n must also be included in the subsegment.
+
+Gildong wants to make all elements of a equal — he will always do so using the minimum number of operations necessary. To make his life even easier, before Gildong starts using the machine, you have the option of changing one of the integers in the array to any other integer. You are allowed to leave the array unchanged. You want to minimize the number of operations Gildong performs. With your help, what is the minimum number of operations Gildong will perform?
+
+Note that even if you change one of the integers in the array, you should not count that as one of the operations because Gildong did not perform it.
+
+Input
+Each test contains one or more test cases. The first line contains the number of test cases t (1≤t≤1000).
+
+Each test case contains two lines. The first line of each test case consists of an integer n (2≤n≤2⋅105) — the number of elements of the array a.
+
+The second line of each test case contains n integers. The i-th integer is ai (−5⋅108≤ai≤5⋅108).
+
+It is guaranteed that the sum of n in all test cases does not exceed 2⋅105.
+
+Output
+For each test case, print one integer — the minimum number of operations Gildong has to perform in order to make all elements of the array equal.
+
+Example
+inputCopy
+7
+2
+1 1
+3
+-1 0 2
+4
+99 96 97 95
+4
+-3 -5 -2 1
+6
+1 4 3 2 4 1
+5
+5 0 0 0 5
+9
+-367741579 319422997 -415264583 -125558838 -300860379 420848004 294512916 -383235489 425814447
+outputCopy
+0
+1
+3
+4
+6
+5
+2847372102
+Note
+In the first case, all elements of the array are already equal. Therefore, we do not change any integer and Gildong will perform zero operations.
+
+In the second case, we can set a3 to be 0, so that the array becomes [−1,0,0]. Now Gildong can use the 2-nd operation once on the suffix starting at a2, which means a2 and a3 are decreased by 1, making all elements of the array −1.
+
+In the third case, we can set a1 to 96, so that the array becomes [96,96,97,95]. Now Gildong needs to:
+
+Use the 2-nd operation on the suffix starting at a3 once, making the array [96,96,96,94].
+Use the 1-st operation on the suffix starting at a4 2 times, making the array [96,96,96,96].
+In the fourth case, we can change the array into [−3,−3,−2,1]. Now Gildong needs to:
+
+Use the 2-nd operation on the suffix starting at a4 3 times, making the array [−3,−3,−2,−2].
+Use the 2-nd operation on the suffix starting at a3 once, making the array [−3,−3,−3,−3].
+
+题意：每次可以选择一个后缀使得元素全部减1，最开始可以选择一个数字
+变成任意数字，询问最少变换次数使得所有数字都一样大小。
+思路：一个序列如果只操作后缀则需要变成相同的次数是各项的差的绝对值，
+因为当前项跟前面一样要想相同肯定要减去差的绝对值，而此时从当前位置
+到最后的每个位置的数字都减去了这个值，所以不影响他们的相对大小。
+这题就考虑去掉每个数字之后的答案是多少。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read() { static char buf[1000000], *p1 = buf, *p2 = buf; int x = false; char ch = gc; bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int N = 2e5 + 10;
+
+int a[N], b[N];
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll sum = 0;
+		int n;
+		scanf("%d", &n);
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%d", &a[i]);
+			if (i >= 2)
+				b[i] = abs(a[i] - a[i - 1]), sum += b[i];
+		}
+		ll ans = min(sum - b[2], sum - b[n]);
+		for (int i = 2; i < n; i++)
+			ans = min(ans, sum - b[i] - b[i + 1] + abs(a[i + 1] - a[i - 1]));
+		cout << ans << endl;
+	}
+	return TIME;
+}

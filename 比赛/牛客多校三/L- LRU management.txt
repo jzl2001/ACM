@@ -1,0 +1,91 @@
+/*
+Ä£Äâ STL
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+const int N = 1e5 + 10;
+typedef long long ll;
+struct node{
+	string name;
+	int val;
+};
+unordered_map<string, list<node>::iterator>mp;
+list<node>ls;
+int n, m;
+void fun(int op, string name, int val)
+{
+	if (!op)
+	{
+		if (mp.find(name) == mp.end())
+		{
+			ls.push_back({ name, val });
+			mp[name] = --ls.end();
+			if (ls.size() > m)
+			{
+				mp.erase(ls.front().name);
+				ls.pop_front();
+			}
+			printf("%d\n", val);
+		}
+		else
+		{
+			auto i = mp[name];
+			printf("%d\n", i->val);
+			int num = i->val;
+			ls.erase(i);
+			ls.push_back({ name, num });
+			mp.erase(name);
+			mp[name] = --ls.end();
+		}
+	}
+	else
+	{
+		if (mp.find(name) == mp.end())
+			puts("Invalid");
+		else
+		{
+			auto i = mp[name];
+			if (val == 1)
+			{
+				if (i == --ls.end())
+					puts("Invalid");
+				else
+					printf("%d\n", next(i)->val);
+			}
+			else
+				if (val == -1)
+				{
+					if (i == ls.begin())
+						puts("Invalid");
+					else
+						printf("%d\n", prev(i)->val);
+				}
+				else
+					printf("%d\n", i->val);
+		}
+	}
+}
+int main(){
+	//freopen("D:/input.txt", "r", stdin);
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		mp.clear();
+		ls.clear();
+		cin >> n >> m;
+		int op;
+		char name[11];
+		int val;
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%d", &op);
+			scanf("%s", name);
+			scanf("%d", &val);
+			string s = name;
+			fun(op, s, val);
+		}
+	}
+	return 0;
+}

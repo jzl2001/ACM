@@ -1,0 +1,45 @@
+<±©Á¦>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int N = 1e5 + 10;
+const int mod = 998244353;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	int d, e;
+	cin >> d >> e;
+	int tot = 0;
+	int MIN = 0x3f3f3f3f;
+	e *= 5;
+	if (n < d && n < e)
+		cout << n << endl, exit(0);
+	for (;;)
+	{
+		MIN = min(MIN, (n - tot) % e);
+		tot += d;
+		if (tot == n)
+			cout << "0" << endl, exit(0);
+		if (tot >= n)
+			break;
+	}
+	cout << MIN << endl;
+	return TIME;
+}

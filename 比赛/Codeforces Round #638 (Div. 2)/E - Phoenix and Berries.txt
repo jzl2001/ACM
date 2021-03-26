@@ -1,0 +1,124 @@
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Phoenix is picking berries in his backyard. There are n shrubs, and each shrub has ai red berries and bi blue berries.
+
+Each basket can contain k berries. But, Phoenix has decided that each basket may only contain berries from the same shrub or berries of the same color (red or blue). In other words, all berries in a basket must be from the same shrub or/and have the same color.
+
+For example, if there are two shrubs with 5 red and 2 blue berries in the first shrub and 2 red and 1 blue berries in the second shrub then Phoenix can fill 2 baskets of capacity 4 completely:
+
+the first basket will contain 3 red and 1 blue berries from the first shrub;
+the second basket will contain the 2 remaining red berries from the first shrub and 2 red berries from the second shrub.
+Help Phoenix determine the maximum number of baskets he can fill completely!
+
+Input
+The first line contains two integers n and k (1≤n,k≤500) — the number of shrubs and the basket capacity, respectively.
+
+The i-th of the next n lines contain two integers ai and bi (0≤ai,bi≤109) — the number of red and blue berries in the i-th shrub, respectively.
+
+Output
+Output one integer — the maximum number of baskets that Phoenix can fill completely.
+
+Examples
+inputCopy
+2 4
+5 2
+2 1
+outputCopy
+2
+inputCopy
+1 5
+2 3
+outputCopy
+1
+inputCopy
+2 5
+2 1
+1 3
+outputCopy
+0
+inputCopy
+1 2
+1000000000 1
+outputCopy
+500000000
+Note
+The first example is described above.
+
+In the second example, Phoenix can fill one basket fully using all the berries from the first (and only) shrub.
+
+In the third example, Phoenix cannot fill any basket completely because there are less than 5 berries in each shrub, less than 5 total red berries, and less than 5 total blue berries.
+
+In the fourth example, Phoenix can put all the red berries into baskets, leaving an extra blue berry behind.
+题意:
+n个果实，每个含有a个1，b个2，现在有k个容量的篮子，问最多装几个篮子
+装只能每个篮子装相同果实的，或者相同颜色的
+显然最多只有一个篮子装的是一个果实的，因为如果都选相同的果实则最多为n，但是可以选择相同颜色提取出来装
+#pragma GCC optimize(2)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 500 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+ll d[N][N]; //装到第i个，之前剩余j个红色的最大篮子数
+int a[N];
+int b[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, k;
+	cin >> n >> k;
+	ll tot = 0;
+	memset(d, -1, sizeof d);
+	for (int i = 0; i < n; i++)
+	{
+		scanf("%d%d", &a[i], &b[i]);
+	}
+	d[0][0] = 0;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < k; j++) //剩余的红色
+		{
+			if (d[i][j] >= 0)
+			{
+				int blue = tot - d[i][j] * k - j;//剩余的蓝色
+				for (int u = 1; u <= a[i] && u < k; u++)//装不同色的篮子，枚举红色
+				{
+					if (b[i] + u >= k)
+					{
+						int cnt1 = j + a[i] - u; //相同的装一起
+						int cnt2 = b[i] - (k - u) + blue;//需要的蓝色
+						//cout << cnt1 << " " << cnt2 << endl;
+						d[i + 1][cnt1 % k] = max(d[i + 1][cnt1 % k], d[i][j] + 1 + cnt1 / k + cnt2 / k);
+					}
+				}
+				int z = (j + a[i]), w = (blue + b[i]);
+				d[i + 1][z % k] = max(d[i + 1][z % k], d[i][j] + z / k + w / k);//全部相同颜色
+			}
+		}
+		tot += a[i] + b[i];
+	}
+	ll ans = 0;
+	for (int i = 0; i <= n; i++)
+	{
+		for (int j = 0; j < k; j++)
+		{
+			ans = max(ans, d[i][j]);
+		}
+	}
+	cout << ans << endl;
+	return TIME;
+}

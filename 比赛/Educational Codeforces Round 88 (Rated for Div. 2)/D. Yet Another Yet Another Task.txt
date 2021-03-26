@@ -1,0 +1,100 @@
+time limit per test1.5 seconds
+memory limit per test512 megabytes
+inputstandard input
+outputstandard output
+Alice and Bob are playing yet another card game. This time the rules are the following. There are n cards lying in a row in front of them. The i-th card has value ai.
+
+First, Alice chooses a non-empty consecutive segment of cards [l;r] (l≤r). After that Bob removes a single card j from that segment (l≤j≤r). The score of the game is the total value of the remaining cards on the segment (al+al+1+⋯+aj−1+aj+1+⋯+ar−1+ar). In particular, if Alice chooses a segment with just one element, then the score after Bob removes the only card is 0.
+
+Alice wants to make the score as big as possible. Bob takes such a card that the score is as small as possible.
+
+What segment should Alice choose so that the score is maximum possible? Output the maximum score.
+
+Input
+The first line contains a single integer n (1≤n≤105) — the number of cards.
+
+The second line contains n integers a1,a2,…,an (−30≤ai≤30) — the values on the cards.
+
+Output
+Print a single integer — the final score of the game.
+
+Examples
+inputCopy
+5
+5 -2 10 -1 4
+outputCopy
+6
+inputCopy
+8
+5 2 5 3 -30 -30 6 9
+outputCopy
+10
+inputCopy
+3
+-10 6 -15
+outputCopy
+0
+Note
+In the first example Alice chooses a segment [1;5] — the entire row of cards. Bob removes card 3 with the value 10 from the segment. Thus, the final score is 5+(−2)+(−1)+4=6.
+
+In the second example Alice chooses a segment [1;4], so that Bob removes either card 1 or 3 with the value 5, making the answer 5+2+3=10.
+
+In the third example Alice can choose any of the segments of length 1: [1;1], [2;2] or [3;3]. Bob removes the only card, so the score is 0. If Alice chooses some other segment then the answer will be less than 0.
+
+题意:要求选取一段并使得去掉最大值之后的值最大。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 4e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+int d[N][70]; //以i为结尾的最大子段和且最大值为j
+int base = 30;
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		cin >> a[i];
+	}
+	memset(d, -0x3f, sizeof d);
+	int ans = -INF;
+	for (int i = 1; i <= n; i++)
+	{
+		d[i][a[i] + base] = a[i];
+		for (int j = 0; j <= 60; j++)
+		{
+			if (j <= a[i] + base)
+				d[i][a[i] + base] = max(d[i][a[i] + base], d[i - 1][j] + a[i]);
+			else
+				d[i][j] = max(d[i][j], d[i - 1][j] + a[i]);
+		}
+		for (int j = 0; j <= 60; j++)
+		{
+			ans = max(ans, d[i][j] - j + base);
+		}
+	}
+	cout << ans << endl;
+	return TIME;
+}

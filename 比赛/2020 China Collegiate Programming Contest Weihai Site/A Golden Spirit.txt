@@ -1,0 +1,90 @@
+It's a sunny day with good scenery, and you come to the park for a walk. You feel curious that there are many old guys gathering by a bridge, and want to take a look at what happened.
+
+There are exactly n old guys on each side of the bridge, and they all want to go across the bridge, take some time for relaxing on the other side, and finally go across the bridge back to the original side. However, they are too old to cross the bridge by themselves.
+
+Driven by the golden spirit in your heart, you want to help these 2n old guys. Initially, you are on one side of the bridge. It takes t minutes for you to go across the bridge and x minutes for an old guy relaxing. You may help an old guy when you cross the bridge, which doesn't take extra time.
+
+As a master of time management, you want to know the minimum time needed to help all these 2n old guys. Please write a program to calculate this minimum time.
+
+Input Specification:
+The first line contains one integer T (1≤t≤10
+​4
+​​ ), indicating the total number of test cases.
+
+For each of the next T lines, there are three integers n,x,t (1≤n,x,t≤10
+​9
+​​ ), as explained in problem statement.
+
+Output Specification:
+You should output exactly T lines. Each line should contain exactly one integer, indicating the minimum time you needed in each test case.
+
+Sample Input 1:
+3
+2 2 2
+3 1 10
+11 45 14
+Sample Output 1:
+16
+120
+616
+Notes:
+For the first case of the sample data, the optimal plan is shown below, where a numerical digit denotes an old guy, | denotes the bridge, and x denotes you.
+
+   Time
+     0     x 1 2 | 3 4
+     2         2 | 3 4 1 x
+     4     x 3 2 | 4 1
+     6         3 | 4 1 2 x
+     8     x 4 3 | 1 2 x
+    10         4 | 1 2 3 x
+    12     x 1 4 | 2 3
+    14         1 | 2 3 4 x
+    16     x 2 1 | 3 4
+
+题意：有个桥，两边各有n个人，现在你在一边，你每次可以带一个人过桥
+过桥的时间是t秒，每个人都要在对岸休息x秒。问最少的完成这些的时间。
+因为对每个人的操作时间是一样的，所以是个类似于循环的过程，1可以了，过了t秒我到对面去
+那个2肯定也可以，因为当时运的时候时间差就是t。
+两种情况，假设我最开始在左边，最后从右边开始回运，2 * n * t + t，第一个人t秒开始休息
+到对面准备运他至少要t+x秒，所以第一个答案就是max(2 * n * t + t, t + x)。
+第二种我2 * n * t秒把人都运到左边，然后从左边开始运，但是第一个到左边的人是2*t的时候，
+所以代价就是max(2 * n * t, 2 * t + x)。
+然后取个min，再加上最后运回的2 * n * t代价。
+#include <bits/stdc++.h>
+#include <unordered_map>
+#include <unordered_set>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ull n, x, t;
+		cin >> n >> x >> t;	
+		cout << min(max(2 * n * t + t, t + x), max(2 * n * t, 2 * t + x)) + 2 * n * t << endl;
+	}
+	return TIME;
+}

@@ -1,0 +1,115 @@
+Time Limit: 2000/1000 MS (Java/Others)    Memory Limit: 524288/262144 K (Java/Others)
+Total Submission(s): 1242    Accepted Submission(s): 496
+
+
+Problem Description
+Because of the thriller adventure game The 3rd Building, there are fewer and fewer students who would like to go to the 3rd Building. So few students are working in the studio in the 3rd Building. Students are even more reluctant to go to the 3rd Building for experiments, which are also annoying.
+
+Kanade takes responsibility to improve this status. She thinks it a good idea to decorate the ginkgo trees along the road to the 3rd Building, making them cute. There are n ginkgo trees that are planted along the road, numbered with 1…n. Each tree has a cute value. The cute value of tree i is si.
+
+Kanade defines a plan as an ordered pair (i,j), here 1≤i≤j≤n. It means a student will appear at the position of the tree i magically, walk along the road, and finally stop walking at the position of the tree j. The cute level of a plan is the average of the cute value of the trees visited. Formally, the cute level of plan (i,j) is 1j−i+1∑jk=isk.
+
+Kanade wants to know the mathematical expectation of the cute level if a student will take a plan among all these plans in a uniformly random way. But she is busy with learning Computer Networking, would you help her?
+ 
+
+Input
+The first line of the input contains an integer T — the number of testcases. You should process these testcases independently.
+
+The first line of each testcase contains an integer n — the number of ginkgo trees.
+
+The second line of each testcase contains n integers si — the cute value of each ginkgo tree, space-separated.
+
+1≤T≤20,1≤n≤2×105,1≤si≤109
+
+It is guaranteed that ∑n≤106.
+ 
+
+Output
+For each testcase, output the answer in the fraction form modulo 109+7 in one line. That is, if the answer is PQ, you should output P⋅Q−1mod(109+7), where Q−1 denotes the multiplicative inverse of Q modulo 109+7.
+ 
+
+Sample Input
+3
+3
+1 3 2
+6
+1 1 4 5 1 4
+9
+7325 516 56940 120670 16272 15007 337527 333184 742294
+ 
+
+Sample Output
+83333336
+188888893
+303405448
+
+Hint
+ The answer to the first testcase is 25/12. 
+ 
+ 
+
+Source
+2020 Multi-University Training Contest 6
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+期望，选择i，j取下标i，j之间数字的平均数。
+直接模拟计算所有情况即可。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+
+ll a[N];
+ll fpow(ll a, ll b, ll mod)
+{
+    a %= mod;
+    ll res = 1;
+    while (b)
+    {
+        if (b & 1)
+            res = res * a % mod;
+        a = a * a % mod;
+        b >>= 1;
+    }
+    return res;
+}
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n;
+        cin >> n;
+        for (int i = 1; i <= n; i++)
+        {
+            scanf("%lld", &a[i]), a[i] = (a[i - 1] + a[i]) % mod;
+        }
+        ll ans = 0, sub = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            ll res = (i * a[n] % mod - sub + mod) % mod;
+            ans = (ans + res * fpow(i, mod - 2, mod) % mod) % mod;
+            sub = (sub + a[i] + a[n] - a[n - i]) % mod;
+        }
+        cout << ans * fpow(1LL * n * (n + 1) / 2, mod - 2, mod) % mod << endl;
+    }
+    return TIME;
+}

@@ -1,0 +1,124 @@
+链接：https://ac.nowcoder.com/acm/contest/5678/C
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+在图论中，树是一种无向图，其中任意两个顶点间存在唯一一条路径。
+给定一棵根为 1 含有 n 个点的树，每个点都有一个权值，通过删去一些点和边我们可以组成一棵新的树，我们规定一棵树的权值为这棵树所有的点权值的异或，问能够新生成的树权值最大为多少？
+输入描述:
+输入包含多行,第一行包含一个数字 n(1 \le n \le 100)n(1≤n≤100) ，表示节点数目，
+第二行包含 n 个数字 a_1,a_2,...,a_n(1 \le a_i \le 127)a 
+1
+​	
+ ,a 
+2
+​	
+ ,...,a 
+n
+​	
+ (1≤a 
+i
+​	
+ ≤127)，表示每个节点的权值，
+接下来 n - 1 行每行包含两个整数 u、v(1 \le u,v \le n)u、v(1≤u,v≤n) 表示 u 与 v 之间有一条边连接。
+输出描述:
+输出包含一行，代表新生成的树权值最大的最大值。
+示例1
+输入
+复制
+3
+1 2 3
+1 2
+1 3
+输出
+复制
+3
+示例2
+输入
+复制
+5
+4 2 6 8 1
+1 5
+2 3 
+1 3
+3 4
+输出
+复制
+14
+#pragma GCC optimize(2)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int a[N];
+vector<int>G[N];
+int d[110][130];
+int f[110][130];
+int vis[N];
+void dfs(int x)
+{
+	vis[x] = 1;
+	for (auto &i : G[x])
+	{
+		if (vis[i])
+			continue;
+		dfs(i);
+		for (int j = 0; j <= 127; j++)
+			f[x][j] = d[x][j];
+		for (int j = 0; j <= 127; j++)
+		{
+			for (int k = 0; k <= 127; k++)
+			{
+				if (f[x][j] && d[i][k])
+				{
+					d[x][j ^ k] = 1;
+				}
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		cin >> a[i];
+		d[i][a[i]] = 1;
+	}
+	for (int i = 1; i <= n - 1; i++)
+	{
+		int u, v;
+		cin >> u >> v;
+		G[u].push_back(v);
+		G[v].push_back(u);
+	}
+	dfs(1);
+	int ans = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 127; j >= 1; j--)
+		{
+			if (d[i][j])
+				ans = max(ans, j);
+		}
+	}
+	cout << ans << endl;
+	return TIME;
+}

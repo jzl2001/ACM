@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <string.h>
+int main(){
+	char a[2010];
+	char s[30];
+	int t;
+	int kcase = 0;
+	scanf("%d", &t);
+	while (t--)
+	{
+		printf("Case #%d: ", ++kcase);
+		int m[30] = {0};
+		scanf("%s%s", a, s);
+		int len1 = strlen(a);
+		for (int i = 0; i < 26; i++)
+			if (s[i] == 'd')
+				m[i] = 1;
+			else
+				if (s[i] == 'w')
+					m[i] = 2;
+				else
+					m[i] = 3;
+		int cnt[4] = { 0 };
+		for (int i = 0; i < len1; i++)
+			cnt[m[a[i] - 'a']]++;
+		if (cnt[3] * 4 >= len1)
+			puts("Harmful");
+		else
+			if (cnt[3] * 10 <= len1)
+				puts("Recyclable");
+			else
+				if (cnt[1] >= cnt[2] * 2)
+					puts("Dry");
+				else
+					puts("Wet");
+	}
+	return 0;
+}

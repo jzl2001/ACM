@@ -1,0 +1,144 @@
+Fragrant numbers
+Time Limit: 3000/2000 MS (Java/Others)    Memory Limit: 131072/65536 K (Java/Others)
+Total Submission(s): 666    Accepted Submission(s): 338
+
+
+Problem Description
+Many people love numbers, and some have a penchant for specific numbers. Nowadays in popular culture, 1145141919 is a very fragrant number, and many people want to represent all other numbers with this number.
+
+Let S be an infinite string of "1145141919" infinitely stitched together as "114514191911451419191145141919...".
+
+Take a prefix T of S , you can insert '(' , ')' , '+' or '∗' to T to form a new string T′, and then let the value of T′ be val(T′) according to ordinary rules. (You can insert any number of operators, even 0. But need to ensure that the inserted operators form legitimate operations)
+
+Now for a number N, please calculate the minimum length of T that can make val(T′)=N. For example, when N=520, the minimum length of 6 (pick the first 6 characters 114514 and insert operators to make T′=1+1+4+514 , then we have val(T′)=520 )
+
+If no such T exists, output −1.
+ 
+
+Input
+There are multiple test cases.
+
+The first line with a number t indicates the number of test cases.
+
+For each test case, one integer N per line indicates an inquiry.
+
+1≤t≤30
+
+1≤N≤5000
+ 
+
+Output
+Output t lines.
+
+One integer per line indicates the corresponding answer.
+ 
+
+Sample Input
+3
+520
+1
+2
+ 
+
+Sample Output
+6
+1
+2
+ 
+
+Source
+2020 Multi-University Training Contest 6
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+使用给出的循环序列，可以加括号，加号，乘号。求最短序列使得某个数字出现。
+dp、暴力
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 1e5 + 10;
+set<int> d[15][15];
+string s = "01145141919";
+int num[13][10];
+void dfs(int l, int r)
+{
+	if (l > r)
+		return;
+	if (r - l + 1 <= 3 && num[l][r - l + 1] <= 5000)
+		d[l][r].insert(num[l][r - l + 1]);
+	for (int i = l; i < r; i++)
+	{
+		dfs(l, i);
+		dfs(i + 1, r);
+		if (d[l][i].size() && d[i + 1][r].size())
+		{
+			for (auto &u: d[l][i])
+			{
+				for (auto &v : d[i + 1][r])
+				{
+					if (u + v <= 5000)
+					{
+						d[l][r].insert(u + v);
+					}
+					if (u * v <= 5000)
+					{
+						d[l][r].insert(u * v);
+					}
+				}
+			}
+		}
+	}
+}
+int ans[5100];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	for (int j = 1; j <= 3; j++)
+		for (int i = 1; i <= 10; i++)
+			num[i][j] = num[i][j - 1] * 10 + s[(i + j - 1 - 1) % 10 + 1] - '0';
+	memset(ans, -1, sizeof ans);
+	dfs(1, 12);
+	for (int i = 1; i <= 12; i++)
+	{
+		for (auto& j: d[1][i])
+		{
+			if (ans[j] == -1)
+			{
+				ans[j] = i;
+			}
+		}
+	}
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int num;
+		scanf("%d", &num);
+		cout << ans[num] << endl;
+	}
+	return TIME;
+}

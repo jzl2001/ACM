@@ -1,0 +1,115 @@
+链接：https://ac.nowcoder.com/acm/contest/5678/G
+来源：牛客网
+
+校车
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+西安邮电大学有一辆从老校区到新校区的校车，总共有 n 个学生乘坐校车，在 a_{i}a 
+i
+​	
+  站上车，在 b_{i}b 
+i
+​	
+  站下车。学校打算去除一部分不必要的站点，请问需要保留多少站点，需要安排多少个座位？
+输入描述:
+输入 T 组数据 (1 \le T \le 10)(1≤T≤10)
+输入 n(1 \le n \le 10^{5})n(1≤n≤10 
+5
+ )
+输入 n 组 a_{i},b_{i}(1 \le a_{i}，b_{i} \le 10^{9})a 
+i
+​	
+ ,b 
+i
+​	
+ (1≤a 
+i
+​	
+ ，b 
+i
+​	
+ ≤10 
+9
+ )
+输出描述:
+输出保留站点数，座位数。
+示例1
+输入
+复制
+1
+3
+1 2
+1 3
+2 4
+输出
+复制
+4 2
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int c[N];
+pair<int, int>p[N];
+vector<int>v;
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        v.clear();
+        int n;
+        cin >> n;
+        set<int>s;
+        int ans = 0, cnt = 0;
+        for (int i = 1; i <= n; i++)
+        {
+            int x, y;
+            scanf("%d%d", &x, &y);
+            v.push_back(x);
+            v.push_back(y);
+            p[i] = { x, y };
+        }
+        sort(v.begin(), v.end());
+        v.erase(unique(v.begin(), v.end()), v.end());
+        for (int i = 1; i <= n; i++)
+        {
+            int num1 = lower_bound(v.begin(), v.end(), p[i].first) - v.begin() + 1;
+            int num2 = lower_bound(v.begin(), v.end(), p[i].second) - v.begin() + 1;
+            c[num1]++, c[num2]--;
+        }
+        int mx = 0;
+        for (int i = 1; i <= v.size(); i++)
+        {
+            c[i] += c[i - 1];
+            mx = max(mx, c[i]);
+        }
+        cout << v.size() << " " << mx << endl;
+        for (int i = 1; i <= v.size(); i++)
+            c[i] = 0;
+    }
+    return TIME;
+}

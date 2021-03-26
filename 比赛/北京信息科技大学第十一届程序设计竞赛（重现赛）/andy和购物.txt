@@ -1,0 +1,35 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include<string.h>
+using namespace std;
+typedef long long ll;
+int n, q;
+const int N = 1e5 + 10;
+int a[N];
+double b[N];
+bool cmp(int a, int b)
+{
+	return a > b;
+}
+int main(){
+	int t;
+	scanf("%d", &t);
+	while (t--)
+	{
+		cin >> n;
+		memset(a, 0, sizeof a);
+		memset(b, 0, sizeof b);
+		for (int i = 0; i < n; i++)
+			cin >> a[i];
+		for (int i = 0; i < n; i++)
+			cin >> b[i];
+		double ans = 0; 
+		sort(b, b + n);
+		sort(a, a + n, cmp);
+		for (int i = 0; i < n; i++)
+			ans += a[i] * b[i];
+		printf("%.3f\n", ans);
+	}
+	return 0;
+}

@@ -1,0 +1,91 @@
+/*
+https://ac.nowcoder.com/acm/problem/205301
+从字符串里面找到k个字母组成的数字满足是3的倍数，且最大
+贪心从9开始，枚举个数的时候最多删掉3，因为是3的倍数，删掉四个的话约数也是等于
+1的时候
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int cnt[12];
+int a[N];
+char s[N];
+int k;
+int flag;
+void dfs(int num, int tot, int ys) 
+{
+	if (flag || (!num && !tot && k != 1))//避免前导0
+		return;
+	if (num == -1)
+	{
+		if (ys == 0 && tot == k)
+		{
+			for (int i = 9; i >= 0; i--)
+			{
+				for (int j = 1; j <= a[i]; j++)
+				{
+					printf("%d", i);
+				}
+			}
+			cout << endl;
+			flag = 1;
+			return;
+		}
+	}
+	else
+	{
+		int mx = min(cnt[num], k - tot);//最多取这些
+		for (int i = mx; i >= max(0, mx - 2); i--) //因为是3的倍数，每次考虑最多三个即可
+		{
+			a[num] = i;
+			dfs(num - 1, tot + i, (ys + i * num) % 3);
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		flag = 0;
+		scanf("%s%d", s, &k);
+		int len = strlen(s);
+		for (int i = 0; i <= 9; i++)
+		{
+			cnt[i] = 0;
+		}
+		for (int i = 0; i < len; i++)
+		{
+			cnt[s[i] - '0']++;
+		}
+		dfs(9, 0, 0);
+		if (!flag)
+		{
+			puts("-1");
+		}
+	}
+	return TIME;
+}

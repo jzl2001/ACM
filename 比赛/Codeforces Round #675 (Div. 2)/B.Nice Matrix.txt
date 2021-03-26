@@ -1,0 +1,143 @@
+B. Nice Matrix
+time limit per test1 second
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+A matrix of size n×m is called nice, if all rows and columns of the matrix are palindromes. A sequence of integers (a1,a2,…,ak) is a palindrome, if for any integer i (1≤i≤k) the equality ai=ak−i+1 holds.
+
+Sasha owns a matrix a of size n×m. In one operation he can increase or decrease any number in the matrix by one. Sasha wants to make the matrix nice. He is interested what is the minimum number of operations he needs.
+
+Help him!
+
+Input
+The first line contains a single integer t — the number of test cases (1≤t≤10). The t tests follow.
+
+The first line of each test contains two integers n and m (1≤n,m≤100) — the size of the matrix.
+
+Each of the next n lines contains m integers ai,j (0≤ai,j≤109) — the elements of the matrix.
+
+Output
+For each test output the smallest number of operations required to make the matrix nice.
+
+Example
+inputCopy
+2
+4 2
+4 2
+2 4
+4 2
+2 4
+3 4
+1 2 3 4
+5 6 7 8
+9 10 11 18
+outputCopy
+8
+42
+Note
+In the first test case we can, for example, obtain the following nice matrix in 8 operations:
+
+
+2 2
+4 4
+4 4
+2 2
+In the second test case we can, for example, obtain the following nice matrix in 42 operations:
+
+
+5 6 6 5
+6 6 6 6
+5 6 6 5
+题意：给出一个矩阵，上面有数字，问要求每行每列都回文的最小代价，加减一个数的一次代价都是1。
+思路：每四个点是一组，最后一定答案一样，所以分到一组变成中位数即可。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[110][110];
+struct node
+{
+	int x1, x2, y1, y2;
+	ll calc()
+	{
+		ll ans = LINF;
+		int num[6];
+		num[1] = a[x1][y1], num[2] = a[x1][y2];
+		num[3] = a[x2][y1], num[4] = a[x2][y2];
+		for (int i = 1; i <= 4; i++)
+		{
+			ll now = 0;
+			for (int j = 1; j <= 4; j++)
+			{
+				if (i == j)
+					continue;
+				now += abs(num[i] - num[j]);
+			}
+			ans = min(ans, now);
+		}
+		return ans;
+	}
+}b[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int cnt = 0;
+		int n, m;
+		cin >> n >> m;
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= m; j++)
+				cin >> a[i][j];
+		for (int i = 1; i <= n / 2; i++)
+			for (int j = 1; j <= m / 2; j++)
+			{
+				if (i <= n - i + 1 && j <= m - j + 1)
+				b[++cnt] = { i, n - i + 1, j, m - j + 1 };
+			}
+		ll ans = 0;
+		for (int i = 1; i <= cnt; i++)
+			ans += b[i].calc();
+		if (n & 1)
+		{
+			int mid = (n - 1) / 2 + 1;
+			for (int i = 1; i <= m / 2; i++)
+			{
+				ans += abs(a[mid][i] - a[mid][m - i + 1]);
+			}
+		}
+		if (m & 1)
+		{
+			int mid = (m - 1) / 2 + 1;
+			for (int i = 1; i <= n / 2; i++)
+			{
+				ans += abs(a[i][mid] - a[n - i + 1][mid]);
+			}			
+		}
+		cout << ans << endl;
+	}
+	return TIME;
+}
+ 

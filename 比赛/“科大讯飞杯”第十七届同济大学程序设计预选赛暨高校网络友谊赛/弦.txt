@@ -1,0 +1,64 @@
+链接：https://ac.nowcoder.com/acm/contest/5477/E
+来源：牛客网
+
+弦
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+给定一个圆，圆上有2N个互不重叠的点。每次操作随机选择两个先前未选择过的点连一条弦，共连成N条弦，求所有弦不交的概率。
+
+输入描述:
+一行，只有一个整数N（1≤N≤107）。
+
+输出描述:
+一行，即答案。答案应以模109+7的形式输出。正式的说，令M=109+7，答案可以表示为最简分数p/q的形式，其中p和q为整数且q与M互质。输出整数x满足 0≤x<M且 x⋅q ≡ p（mod M）。
+
+示例1
+输入
+复制
+2
+输出
+复制
+666666672
+备注:
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+//h(n)=C(2n,n)/(n+1)
+//C(2n, 2) * C(2*n-2,2)*...
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	ll n;
+	cin >> n;
+	ll fz = fpow(2LL, n, mod);
+	ll fm = 1;
+	for (int i = 1; i <= n + 1; i++)
+	{
+		fm = fm * i % mod;
+	}
+	cout << fz * fpow(fm, mod - 2, mod) % mod << endl;
+	return TIME;
+}

@@ -1,0 +1,81 @@
+During the quarantine, Sicromoft has more free time to create the new functions in "Celex-2021". The developers made a new function GAZ-GIZ, which infinitely fills an infinite table to the right and down from the upper left corner as follows:
+
+The cell with coordinates (x,y) is at the intersection of x-th row and y-th column. Upper left cell (1,1) contains an integer 1.
+The developers of the SUM function don't sleep either. Because of the boredom, they teamed up with the developers of the RAND function, so they added the ability to calculate the sum on an arbitrary path from one cell to another, moving down or right. Formally, from the cell (x,y) in one step you can move to the cell (x+1,y) or (x,y+1).
+
+After another Dinwows update, Levian started to study "Celex-2021" (because he wants to be an accountant!). After filling in the table with the GAZ-GIZ function, he asked you to calculate the quantity of possible different amounts on the path from a given cell (x1,y1) to another given cell (x2,y2), if you can only move one cell down or right.
+
+Formally, consider all the paths from the cell (x1,y1) to cell (x2,y2) such that each next cell in the path is located either to the down or to the right of the previous one. Calculate the number of different sums of elements for all such paths.
+
+Input
+The first line contains one integer t (1≤t≤57179) — the number of test cases.
+
+Each of the following t lines contains four natural numbers x1, y1, x2, y2 (1≤x1≤x2≤109, 1≤y1≤y2≤109) — coordinates of the start and the end cells.
+
+Output
+For each test case, in a separate line, print the number of possible different sums on the way from the start cell to the end cell.
+
+Example
+inputCopy
+4
+1 1 2 2
+1 2 2 4
+179 1 179 100000
+5 7 5 7
+outputCopy
+2
+3
+1
+1
+Note
+In the first test case there are two possible sums: 1+2+5=8 and 1+3+5=9.
+题意:给出一个数组，询问从x1，y1到x2，y2的所有路径和的不同情况
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll ans = 0;
+		ll x1, y1, x2, y2;
+		cin >> x1 >> y1 >> x2 >> y2;
+		if (x1 == x2 || y1 == y2)
+		{
+			cout << 1 << endl;
+			continue;
+		}
+		ll a = abs(x1 - x2);
+		ll b = abs(y1 - y2);
+		ll x = max(a, b);
+		ll u = min(a, b);
+		ans += u * (u - 1);
+		ans += u * (x - u + 1);
+		cout << ans + 1 << endl;
+	}
+	return TIME;
+}

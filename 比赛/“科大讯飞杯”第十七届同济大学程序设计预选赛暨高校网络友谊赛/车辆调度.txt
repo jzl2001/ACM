@@ -1,0 +1,184 @@
+链接：https://ac.nowcoder.com/acm/contest/5477/D
+来源：牛客网
+
+张老师设计了一个智能调度系统来控制他的遥控车队，今天，他带着他的车队来到黄渡理工大学的一块空地上测试这个系统。
+这块空地可以描述为一个 w * h 大小的长方形，广场上有一些障碍物，几个目标点，当然，还有张老师的车队。
+每分钟，调度系统会智能地向其中的一辆遥控车发送以下指令的其中一条：
+
+向北走，直到撞到空地的边界、障碍物或其他遥控车；
+
+向南走，直到撞到空地的边界、障碍物或其他遥控车；
+
+向西走，直到撞到空地的边界、障碍物或其他遥控车；
+
+向东走，直到撞到空地的边界、障碍物或其他遥控车；
+
+每条指令都会在一分钟之内完成，也就是说，空地上最多只有一辆遥控车在运动。此外，当遥控车无法向相应的方向移动时，它会停在原地。
+
+你想知道，在第 k 分钟时，有没有可能有任意一辆遥控车处在任意一个目标点上。
+
+输入描述:
+第一行输入三个数字w, h, k (1 ≤  w, h ≤ 10, 1 ≤ k ≤ 5) ,含义在题目描述中已给出。
+
+接下来h行，每行输入一个长度为w的字符串si，其中第i行的第j个字符表示(i, j)位置的状态。
+
+其中，'R'代表该位置初始有一辆遥控车，'X'代表该位置有障碍物，'D'代表该位置是一个目标点，'.'代表该位置可以正常通过。
+
+数据保证广场上的遥控车不超过4辆。
+
+输出描述:
+如果k分钟后有可能有任意一个遥控车处在任意一个目标点上，输出YES,否则输出NO。
+
+示例1
+输入
+复制
+6 5 4
+.....R
+...X..
+..D...
+....D.
+R.R...
+输出
+复制
+YES
+说明
+样例中，遥控车可以按下述路线移动：
+
+.....R
+
+...X..
+
+..D...
+
+....D.
+
+R.R...
+
+R.....
+
+...X..
+
+..D...
+
+....D.
+
+R.R...
+
+R.....
+
+R..X..
+
+..D...
+
+....D.
+
+..R...
+
+R.....
+
+..RX..
+
+..D...
+
+....D.
+
+..R...
+
+R.....
+
+..RX..
+
+..R...
+
+....D.
+
+......
+
+4分钟时，有一辆遥控车达到了目标点。于是输出YES
+#pragma GCC optimize(2)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int vis[11][11];
+char s[20][20];
+int n, m, ti;
+int dir[4][2] = { -1, 0, 0, -1, 0, 1, 1, 0 };
+int flag1; //车1，障碍物2，终点3，到达4
+struct node
+{
+    int x, y;
+}car[1010];
+int cnt = 0;
+void dfs(int d)//第d分钟
+{
+    if (flag1 || d > ti)
+        return;
+    for (int u = 1; u <= cnt; u++)
+    {
+ 
+        int i = car[u].x;
+        int j = car[u].y;
+        for (int k = 0; k < 4; k++)
+        {
+            int flag = 0;
+            int xx = i + dir[k][0], yy = j + dir[k][1];
+            while (xx <= n && xx >= 1 && yy <= m && yy >= 1 && vis[xx][yy] == 0)
+                flag = 1, xx = xx + dir[k][0], yy = yy + dir[k][1];
+            if (vis[xx][yy] == 3)
+            {
+                flag1 = 1;
+                return;
+            }
+            vis[i][j] = 0;
+            xx -= dir[k][0];
+            yy -= dir[k][1];
+            int yuan = vis[xx][yy];
+            vis[xx][yy] = 1;
+            car[u] = { xx, yy };
+            dfs(d + 1);
+            vis[i][j] = 1;
+            vis[xx][yy] = yuan;
+            car[u] = { i, j };
+        }
+    }
+}
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    cin >> m >> n >> ti;
+    for (int i = 1; i <= n; i++)
+    {
+        scanf("%s", s[i] + 1);
+        for (int j = 1; j <= m; j++)
+        {
+            if (s[i][j] == 'R')
+                vis[i][j] = 1, car[++cnt] = { i, j };
+            else
+                if (s[i][j] == 'D')
+                    vis[i][j] = 3;
+                else
+                    if (s[i][j] == 'X')
+                        vis[i][j] = 2;
+        }
+    }
+    dfs(1);
+    if (flag1)
+        puts("YES");
+    else
+        puts("NO");
+    return TIME;
+}

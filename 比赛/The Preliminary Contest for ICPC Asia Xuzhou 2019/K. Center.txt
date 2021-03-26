@@ -1,0 +1,74 @@
+/*
+题意: 给出n个点的坐标， 问你最少添加几个点, 使得这些点关于某个中心点的对称,
+
+思路:首先考虑对称中心, 一定是某两个点的对称中心, 否则需要添加更多的点。
+
+所以我们枚举点对, 用map记录, 以某个坐标为中心点的点对有多少, 设中心点坐标为x, y
+
+需要添加的点数自然为n - mp[{ x, y }]。 考虑若当前中心点为输入的n个点之一, 则该点
+
+不需要添加， 自然答案为n - mp[{ x, y }] - 1。 在处理时， 可以先将坐标都乘以2. 这样处理
+
+的坐标都为整数了。
+*/
+#include <bits/stdc++.h>
+//#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int x[1010];
+int y[1010];
+map<pair<int, int>, int>mp;
+map<pair<int, int>, int>vis;
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	int MI = 0x3f3f3f3f;
+	if (n == 1)
+		cout << "0" << endl, exit(0);
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d%d", &x[i], &y[i]);
+		x[i] *= 2;
+		y[i] *= 2;
+		vis[{x[i], y[i]}] = 1;
+	}
+
+	for (int i = 1; i <= n; i++)
+		for (int j = i + 1; j <= n; j++)
+		{
+			int zx = (x[i] + x[j]) / 2;
+			int zy = (y[i] + y[j]) / 2;
+			mp[{zx, zy}]++;
+		}
+	for (int i = 1; i <= n; i++)
+		for (int j = i + 1; j <= n; j++)
+		{
+			int zx = (x[i] + x[j]) / 2;
+			int zy = (y[i] + y[j]) / 2;
+			if (vis.find({ zx, zy }) != vis.end())
+				MI = min(MI, n - mp[{ zx, zy }] * 2 - 1);
+			else
+				MI = min(MI, n - mp[{ zx, zy }] * 2);
+		}
+	cout << MI << endl;
+	return TIME;
+}

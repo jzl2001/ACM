@@ -1,0 +1,44 @@
+Given 2N people, you need to assign each of them into either red team or white team such that each team consists of exactly N people and the total competitive value is maximized.
+
+Total competitive value is the summation of competitive value of each pair of people in different team.
+
+The equivalent equation is
+<DFS>
+组队， 分到两队有个竞争值要求最大
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int N = 500000 + 10;
+ 
+int n;
+int a[40][40];
+int vis[32];
+bool use[32];
+ll ans = 0;
+ll f[32];
+void dfs(int x, int b, ll tot)
+{
+    if (x == n + 1)
+    {
+        ans = max(ans, tot);
+        return;
+    }
+    for (int i = b; i <= 2 * n; i++)
+    {
+        vis[x] = i;
+        ll now = f[i];
+        for (int j = 1; j < x; j++)
+            now -= a[i][vis[j]] * 2;
+        dfs(x + 1, i + 1, tot + now);
+    }
+}
+int main()
+{
+    cin >> n;
+    for (int i = 1; i <= n * 2; i++)
+        for (int j = 1; j <= n * 2; j++)
+            scanf("%d", &a[i][j]), f[i] += a[i][j];
+    dfs(1, 1, 0);
+    cout << ans << endl;
+    return 0;
+}

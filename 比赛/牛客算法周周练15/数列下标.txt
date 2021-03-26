@@ -1,0 +1,81 @@
+链接：https://ac.nowcoder.com/acm/contest/8018/A
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 131072K，其他语言262144K
+64bit IO Format: %lld
+题目描述 
+给出一个数列 A，求出一个数列B.
+其中Bi   表示 数列A中 Ai 右边第一个比 Ai 大的数的下标(从1开始计数),没有找到这一个下标  Bi 就为0
+输出数列B
+输入描述:
+第一行1个数字 n (n ≤ 10000)
+第二行n个数字第 i 个数字为 Ai (0 ≤ Ai  ≤ 1000000000)
+输出描述:
+一共一行，第 i 个数和第 i+1 个数中间用空格隔开.
+示例1
+输入
+复制
+6
+3 2 6 1 1 2
+输出
+复制
+3 3 0 6 6 0
+说明
+样例不用解释
+单调栈
+#include <iostream>
+#include <set>
+#include <bits/stdc++.h>
+//#include <unordered_map>
+#include <assert.h>
+#include <time.h>
+#include <algorithm>
+#include <stdio.h>
+#include <string.h>
+#include <string>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e4 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+int a[N];
+int stk[N];
+int ans[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, top = 0;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d", &a[i]);
+		while (top && a[stk[top]] < a[i])
+			ans[stk[top]] = i, --top;
+		stk[++top] = i;
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		cout << ans[i] << " ";
+	}
+	cout << endl;
+	return TIME;
+}

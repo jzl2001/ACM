@@ -1,0 +1,139 @@
+L2-001 紧急救援 (25分)
+作为一个城市的应急救援队伍的负责人，你有一张特殊的全国地图。在地图上显示有多个分散的城市和一些连接城市的快速道路。每个城市的救援队数量和每一条连接两个城市的快速道路长度都标在地图上。当其他城市有紧急求助电话给你的时候，你的任务是带领你的救援队尽快赶往事发地，同时，一路上召集尽可能多的救援队。
+
+输入格式:
+输入第一行给出4个正整数N、M、S、D，其中N（2≤N≤500）是城市的个数，顺便假设城市的编号为0 ~ (N−1)；M是快速道路的条数；S是出发地的城市编号；D是目的地的城市编号。
+
+第二行给出N个正整数，其中第i个数是第i个城市的救援队的数目，数字间以空格分隔。随后的M行中，每行给出一条快速道路的信息，分别是：城市1、城市2、快速道路的长度，中间用空格分开，数字均为整数且不超过500。输入保证救援可行且最优解唯一。
+
+输出格式:
+第一行输出最短路径的条数和能够召集的最多的救援队数量。第二行输出从S到D的路径中经过的城市编号。数字间以空格分隔，输出结尾不能有多余空格。
+
+输入样例:
+4 5 0 3
+20 30 40 10
+0 1 1
+1 3 2
+0 3 3
+0 2 2
+2 3 2
+输出样例:
+2 60
+0 1 3
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const int N = 5e5 + 10;
+
+struct node
+{
+	int x;
+	ll dis;
+	ll sum;
+	bool operator < (const node &oth)const
+	{
+		if (dis != oth.dis)
+			return dis > oth.dis;
+		return sum < oth.sum;
+	}
+};
+priority_queue<node>q;
+vector<pair<int, int>>G[N];
+ll dis[N];
+ll a[N];
+int vis[N];
+int pre[N];
+ll he[N];
+void dijkstra(int s)
+{
+	memset(dis, 0x3f, sizeof dis);
+	dis[s] = 0;
+	q.push({ s, 0, a[s] });
+	he[s] = a[s];
+	while (!q.empty())
+	{
+		int f = q.top().x;
+		ll sum = q.top().sum;
+		q.pop();
+		if (vis[f])
+			continue;
+		vis[f] = 1;
+		for (auto &i : G[f])
+		{
+			if (dis[i.first] > i.second + dis[f])
+			{
+				dis[i.first] = i.second + dis[f];
+				he[i.first] = a[i.first] + sum;
+				q.push({ i.first, dis[i.first], he[i.first] }), pre[i.first] = f;
+			}
+			else
+				if (dis[i.first] == i.second + dis[f])
+				{
+					if (a[i.first] + sum > he[i.first])
+					{
+						he[i.first] = a[i.first] + sum;
+						q.push({ i.first, dis[i.first], he[i.first] }), pre[i.first] = f;
+					}
+				}
+		}
+	}
+}
+int dp[N], n, ed;
+void dfs(int s)
+{
+	if (dp[s] != -1)
+		return ;
+	int res = 0;
+	for (auto &i : G[s])
+	{
+		if (dis[i.first] + i.second == dis[s])
+			dfs(i.first), res += dp[i.first];
+	}
+	dp[s] = res;
+	return;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	memset(dp, -1, sizeof dp);
+	int m, s;
+	cin >> n >> m >> s >> ed;
+	for (int i = 0; i < n; i++)
+		cin >> a[i];
+	for (int i = 1; i <= m; i++)
+	{
+		int u, v, w;
+		cin >> u >> v >> w;
+		G[u].push_back({ v, w });
+		G[v].push_back({ u, w });
+	}
+	memset(pre, -1, sizeof pre);
+	dijkstra(s);
+	dp[s] = 1;
+	dfs(ed);
+	vector<int>ans;
+	int now = ed;
+	ll sum = 0;
+	while (now != -1)
+	{
+		sum += a[now];
+		ans.push_back(now);
+		now = pre[now];
+	}
+	cout << dp[ed] << " " << sum << endl;
+	reverse(ans.begin(), ans.end());
+	int cnt = 0;
+	for (auto &i : ans)
+	{
+		++cnt;
+		cout << i;
+		if (cnt != ans.size())
+			cout << " ";
+	}
+	return 0;
+}

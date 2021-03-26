@@ -1,0 +1,59 @@
+#include <bits/stdc++.h>
+//#include <unordered_map>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+ll gcd(ll a, ll b)
+{
+	return b == 0 ? a : gcd(b, a % b);
+}
+const int N = 1e5 + 10;
+ll a[N];
+int main(){
+#ifdef LOCAL
+	//freopen("D:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(a, 0, sizeof a);
+		int flag = 1;
+		ll n, m, k;
+		cin >> n >> m >> k;
+		for (int i = 1; i <= n; i++)
+			scanf("%I64d", &a[i]);
+		for (int i = 1; i < n; i++)//
+		{
+			ll ad = 0;
+			if (a[i] >= a[i + 1]) 
+			{
+				ad = a[i] - a[i + 1];
+				ad += (a[i + 1] < k ?  a[i + 1] : k);
+				m += ad;
+			}
+			if (a[i + 1] > a[i])
+			{
+				ad = a[i + 1] - a[i];
+				if (ad > k)
+					m -= ad - k;
+				else
+					m += (k - ad > a[i] ? a[i] : k - ad);
+				if (m < 0)
+					break(flag = 0);
+			}
+		}
+		if (!flag)
+			cout << "NO" << endl;
+		else
+			cout << "YES" << endl;
+	}
+	return TIME;
+}

@@ -1,0 +1,66 @@
+<暴力>
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e5 + 10;
+struct node{
+	int h, c, p;
+	bool operator < (const node & oth)const
+	{
+		return h < oth.h;
+	}
+}a[N];
+ll cnt[210]; // 统计各个价格出现次数
+ll num[N], m[N]; // 数目前缀和， 花费前缀和
+vector<int>v;
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	while (~scanf("%d", &n))
+	{
+		ll sum = 0;
+		for (int i = 1; i <= n; i++)
+			scanf("%d%d%d", &a[i].h, &a[i].c, &a[i].p), sum += a[i].p;
+		sort(a + 1, a + n + 1);
+		num[n + 1] = m[n + 1] = 0;
+		for (int i = n; i >= 1; i--)
+			num[i] = num[i + 1] + a[i].p, m[i] = m[i + 1] + a[i].p * a[i].c;
+		ll ans = 0x3f3f3f3f3f3f3f3f;
+		for (int i = 1; i <= 200; i++)
+			cnt[i] = 0;
+		for (int i = 1; i <= n; i++) // 枚举这棵树为最高的树
+		{
+			if (a[i].h == a[i - 1].h)
+				continue;
+			int now = i;
+			ll tot = 0; // 当前树的个数
+			while (now <= n && a[now].h == a[i].h)
+				tot += a[now].p, now++;
+			ll cost = m[now]; // 已经砍掉后面树的代价
+			ll need = sum - num[now] + 1 - tot * 2;
+			for (int j = 1; j <= 200 && need > 0; j++) // 从小到大砍
+			{
+				ll nh = min(need, cnt[j]);
+				cost += nh * j;
+				need -= nh;
+			}
+			if (need <= 0)
+				ans = min(ans, cost);
+			now = i;
+			while (now <= n && a[now].h == a[i].h) // 增加可砍的树
+				cnt[a[now].c] += a[now].p, now++;
+		}	
+		cout << ans << endl;
+	}
+	return 0;
+}

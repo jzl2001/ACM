@@ -1,0 +1,246 @@
+2701: 送外卖
+时间限制: 8 Sec  内存限制: 512 MB
+提交: 38  解决: 3
+[状态] [讨论版] [提交] [命题人:admin]
+
+题目描述
+
+在智慧岛上，程序员小 Q 每天下班都会在 n 栋公寓之间兼职送外卖。这 n 栋公寓由 m 条双向道路连通，任意两栋公寓可通过这些道路相互到达。第 i 条道路连接公寓  ui,vi，长度为 wi 米。
+精通解梦的小 Q 早已在昨夜梦中知晓今日的所有订单信息：今晚，每栋公寓都恰好订了一份外卖，公寓 i 在 qi 秒下单。小 Q 下班后会从 1 公寓骑上他的小电驴，从 0 秒开始送餐。小 Q 可以以不超过 1 m/s的速度沿道路移动，也可以在任意位置休息不动，到达公寓后的送餐时间可以忽略不计。当然，小 Q 不能在下单前将外卖送达，以免引起客户的恐慌。
+对于一笔订单，小Q在订单发起后的不同时间送达将会产生不同收益。形式化地说，对一笔订单 j，外卖平台会规定 d 个送达时间节点 qj<t1<t2<⋯<td（单位：秒），以及 d+1 个根据时间变化的收益p1, p2, ⋯, pd+1。注意，收益不一定随着送达时间推迟而减少。设小 Q 在 T 秒送达外卖，那么他的收益为
+
+聪明的你能告诉小 Q，今晚送完所有订单最多能挣多少钱吗？
+
+ 
+
+输入
+
+第一行包含两个整数 n, m (1≤n≤14, n−1≤m≤(n(n−1))/2)，分别表示公寓的数量和道路的数量。
+接下来 m 行，第 i 行包含三个整数  ui,vi,wi (1≤ui,vi≤n, ui≠vi, 1≤wi≤300)，表示第 i 条道路连接公寓 ui,vi，长度为 wi 米。保证无重边。
+接下来一行包含 n 个整数，第 i 个整数为 qi (0≤qi≤200)，表示第 i 栋公寓订单的发起时刻。
+接下来 3n 行，每 3 行依次描述公寓  1,2,⋯,n  订单的收益信息。第一行包含一个整数  d (1≤d≤200)。第二行包含 d 个整数，第 i 个整数为  ti (1≤ti≤200)。第三行包含 d+1 个整数，第 d+1 个整数为  pi (0≤pi≤108)。d,ti,pi的含义见题目描述。
+
+输出
+
+输出一行一个整数，表示最大收益。
+
+样例输入 Copy
+
+3 2
+1 2 1
+2 3 1
+1 3 3
+1
+2
+5 1
+1
+4
+5 4
+1
+4
+5 1
+样例输出 Copy
+
+14
+提示
+
+样例中，小 Q 在第 0 秒时已经在 1 号公寓等候订单；第 1 秒小 Q 完成 1 号订单（不计时间），获得 5 收益，随后动身前往 3 号公寓，并于第 3 秒抵达；第 3 秒小 Q 完成 3 号订单，获得 5 收益，随后动身前往 2 号公寓，并于第 4 秒抵达；第 4 秒小 Q 完成 2 号订单，获得 4 收益，此时全部订单完成，小 Q 获得最大收益 14。
+
+题意：
+给出一张图n个点和m条边，每个点有个最早到达时间，和d个时间段，每个时间段右端点开，在每个时间段到达的收益可能不一样，
+
+但不一定保证递减，询问遍历所有点的最大收益。
+
+思路：
+状压DP
+
+n是14，时间段的最大值是200，200以后的数值无意义，很显然可以考虑状压dp状态设为f[sta][j][i]，表示截至到第j秒，上一个完成的点在i，
+
+sta表示已经送到的状态，能带来的最大收益。初步计算时间复杂度6e8，实际上去掉非法的状态，要小于这个值。
+
+第一步先计算出各点之间的最短路，和每个点在某个时间点能获得的收益。
+
+这题需要处理一个点就是停的问题，考虑在某个点停不好计算，可以考虑在路上面停，实际上就是f[sta][j][i]与f[sta][j - 1][i]取个max。
+
+剩下的就是直接枚举状态转移了，我写了两种，第一种是向前更新，第二种是从前面转移，第二种的在≥200的这个点可能难理解一点。
+
+还有就是一些细节，主要是判当前状态合不合法的，可以看代码。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 15;
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+typedef long long ll;
+ 
+int dis[N][N];
+int cost[N][210];
+ll f[16384 + 10][210][N];
+void floyd(int n)
+{
+	for (int k = 1; k <= n; k++)
+		for (int i = 1; i <= n; i++)
+		{
+			dis[i][i] = 0;
+			if (i == k || dis[i][k] == INF)
+				continue;
+			for (int j = 1; j <= n; j++)
+				dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
+		}
+}
+int q[210], t[210], p[210];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	memset(dis, 0x3f, sizeof dis);
+	int n, m;
+	scanf("%d%d", &n, &m);
+	for (int u, v, w, i = 1; i <= m; i++)
+		scanf("%d%d%d", &u, &v, &w), dis[u][v] = dis[v][u] = w;
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &q[i]);
+	for (int d, i = 1; i <= n; i++)
+	{
+		scanf("%d", &d);
+		for (int j = 1; j <= d; j++)
+			scanf("%d", &t[j]);
+		for (int j = 1; j <= d + 1; j++)
+			scanf("%d", &p[j]);
+		for (int j = 1; j <= d; j++)
+			for (int k = max(q[i], t[j - 1]); k < t[j]; k++)
+				cost[i][k] = p[j];
+		for (int j = t[d]; j <= 200; j++)
+			cost[i][j] = p[d + 1];
+	}
+	floyd(n);
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = min(max(q[i], dis[1][i]), 200); j <= 200; j++)
+		{
+			f[(1 << i - 1)][j][i] = cost[i][j];
+			if (j)
+				f[(1 << i - 1)][j][i] = max(1LL * cost[i][j], f[(1 << i - 1)][j - 1][i]);
+		}
+	}
+	for (int sta = 0; sta < (1 << n); sta++)
+	{
+		for (int i = 1; i <= n; i++)
+		{
+			if ((sta & (1 << (i - 1))) == 0)
+				continue;
+			for (int j = min(max(q[i], dis[1][i]), 200); j <= 200; j++)
+			{
+				if (j)
+					f[sta][j][i] = max(f[sta][j][i], f[sta][j - 1][i]);
+				for (int k = 1; k <= n; k++)
+				{
+					if ((sta & (1 << (k - 1))))
+						continue;
+					int tmp = min(j + dis[i][k], 200);
+					if (tmp != 200 && tmp < q[k])
+						continue;
+					f[sta | (1 << k - 1)][tmp][k] = max(f[sta | (1 << k - 1)][tmp][k], f[sta][j][i] + cost[k][tmp]);
+				}
+			}
+		}
+	}
+	ll ans = 0;
+	for (int i = 1; i <= n; i++)
+		for (int j = 0; j <= 200; j++)
+			ans = max(ans, f[(1 << n) - 1][j][i]);
+	cout << ans << endl;
+	return 0;
+}
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 15;
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+typedef long long ll;
+ 
+int dis[N][N];
+int cost[N][210];
+ll f[16384 + 10][210][N];
+void floyd(int n)
+{
+	for (int k = 1; k <= n; k++)
+		for (int i = 1; i <= n; i++)
+		{
+			dis[i][i] = 0;
+			if (i == k || dis[i][k] == INF)
+				continue;
+			for (int j = 1; j <= n; j++)
+				dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
+		}
+}
+int q[210], t[210], p[210];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	memset(dis, 0x3f, sizeof dis);
+	int n, m;
+	scanf("%d%d", &n, &m);
+	for (int u, v, w, i = 1; i <= m; i++)
+		scanf("%d%d%d", &u, &v, &w), dis[u][v] = dis[v][u] = w;
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &q[i]);
+	for (int d, i = 1; i <= n; i++)
+	{
+		scanf("%d", &d);
+		for (int j = 1; j <= d; j++)
+			scanf("%d", &t[j]);
+		for (int j = 1; j <= d + 1; j++)
+			scanf("%d", &p[j]);
+		for (int j = 1; j <= d; j++)
+			for (int k = max(q[i], t[j - 1]); k < t[j]; k++)
+				cost[i][k] = p[j];
+		for (int j = t[d]; j <= 200; j++)
+			cost[i][j] = p[d + 1];
+	}
+	floyd(n);
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = min(max(q[i], dis[1][i]), 200); j <= 200; j++)
+		{
+			f[(1 << i - 1)][j][i] = cost[i][j];
+			if (j)
+				f[(1 << i - 1)][j][i] = max(1LL * cost[i][j], f[(1 << i - 1)][j - 1][i]);
+		}
+	}
+	for (int sta = 0; sta < (1 << n); sta++)
+	{
+		for (int i = 1; i <= n; i++)
+		{
+			if ((sta & (1 << (i - 1))) == 0)
+				continue;
+			for (int j = 1; j <= n; j++)
+			{
+				if (i == j || (sta & (1 << (j - 1))) == 0)
+					continue;
+				for (int k = min(max(q[i], dis[1][i]), 200); k <= 200; k++)
+				{
+					if (k)
+						f[sta][k][i] = max(f[sta][k - 1][i], f[sta][k][i]);
+					if (k == 200)
+					{
+						f[sta][k][i] = max(f[sta][k][i], f[sta ^ (1 << (i - 1))][200][j] + cost[i][200]);
+						continue;
+					}
+					int tmp = k - dis[i][j];
+					if (tmp < q[j])
+						continue;
+					f[sta][k][i] = max(f[sta][k][i], f[sta ^ (1 << (i - 1))][tmp][j] + cost[i][k]);
+				}
+			}
+		}
+	}
+	ll ans = 0;
+	for (int i = 1; i <= n; i++)
+		for (int j = 0; j <= 200; j++)
+			ans = max(ans, f[(1 << n) - 1][j][i]);
+	cout << ans << endl;
+	return 0;
+}

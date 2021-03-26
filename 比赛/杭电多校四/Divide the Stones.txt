@@ -1,0 +1,85 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const ll N = 1e5 + 10;
+vector<int>G[N];
+int main(){
+	ll t;
+	cin >> t;
+	while (t--)
+	{
+		ll n, k;
+		cin >> n >> k;
+		if (k == 1)
+		{
+			cout << "yes" << endl;
+			for (int i = 1; i <= n; i++)
+				if (i != n)
+					cout << i << " ";
+				else
+					cout << i << endl;
+			continue;
+		}
+		if (n == k)
+		{
+			cout << 0 << endl;
+			continue;
+		}
+		ll sum = (n + 1) * n / 2;
+		if (sum % k != 0)
+			cout << "no" << endl;
+		else
+		{
+			cout << "yes" << endl;	
+			if ((n / k) % 2 == 0)
+			{
+				ll L = 1, R = n;
+				for (ll i = 1; i <= k; i++) // 分k组 
+				{
+					for (ll j = 1; j <= n / k / 2; j++) // 每组 n / k 个人 
+					{
+					
+						if(j == n / k / 2)
+							cout << L++ << " " << R-- << endl;
+						else
+							cout << L++ << " " << R-- << " ";
+					}
+				}
+			}
+			else
+			{
+				for (int i = 1; i <= k; i++)
+					G[i].clear(); 
+				for (ll i = 1; i <= k; i++)
+				{
+					G[i].push_back(3 * k - (i - 1));
+					if (i <= k / 2)
+						G[i].push_back(2 * k - (k + 1) / 2 - (i - 1));
+					else
+						G[i].push_back(2 * k + 1 - (i - k / 2));
+					if (i <= k / 2)
+						G[i].push_back(2 * i);	
+					else
+						G[i].push_back(2 * (i - k / 2) - 1);
+					
+				}
+				ll L = 3 * k + 1, R = n, ave = (n / k - 3) / 2;
+				for (ll i = 1; i <= k; i++) 
+				{
+					for (ll j = 1; j <= ave; j++) 
+					{
+						G[i].push_back(L++);
+						G[i].push_back(R--);
+					}
+				}
+				for (ll i = 1; i <= k; i++)
+					for (ll j = 0; j < G[i].size(); j++)
+						if (j != G[i].size() - 1)
+							cout << G[i][j] << " ";
+						else
+							cout << G[i][j] << endl;
+			}
+		} 
+	}
+	return 0;
+}

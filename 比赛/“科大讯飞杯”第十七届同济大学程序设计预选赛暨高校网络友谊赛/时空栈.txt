@@ -1,0 +1,191 @@
+链接：https://ac.nowcoder.com/acm/contest/5477/H
+来源：牛客网
+
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+最近，dzerzhinski刚刚学会了栈这个基础数据结构，但是他却被一道简单题难住了。
+
+栈是一种特殊的线性表，它只能在固定的一段进行插入和删除操作。栈满足“后进先出”的性质，也就是每次出栈的元素一定是最后入栈的元素。 这道题要求实现一个栈，模拟元素的进栈和出栈和查看栈顶元素。
+
+但是dzerzhinski的栈有时空能力，每一个操作都会首先跳转到某个时间点，然后执行这个操作，再回到当前的时间。最终状态是所有操作按照时间顺序依次执行的结果。
+
+意识到问题的dzerzhinski发现这是一个很好的训练项目，决定让你来实现一个这样有时空能力的栈。
+
+输入描述:
+第一行一个整数n（1≤n≤2×105），表示有n个操作。
+
+后面n行，每行表示一个操作。第一个数op表示操作类型。
+
+op=0：入栈操作。输入三个数op,t, v，表示回到时间点t，然后整数v入栈。
+
+op=1：出栈操作。输入两个数op,t，表示回到时间t，栈顶元素出栈。
+
+op=2：查询栈顶元素。输入两个数op,t，表示查询时间t时的栈顶元素。
+
+其中所有操作的时间点t满足1≤t≤109，且都不相等，保证能够有唯一的操作顺序。所有入栈整数v满足1≤v≤109。保证任意时刻不会出现空栈时出栈操作，或者在空栈的时刻查询栈顶元素操作。
+
+输出描述:
+对于每一个查询操作，输出一行，表示到当前为止的所有操作栈顶元素。
+
+ 
+
+示例1
+输入
+复制
+8
+0 2 2
+2 6
+2 4
+0 1 1
+2 7
+1 5
+2 3
+2 8
+输出
+复制
+2
+2
+2
+2
+1
+说明
+部分解释：
+
+查询7时刻栈顶的时候，之前在2时刻入栈2，在1时刻入栈1。按照时间顺序2在1之后入栈，所以结果是2；
+
+查询3时刻的时候，所有操作是2时刻入栈2，1时刻入栈1，5时刻出栈，但是5时刻的操作不会在3时刻之前产生，所以结果还是2；
+
+查询8时刻的时候，所有操作是2时刻入栈2，1时刻入栈1，5时刻出栈。按照时间顺序是1入栈，2入栈，2出栈，所以栈顶是1。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+//BDF0D6BEC0F1
+struct node 
+{
+	int op, t, v;
+}a[N];
+int b[N];
+int c[N * 4];
+int lzy[N * 4];
+int cnt;
+int flag;
+int idx;
+int ans[N];
+#define ls ((x) << 1)
+#define rs ((x) << 1 | 1)
+#define m ((L) + (R) >> 1)
+void push_down(int x)
+{
+	if (lzy[x])
+	{
+		lzy[ls] += lzy[x];
+		lzy[rs] += lzy[x];
+		c[ls] += lzy[x];
+		c[rs] += lzy[x];
+		lzy[x] = 0;
+	}
+}
+void update(int x, int L, int R, int l, int r, int val)
+{
+	if (L >= l && R <= r)
+	{
+		lzy[x] += val;
+		c[x] += val;
+		return;
+	}
+	push_down(x);
+	if (l <= m)
+		update(ls, L, m, l, r, val);
+	if (r > m)
+		update(rs, m + 1, R, l, r, val);
+	c[x] = min(c[ls], c[rs]);
+}
+int query1(int x, int L, int R, int t)
+{
+	if (L == R)
+		return c[x];
+	push_down(x);
+	if (t <= m)
+		return query1(ls, L, m, t);
+	return query1(rs, m + 1, R, t);
+}
+void query2(int x, int L, int R, int l, int r, int num)
+{
+	if (l > R || L > r || flag)
+		return;
+	if (L == R)
+	{
+		if (c[x] < num)
+		{
+			flag = 1;
+			idx = L;
+		}
+		return;
+	}
+	push_down(x);
+	if (c[rs] < num)
+		query2(rs, m + 1, R, l, r, num);
+	query2(ls, L, m, l, r, num);
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		cin >> a[i].op;
+		if (!a[i].op)
+		{
+			scanf("%d%d", &a[i].t, &a[i].v);
+		}
+		else
+		{
+			scanf("%d", &a[i].t);
+		}
+		b[++cnt] = a[i].t;
+	}
+	sort(b + 1, b + cnt + 1);
+	for (int i = 1; i <= n; i++)
+	{
+		a[i].t = lower_bound(b + 1, b + cnt + 1, a[i].t) - b;
+		if (a[i].op == 0)
+			update(1, 1, cnt, a[i].t, cnt, 1), ans[a[i].t] = a[i].v;
+		else
+			if (a[i].op == 1)
+				update(1, 1, cnt, a[i].t, cnt, -1);
+			else
+			{
+				flag = 0;
+				idx = 0;
+				int num = query1(1, 1, cnt, a[i].t);
+				query2(1, 1, cnt, 1, a[i].t, num);
+				cout << ans[idx + 1] << endl;
+			}
+	}
+	return TIME;
+}

@@ -1,0 +1,207 @@
+链接：https://ac.nowcoder.com/acm/contest/6112/D
+来源：牛客网
+
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+牛妹是一个喜欢循环的女孩子。
+
+牛妹有 nn 个变量，第 ii 个变量会从 00 到 p_i - 1p 
+i
+​	
+ −1 进行周期性的变化，即：
+
+时刻	值
+00	00
+11	11
+22	22
+\vdots⋮	\vdots⋮
+p_i - 1p 
+i
+​	
+ −1	p_i - 1p 
+i
+​	
+ −1
+p_ip 
+i
+​	
+ 	00
+p_i + 1p 
+i
+​	
+ +1	11
+p_i + 2p 
+i
+​	
+ +2	22
+\vdots⋮	\vdots⋮
+我们令 f(k, i)f(k,i) 表示时刻 kk 时第 ii 个变量的值。
+
+对于一个正整数 XX，我们可以定义 \operatorname{Per}(X)Per(X) 是由对于所有 0 \le t < X, 1 \le i \le n0≤t<X,1≤i≤n，序列 f(t, i), f(t + X, i), f(t + 2X, i), \ldotsf(t,i),f(t+X,i),f(t+2X,i),… 的最小周期组成的正整数集合。
+
+一个序列 a_1,a_2,a_3,\ldotsa 
+1
+​	
+ ,a 
+2
+​	
+ ,a 
+3
+​	
+ ,… 的最小周期为最小的正整数 pp 满足对于所有 i \ge 1i≥1，有 a_{i + p} = a_ia 
+i+p
+​	
+ =a 
+i
+​	
+ 。
+
+例如，当 p = \{3, 4\}, X = 2p={3,4},X=2 时：
+
+第一个变量的值按时间顺序依次为 0, 1, 2, 0, 1, 2, \ldots0,1,2,0,1,2,…。
+第二个变量的值按时间顺序依次为 0, 1, 2, 3, 0, 1, 2, 3, \ldots0,1,2,3,0,1,2,3,…。
+t = 0t=0 时，序列 f(0, 1), f(2, 1), f(4, 1), \ldotsf(0,1),f(2,1),f(4,1),… 为 0, 2, 1, 0, 2, 1, \ldots0,2,1,0,2,1,…，最小周期为 33。
+t = 0t=0 时，序列 f(0, 2), f(2, 2), f(4, 2), \ldotsf(0,2),f(2,2),f(4,2),… 为 0, 2, 0, 2, 0, 2, \ldots0,2,0,2,0,2,…，最小周期为 22。
+t = 1t=1 时同理，可以得到序列分别为 1, 0, 2, 1, 0, 2, \ldots1,0,2,1,0,2,… 和 1, 3, 1, 3, 1, 3, \cdots1,3,1,3,1,3,⋯，最小周期分别为 33 和 22。
+综上，当 p = \{3, 4\}p={3,4} 时，\operatorname{Per}(2) = \{3, 2\}Per(2)={3,2}。
+牛妹希望你求出最小的 XX 满足 \operatorname{Per}(X)Per(X) 中的所有数都是质数的幂次。
+
+一个数 xx 是质数的幂次当且仅当存在一个质数 pp 和非负整数 cc，满足 x = p^cx=p 
+c
+ 。如 1, 2, 3, 4, 5, 7, 8, 91,2,3,4,5,7,8,9 均为质数的幂次，但 6, 10, 126,10,12 不是质数的幂次。
+
+由于答案可能很大，你只需要输出最小的 XX 模 998\,244\,353998244353 的值即可。注意不是 XX 模 998\,244\,353998244353 的最小值，而是 XX 的最小值模 998\,244\,353998244353。
+
+输入描述:
+第一行一个整数 n\ (1 \le n \le 16)n (1≤n≤16)，表示变量数量。
+第二行 n 个整数 p_1, p_2, \ldots, p_n\ (1 \le p_i \le 10^6)p 
+1
+​	
+ ,p 
+2
+​	
+ ,…,p 
+n
+​	
+  (1≤p 
+i
+​	
+ ≤10 
+6
+ )，p_ip 
+i
+​	
+  表示第 i 个变量的变化周期。
+输出描述:
+一行一个整数，表示最小的 X 模 998\,244\,353998244353 的值。
+示例1
+输入
+复制
+4
+3 4 3 6
+输出
+复制
+2
+<dp><状压dp><数学><循环节>
+一个从0到~p[i]-1的循环数列，若x位一取，则长度为
+p[i] / (gcd(p[i], x))
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef unsigned long long ull;
+typedef long long ll;
+const int N = 1e5 + 10;
+const int mod = 998244353;
+ 
+int p[N];
+ll pre[N];
+double f[120][N];
+ll d[120][N];
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	vector<int>pri;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d", &p[i]);
+		int k = sqrt(p[i]);
+		int num = p[i];
+		for (int j = 2; j <= k; j++)
+		{
+			while (num % j == 0)
+				pri.push_back(j), num /= j;
+		}
+		if (num > 1)
+			pri.push_back(num);
+	}
+	sort(pri.begin(), pri.end());
+	pri.erase(unique(pri.begin(), pri.end()), pri.end());
+	fill(f[0], f[0] + N, 1e18);
+	f[0][0] = 0;
+	d[0][0] = 1;
+	int sz = pri.size();
+	for (int i = 1; i <= sz; i++) // 枚举素数
+	{
+		int pr = pri[i - 1];
+		int mx = 0;
+		vector<int>cnt;
+		for (int j = 1; j <= n; j++)
+		{
+			cnt.push_back(0);
+			int num = p[j];
+			while (num % pr == 0)
+				num /= pr, cnt.back()++;
+			mx = max(mx, cnt.back());
+		}
+		for (int j = 0; j < (1 << n); j++)
+		{
+			f[i][j] = 1e18;
+		}
+		double res = 0;
+		ll real = 1;
+		for (int j = 0; j <= mx; j++)
+		{
+			int sta = 0;
+			for (int k = 0; k < n; k++)
+			{
+				if (j < cnt[k])
+					sta |= (1 << k);
+			}
+			for (int k = 0; k < (1 << n); k++)
+			{
+				if ((sta & k) == 0) //每一个数字只能一个因子个数大于
+				{
+					if (f[i][k | sta] > f[i - 1][k] + res)
+						f[i][k | sta] = f[i - 1][k] + res, d[i][k | sta] = d[i - 1][k] * real % mod;
+				}
+			}
+			res += log(pr);
+			real = real * pr % mod;
+		}
+	}
+	double ans = 1e18;
+	ll real;
+	for (int i = 0; i < (1 << n); i++)
+	{
+		if (f[sz][i] < ans)
+			ans = f[sz][i], real = d[sz][i];
+	}
+	cout << real << endl;
+	return TIME;
+}

@@ -1,0 +1,89 @@
+https://nanti.jisuanke.com/t/A1955
+求本质不同回文串的和
+#pragma GCC optimize(2)
+#pragma GCC optimize(3)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+char s[N];
+int record[N];
+int nxt[N][10];
+int fail[N];
+int len[N];
+int tot;
+int last;
+void build()
+{
+    len[0] = 0, len[1] = - 1;
+    tot = 1, last = 0;
+    fail[0] = 1;
+}
+int getfail(char* s, int x, int n)
+{
+    while (s[n - len[x] - 1] != s[n])
+        x = fail[x];
+    return x;
+}
+void insert(char* s, int n)
+{
+    for (int i = 1; i <= n; i++)
+    {
+        int c = s[i] - '0';
+        int p = getfail(s, last, i);
+        if (!nxt[p][c])
+        {
+            tot++;
+            len[tot] = len[p] + 2;
+            fail[tot] = nxt[getfail(s, fail[p], i)][c];
+            nxt[p][c] = tot;
+        }
+        last = nxt[p][c];
+        record[last] = i;
+    }
+}
+ll base[N];
+ll num[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    build();
+    scanf("%s", s + 1);
+    insert(s, strlen(s + 1));
+    base[0] = 1;
+    int n = strlen(s + 1);
+    for (int i = 1; i <= n; i++)
+    {
+        base[i] = base[i - 1] * 10 % mod;
+        num[i] = (num[i - 1] * 10 + s[i] - '0') % mod;
+    }
+    ll ans = 0;
+    for (int i = 2; i <= tot; i++)
+    {
+        int L = record[i] - len[i] + 1;
+        int R = record[i];
+        ans = (ans + (num[R] - num[L - 1] * base[R - L + 1] % mod + mod) % mod) % mod;
+    }
+    cout << ans << endl;
+    return TIME;
+}

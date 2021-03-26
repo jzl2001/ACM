@@ -1,0 +1,74 @@
+#include <iostream>
+using namespace std;
+typedef long long ll;
+ll prime[10] = { 2, 3, 7, 61, 24251 };
+ll mul(ll a, ll b, ll c)   
+{
+    ll ans = 0, res = a;
+    while (b)
+    {
+        if (b & 1)
+            ans = (ans + res) % c;
+        res = (res + res) % c;
+        b >>= 1;
+    }
+    return ans % c;
+}
+ll fpow(ll a, ll b, ll c)     
+{
+    ll ans = 1, res = a;
+    while (b)
+    {
+        if (b & 1)
+            ans = mul(ans, res, c);
+        res = mul(res, res, c);
+        b >>= 1;
+    }
+    return ans;
+}
+bool Miller_Rabin(ll p)    
+{
+    if(p < 2) 
+        return 0;
+    if(p != 2 && p % 2 == 0) 
+        return 0;
+    ll s = p - 1;
+    while(! (s & 1))
+        s >>= 1;
+    for(int i = 0; i < 5; ++i)
+     {
+        if(p == prime[i]) 
+            return 1;
+        ll t = s, m = fpow(prime[i], s, p);
+        while(t != p - 1 && m != 1 && m != p - 1) 
+        {
+            m = mul(m, m, p);
+            t <<= 1;
+        }
+        if(m != p - 1 && !(t & 1)) 
+            return 0;
+    }
+    return 1;
+}
+int main(){
+    ll t;
+    cin >> t;
+    while (t--)
+    {
+        ll p, q;
+        cin >> p;
+        for (ll i = 1;; i++)
+        {
+            if (Miller_Rabin(p - i))
+            {
+                q = p - i;
+                break;
+            }
+        }
+        ll res = 1;
+        for (ll i = q + 1; i < p; i++)
+            res = mul(res, i, p) % p;
+        cout << mul(p - 1, fpow(res, p - 2, p), p) << endl;
+    }
+    return 0;
+}

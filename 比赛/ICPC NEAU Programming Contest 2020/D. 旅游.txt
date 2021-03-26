@@ -1,0 +1,161 @@
+皮皮准备去旅游，共有nn个景点可以选择，景点编号为11~nn，每个景点都有一个“美观值”a_ia 
+i
+​	
+ 。共有mm次查询，对于第i次查询，皮皮将从x_ix 
+i
+​	
+ 号景点开始游览，之后他会选择沿着编号递增的顺序选择游览其他景点，但是如果这个景点的美观值不大于他刚刚游览过的景点，他就会跳过这个景点。也就是说，皮皮在游览一个美观值为uu的景点vv后，他将游览的下一个景点是编号大于vv、美观值大于uu的，编号最小的景点。皮皮将一共访问y_iy 
+i
+​	
+ 个景点，请你输出他最后一个访问的景点编号，如果他不能访问y_iy 
+i
+​	
+ 个景点，输出-1
+
+输入描述
+
+输入第一行一个整数TT，代表接下来有TT组测试数据
+
+接下来TT组，每组第一行有两个整数n,mn,m，第二行有nn个整数a_ia 
+i
+​	
+ ，接下来mm行，每行有两个整数x_i,y_ix 
+i
+​	
+ ,y 
+i
+​	
+ 
+
+输出描述
+
+对于每组测试数据，输出一行，一个整数。如果能游览y_iy 
+i
+​	
+ 个景点，输出最后访问的景点编号，否则输出-1
+
+数据范围
+
+1≤T≤51≤T≤5
+
+1≤n,m≤10^51≤n,m≤10 
+5
+ 
+
+1≤a_i≤10^91≤a 
+i
+​	
+ ≤10 
+9
+ 
+
+1≤x_i, y_i≤n1≤x 
+i
+​	
+ ,y 
+i
+​	
+ ≤n
+
+样例输入复制
+1
+15 10
+1 2 3 4 5 3 4 5 6 7 5 6 7 8 9
+1 1
+1 2
+1 3
+1 4
+1 5
+1 6
+1 7
+1 8
+1 9
+1 10
+样例输出复制
+1
+2
+3
+4
+5
+9
+10
+14
+15
+-1
+单调栈处理下一个到的位置，倍增处理跳多少。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+#define cel cout << endl;
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+int d[N][20];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(d, 0, sizeof d);
+		int n, m;
+		cin >> n >> m;
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%d", &a[i]);
+		}
+		stack<int>s;
+		s.push(1);
+		for (int i = 2; i <= n; i++)
+		{
+			while (!s.empty() && a[s.top()] < a[i])
+				d[s.top()][0] = i, s.pop();
+			s.push(i);
+		}
+		for (int i = 1; i < 20; i++)
+		{
+			for (int j = 1; j <= n; j++)
+			{
+				d[j][i] = d[d[j][i - 1]][i - 1];
+			}
+		}
+		while (m--)
+		{
+			int st, len;
+			scanf("%d%d", &st, &len);
+			len--;
+			for (int i = 0; i <= 19; i++)
+			{
+				if ((len >> i) & 1)
+					st = d[st][i];
+			}
+			if (!st)
+				puts("-1");
+			else
+			{
+				printf("%d\n", st);
+			}
+		}
+	}
+	return TIME;
+}

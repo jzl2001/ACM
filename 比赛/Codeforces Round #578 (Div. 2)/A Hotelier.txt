@@ -1,0 +1,70 @@
+#include <bits/stdc++.h>
+//#include <unordered_map>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e6 + 10;
+int vis[20];
+int main(){
+#ifdef LOCAL
+	//freopen("D:/input.txt", "r", stdin);
+#endif
+	int x;
+	cin >> x;
+	string s;
+	cin >> s;
+	int len = s.size();
+	int cnt = 0;
+	for (int i = 0; i <= 10; i++)
+		vis[i] = -1;
+	for (int i = 0; i < len; i++)
+	{
+		if (s[i] == 'L')
+		{
+			for (int j = 0; j < 10; j++)
+			{
+				if (vis[j] == -1)
+				{
+					vis[j] = j;
+					break;
+				}	
+			}
+		}
+		else
+			if (s[i] == 'R')
+			{
+				for (int j = 9; j >= 0; j--)
+				{
+					if (vis[j] == -1)
+					{
+						vis[j] = j;
+						break;
+					}
+				}
+			}
+			else
+			{
+				for (int j = 0; j < 10; j++)
+				{
+					if (vis[j] == s[i] - '0')
+					{
+						vis[j] = -1;
+						break;
+					}
+				}
+			}
+	}
+	for (int i = 0; i < 10; i++)
+		if (vis[i] != -1)
+			cout << 1;
+		else
+			cout << 0;
+	return TIME;
+}

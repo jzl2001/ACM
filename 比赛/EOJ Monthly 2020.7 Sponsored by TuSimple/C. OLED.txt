@@ -1,0 +1,49 @@
+二维查分，算单个点对整体的贡献。
+https://acm.ecnu.edu.cn/contest/292/problem/C/
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 1e6 + 10;
+
+int ans[3842][2162];
+int x[3842][2162];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int n, m, a, b;
+    cin >> n >> m >> a >> b;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+        {
+            scanf("%d", &x[i][j]);
+            if (x[i][j])
+            {
+                int ii = a - (n - i);
+                int jj = b - (m - j);
+                ans[i][j] += 1;
+                ans[ii + 1][j] -= 1;
+                ans[i][jj + 1] -= 1;
+                ans[ii + 1][jj + 1] += 1;
+            }
+        }
+    int mx = 0;
+    for (int i = 1; i <= a; i++)
+        for (int j = 1; j <= b; j++)
+            ans[i][j] = ans[i][j] + ans[i - 1][j] + ans[i][j - 1] - ans[i - 1][j - 1], mx = max(mx, ans[i][j]);
+    for (int i = 1; i <= a; i++, cout << endl)
+        for (int j = 1; j <= b; j++)
+            printf("%d ", int(1.0 * ans[i][j] / mx * 100));
+	return TIME;
+}

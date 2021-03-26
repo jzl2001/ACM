@@ -1,0 +1,121 @@
+time limit per test1 second
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Shubham has an array a of size n, and wants to select exactly x elements from it, such that their sum is odd. These elements do not have to be consecutive. The elements of the array are not guaranteed to be distinct.
+
+Tell him whether he can do so.
+
+Input
+The first line of the input contains a single integer t (1≤t≤100) — the number of test cases. The description of the test cases follows.
+
+The first line of each test case contains two integers n and x (1≤x≤n≤1000) — the length of the array and the number of elements you need to choose.
+
+The next line of each test case contains n integers a1,a2,…,an (1≤ai≤1000) — elements of the array.
+
+Output
+For each test case, print "Yes" or "No" depending on whether it is possible to choose x elements such that their sum is odd.
+
+You may print every letter in any case you want.
+
+Example
+inputCopy
+5
+1 1
+999
+1 1
+1000
+2 1
+51 50
+2 2
+51 50
+3 3
+101 102 103
+outputCopy
+Yes
+No
+Yes
+Yes
+No
+Note
+For 1st case: We must select element 999, and the sum is odd.
+
+For 2nd case: We must select element 1000, so overall sum is not odd.
+
+For 3rd case: We can select element 51.
+
+For 4th case: We must select both elements 50 and 51  — so overall sum is odd.
+
+For 5th case: We must select all elements  — but overall sum is not odd.
+
+https://codeforces.com/contest/1363/problem/A
+给出n个数字，选x个能不能组成偶数。
+能暴力就暴力，枚举奇数个数，判断偶数个数是否合法。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, x;
+		cin >> n >> x;
+		int sum1 = 0, sum2 = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			int num;
+			cin >> num;
+			if (num % 2 == 0)
+			{
+				sum2++;
+			}
+			else
+				sum1++;
+		}
+		int flag = 0;
+		for (int i = 1; i <= sum1; i++)//枚举奇数个数
+		{
+			if ((x - i) >= 0)
+			{
+				int num1 = i + (x - i) * 2;
+				if (num1 % 2 == 1 && (x - i) <= sum2)
+				{
+					flag = 1;
+					break;
+				}
+			}
+		}
+		if (flag)
+		{
+			puts("Yes");
+		}
+		else
+			puts("No");
+	}
+	return TIME;
+}

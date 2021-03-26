@@ -1,0 +1,151 @@
+Input file: standard input
+Output file: standard output
+There are n heroes and m monsters living in an island. The monsters became very vicious these days,
+so the heroes decided to diminish the monsters in the island. However, the i-th hero can only kill one
+monster belonging to the set Mi
+. Joe, the strategist, has k bottles of magic potion, each of which can buff
+one hero’s power and let him be able to kill one more monster. Since the potion is very powerful, a hero
+can only take at most one bottle of potion.
+Please help Joe find out the maximum number of monsters that can be killed by the heroes if he uses the
+optimal strategy.
+Input
+The first line contains three integers n, m, k (1 ≤ n, m, k ≤ 500) — the number of heroes, the number of
+monsters and the number of bottles of potion.
+Each of the next n lines contains one integer ti
+, the size of Mi
+, and the following ti
+integers
+Mi,j (1 ≤ j ≤ ti), the indices (1-based) of monsters that can be killed by the i-th hero
+(1 ≤ ti ≤ m, 1 ≤ Mi,j ≤ m).
+Output
+Print the maximum number of monsters that can be killed by the heroes.
+Examples
+standard input standard output
+3 5 2
+4 1 2 3 5
+2 2 5
+2 1 2
+4
+5 10 2
+2 3 10
+5 1 3 4 6 10
+5 3 4 6 8 9
+3 1 9 10
+5 1 3 6 7 10
+7
+Page 11 of 15
+The 2018 ACM-ICPC Asia Nanjing Regional Programming Contest
+Nanjing University of Aeronautics and Astronautics, Sunday October 14, 2018
+题意：n个人，m个怪物，k瓶药，每个人有可以打的怪物，每个人可以服用一次药物再打死一次怪物。
+但是每个人最多打死两个怪，问你怎么分配使得被消灭的怪最多。
+注意分配的药是给每个人的，不是给怪物。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 1e3 + 500;
+const int M = 4e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int n, m;
+int vis[N];
+struct edge
+{
+	int v, w, nxt;
+}e[M * 2];
+int h[N], idx; //多样例清空
+void AddEdge(int u, int v, int w)
+{
+	e[idx] = { v, w, h[u] };
+	h[u] = idx++; //后++编号0到idx-1 结束为-1
+	e[idx] = { u, 0, h[v] };
+	h[v] = idx++;
+}
+int dis[N], cur[N]; //cur上次DFS每个节点最后访问的边
+bool BFS(int st, int ed) //求每个点相对于st的层次 也就是边权为1的最短路
+{
+	memset(dis, -1, sizeof(dis)), dis[st] = 0;
+	queue<int> q; q.push(st);
+	while (!q.empty())
+	{
+		int u = q.front(); q.pop();
+		for (int i = h[u]; ~i; i = e[i].nxt)
+		{
+			int v = e[i].v, w = e[i].w;
+			if (dis[v] == -1 && w) //未访问并且没有满流
+				dis[v] = dis[u] + 1, q.push(v);
+		}
+	}
+	return dis[ed] != -1; //返回st是否和ed连通
+}
+int DFS(int x, int ed, int flow) //从x出发寻找到ed的增广路
+{
+	if (x == ed)
+		return flow; //增广宽度
+	int s = 0; //出量总和
+	for (int i = cur[x]; ~i; i = e[i].nxt) //从上次最后访问的i开始
+	{
+		int y = e[i].v;
+		int w = e[i].w;
+		cur[x] = i; //记录节点最后的i 记在外面
+		if (dis[y] == dis[x] + 1 && w) //只向下一层节点进行递归防止舍近求远 且没满流
+		{
+			int res = DFS(y, ed, min(w, flow - s)); //总流量不超边权 出量不超入量
+			e[i].w -= res, e[i ^ 1].w += res; //编号^1为反向边
+			s += res;
+			if (s == flow) //出量=入量
+				break;
+		}
+	}
+	return s;
+}
+int Dinic(int st, int ed) //求st到ed的最大流
+{
+	int res = 0;
+	while (BFS(st, ed))
+	{
+		memcpy(cur, h, sizeof(h)); //初始记录为h
+		res += DFS(st, ed, INF); //增广量
+	}
+	return res;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	memset(h, -1, sizeof h);
+	int n, m, k;
+	cin >> n >> m >> k;
+	AddEdge(0, 1, k);
+	for (int i = 1; i <= n; i++)
+	{
+		AddEdge(0, i + 1, 1);//每个人最多打死一个怪兽
+		AddEdge(1, i + 1, 1);//药
+	}
+	int cnt = n + 1;
+	int t = cnt + m + 1;
+	for (int i = 1; i <= n; i++)
+	{
+		int num;
+		scanf("%d", &num);
+		for (int j = 1; j <= num; j++)
+		{
+			int x;
+			scanf("%d", &x);
+			AddEdge(i + 1, cnt + x, 1);
+			if (!vis[cnt + x])
+			vis[cnt + x] = 1, AddEdge(cnt + x, t, 1);
+		}
+	}
+	cout << Dinic(0, t) << endl;
+	return TIME;
+}

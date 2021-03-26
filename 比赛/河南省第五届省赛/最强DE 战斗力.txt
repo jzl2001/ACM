@@ -1,0 +1,39 @@
+import java.math.BigInteger;
+import java.util.Scanner;
+
+public class Main
+{
+	public static void main(String args[])
+	{
+		Scanner cin = new Scanner(System.in);
+		int t = cin.nextInt();
+		BigInteger two = BigInteger.valueOf(2);
+		BigInteger three = BigInteger.valueOf(3);
+		BigInteger four = BigInteger.valueOf(4);
+		while (t != 0)
+		{
+			BigInteger x = BigInteger.valueOf(1);
+			int n;
+			n = cin.nextInt();
+			if(n == 1)
+				x = BigInteger.valueOf(1);
+			else
+				if(n == 2)
+					x = BigInteger.valueOf(2);
+			else
+				if(n % 3 == 1)
+				{
+					x = three.pow(n / 3 - 1).multiply(four);
+				}
+			else
+				if(n % 3 == 2)
+				{
+					x = three.pow(n / 3 - 1).multiply(two).multiply(three);
+				}
+			else
+				x = three.pow(n / 3);
+			t--;
+			System.out.println(x);
+		}
+	}
+}

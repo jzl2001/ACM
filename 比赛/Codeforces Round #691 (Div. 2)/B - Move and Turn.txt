@@ -1,0 +1,117 @@
+B. Move and Turn
+time limit per test2 seconds
+memory limit per test512 megabytes
+inputstandard input
+outputstandard output
+A robot is standing at the origin of the infinite two-dimensional plane. Each second the robot moves exactly 1 meter in one of the four cardinal directions: north, south, west, and east. For the first step the robot can choose any of the four directions, but then at the end of every second it has to turn 90 degrees left or right with respect to the direction it just moved in. For example, if the robot has just moved north or south, the next step it takes has to be either west or east, and vice versa.
+
+The robot makes exactly n steps from its starting position according to the rules above. How many different points can the robot arrive to at the end? The final orientation of the robot can be ignored.
+
+Input
+The only line contains a single integer n (1≤n≤1000) — the number of steps the robot makes.
+
+Output
+Print a single integer — the number of different possible locations after exactly n steps.
+
+Examples
+inputCopy
+1
+outputCopy
+4
+inputCopy
+2
+outputCopy
+4
+inputCopy
+3
+outputCopy
+12
+Note
+In the first sample case, the robot will end up 1 meter north, south, west, or east depending on its initial direction.
+
+In the second sample case, the robot will always end up 2–√ meters north-west, north-east, south-west, or south-east.
+/*
+题意：从起点，每次走必须拐弯，询问精确走n步后最多能到达的点数。
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf;  int x = false;  char ch = gc;  bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int N = 2e5 + 10;
+
+int m;
+struct node
+{
+	int x, y, t, last;
+};
+int dir[4][2] = { 0, 1, 0, -1, 1, 0, -1, 0 };
+void bfs(int x, int y)
+{
+	set<pair<int, int>>s;
+	queue<node>q;
+	q.push({ 0, 0, 0, -1 });
+	while (!q.empty())
+	{
+		int x = q.front().x, y = q.front().y, t = q.front().t, last = q.front().last;
+		q.pop();
+		if (t == m)
+		{
+			s.insert({ x, y });
+			continue;
+		}
+		if (last == -1)
+			for (int i = 0; i < 4; i++)
+			{
+				q.push({ x + dir[i][0], y + dir[i][1], t + 1, i });
+			}
+		else
+			if (last < 2)
+			{
+				for (int i = 2; i < 4; i++)
+				{
+					q.push({ x + dir[i][0], y + dir[i][1], t + 1, i });
+				}
+			}
+			else
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					q.push({ x + dir[i][0], y + dir[i][1], t + 1, i });
+				}
+			}
+	}
+	cout << s.size() << endl;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	cin >> m;
+	//bfs(0, 0);
+	ll n = m;
+	int flag = 0;
+	if (n & 1)
+		flag = -1;
+	else
+		flag = 1;
+	cout << 1 + (3 * n * (n + 4) + 2 - (flag) * (n * (n + 4) + 2)) / 8 << endl;
+	return TIME;
+}

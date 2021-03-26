@@ -1,0 +1,104 @@
+E. Almost Regular Bracket Sequence
+time limit per test3 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+You are given a bracket sequence s consisting of n opening '(' and closing ')' brackets.
+
+A regular bracket sequence is a bracket sequence that can be transformed into a correct arithmetic expression by inserting characters '1' and '+' between the original characters of the sequence. For example, bracket sequences "()()", "(())" are regular (the resulting expressions are: "(1)+(1)", "((1+1)+1)"), and ")(" and "(" are not.
+
+You can change the type of some bracket si. It means that if si= ')' then you can change it to '(' and vice versa.
+
+Your task is to calculate the number of positions i such that if you change the type of the i-th bracket, then the resulting bracket sequence becomes regular.
+
+Input
+The first line of the input contains one integer n (1≤n≤106) — the length of the bracket sequence.
+
+The second line of the input contains the string s consisting of n opening '(' and closing ')' brackets.
+
+Output
+Print one integer — the number of positions i such that if you change the type of the i-th bracket, then the resulting bracket sequence becomes regular.
+
+Examples
+inputCopy
+6
+(((())
+outputCopy
+3
+inputCopy
+6
+()()()
+outputCopy
+0
+inputCopy
+1
+)
+outputCopy
+0
+inputCopy
+8
+)))(((((
+outputCopy
+0
+题意：给出一个括号序列，询问有多少个位置满足，使得反转当前括号后，使得括号匹配合法。
+思路：记录后缀最值，看下后面是不是有那种不能合法的了。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+char s[N];
+int suf[N];
+int cnt[N];
+int isok[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	scanf("%d", &n);
+	scanf("%s", s + 1);
+	int cnt0 = 0, cnt1 = 0, h = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		s[i] == '(' ? cnt0++ : cnt1++, h += (s[i] == ')' ? -1 : 1);
+		if (h <= -3)
+			break;
+	}
+	int h1 = 0;
+	for (int i = n; i >= 1; i--)
+	{
+		h1 += (s[i] == '(' ? -1 : 1);
+		if (h1 <= -3)
+			break;
+	}
+	if (abs(cnt0 - cnt1) != 2 || h <= -3 || h1 <= -3)
+		cout << 0;
+	else
+	{
+		if (cnt0 < cnt1)
+		{
+			reverse(s + 1, s + n + 1);
+			for (int i = 1; i <= n; i++)
+				s[i] = s[i] == ')' ? '(' : ')';
+		}
+		for (int i = n; i >= 1; i--)
+		{
+
+			suf[i] = suf[i + 1] + (s[i] == '(' ? -1 : 1);
+			isok[i] = min(isok[i + 1], suf[i]);
+		}
+		int ans = 0, sum = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			cnt[i] = cnt[i - 1] + (s[i] == ')' ? -1 : 1);
+			if (cnt[i - 1] >= 1 && s[i] == '(' && isok[i + 1] >= 0)
+				ans++;
+		}
+		cout << ans;
+	}
+	return 0;
+}

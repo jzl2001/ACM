@@ -1,0 +1,28 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <string.h>
+#include <vector>
+using namespace std;
+typedef long long ll;
+const int N = 1e5 + 10;
+ll a[N];
+ll b[N];
+int re[N];
+int main(){
+	ll sum = 0;
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+		scanf("%lld", &a[i]);
+	for (int i = 1; i <= n; i++)
+		scanf("%lld", &b[i]), sum += b[i], b[i] = sum;
+	for (int i = 1; i <= n; i++)
+	{
+		ll need = a[i] + b[i - 1];
+		re[i] = lower_bound(b + 1, b + n + 1, need) - b;
+	}
+	for (int i = 1; i <= n; i++)
+		cout << re[i] << " ";
+	return 0;
+}

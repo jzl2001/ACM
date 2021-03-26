@@ -1,0 +1,72 @@
+题意:
+
+现在有n个矩形区域， 你需要建造两个大小为A×B的矩阵要求面积最大，有两种建造方式
+
+两个建到同一个矩阵区域内， 或者分别建在两个矩阵区域内。
+
+思路:
+
+如果建在一个矩阵内， 比较简单就是n个区域每个区域的面积除以2
+
+如果分别建在两个矩阵内， 那么我们设这n个矩阵的长为x， 宽为y
+
+然后按照y升序排列， 因为以当前的y为宽， 那么之前的矩阵肯定都
+
+可以达宽度y， 这样我们每次取当前的x跟前面最大的x取个min， 此
+
+时的宽就是当前的y， 然后乘一下取个max就可以了。为了避免精损
+
+使用longlong计算， 输出时候判下就可以了。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 100;
+struct node
+{
+	ll x, y;
+	bool operator < (const node &oth)const
+	{
+		return y > oth.y;
+	}
+}a[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	ll ans = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		cin >> a[i].x >> a[i].y;
+		ans = max(ans, a[i].x * a[i].y);
+		if (a[i].x > a[i].y)
+			swap(a[i].x, a[i].y);
+	}
+	sort(a + 1, a + n + 1);
+	ll MX = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		ans = max(ans, min(MX, a[i].x) * a[i].y * 2);
+		MX = max(MX, a[i].x);
+	}
+	if (ans % 2)
+		printf("%lld.5\n", ans / 2);
+	else
+		printf("%lld.0\n", ans / 2);
+	return TIME;
+}

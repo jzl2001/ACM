@@ -1,0 +1,140 @@
+E. Minlexes
+time limit per test1 second
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Some time ago Lesha found an entertaining string s consisting of lowercase English letters. Lesha immediately developed an unique algorithm for this string and shared it with you. The algorithm is as follows.
+
+Lesha chooses an arbitrary (possibly zero) number of pairs on positions (i,i+1) in such a way that the following conditions are satisfied:
+
+for each pair (i,i+1) the inequality 0≤i<|s|−1 holds;
+for each pair (i,i+1) the equality si=si+1 holds;
+there is no index that is contained in more than one pair.
+After that Lesha removes all characters on indexes contained in these pairs and the algorithm is over.
+Lesha is interested in the lexicographically smallest strings he can obtain by applying the algorithm to the suffixes of the given string.
+
+Input
+The only line contains the string s (1≤|s|≤105) — the initial string consisting of lowercase English letters only.
+
+Output
+In |s| lines print the lengths of the answers and the answers themselves, starting with the answer for the longest suffix. The output can be large, so, when some answer is longer than 10 characters, instead print the first 5 characters, then "...", then the last 2 characters of the answer.
+
+Examples
+inputCopy
+abcdd
+outputCopy
+3 abc
+2 bc
+1 c
+0 
+1 d
+inputCopy
+abbcdddeaaffdfouurtytwoo
+outputCopy
+18 abbcd...tw
+17 bbcdd...tw
+16 bcddd...tw
+15 cddde...tw
+14 dddea...tw
+13 ddeaa...tw
+12 deaad...tw
+11 eaadf...tw
+10 aadfortytw
+9 adfortytw
+8 dfortytw
+9 fdfortytw
+8 dfortytw
+7 fortytw
+6 ortytw
+5 rtytw
+6 urtytw
+5 rtytw
+4 tytw
+3 ytw
+2 tw
+1 w
+0 
+1 o
+Note
+Consider the first example.
+
+The longest suffix is the whole string "abcdd". Choosing one pair (4,5), Lesha obtains "abc".
+The next longest suffix is "bcdd". Choosing one pair (3,4), we obtain "bc".
+The next longest suffix is "cdd". Choosing one pair (2,3), we obtain "c".
+The next longest suffix is "dd". Choosing one pair (1,2), we obtain "" (an empty string).
+The last suffix is the string "d". No pair can be chosen, so the answer is "d".
+In the second example, for the longest suffix "abbcdddeaaffdfouurtytwoo" choose three pairs (11,12), (16,17), (23,24) and we obtain "abbcdddeaadfortytw".
+
+https://codeforces.ml/contest/1422/problem/E
+题意：给出一个字符串，求每一个后缀的最小字典序变换，变换是可以删除连续的一对相同字符，但是一个位置的
+字符只能被删除一次。如果答案长度超过了10，输出前五个和...和后两个，否则正常输出。
+思路：
+因为一次删除两个字符，考虑的情况局限于最近的两个后缀。
+if s[i] != s[i + 1]:
+	ans[i] = s[i] + ans[i + 1]
+else:
+	ans[i] = min(ans[i + 2], s[i] + s[i] + ans[i + 2])
+考虑第二种情况：
+当前字符如果小于ans[i + 2]的第一个字符，肯定不删除，大于了肯定删除，相等的时候，比较ans[i+1]第一个不同
+的字符，如果大于了s[i]则不删除，因为删除了会前移动，则会导致字典序变大。
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int N = 1e5 + 10;
+
+char s[N];
+int pre[N];
+struct node
+{
+	string pre, suf;
+	int flag = false;
+	int len = 0;
+	void insert(char x)
+	{
+		len++;
+		if (len == 1)
+		{
+			pre.push_back(x), suf.push_back(x);
+			return;
+		}
+		if (x != pre[0])
+			flag = x < pre[0]; //新插入的小于后面的
+		pre = x + pre;
+		if (pre.size() > 10)
+			pre.pop_back();
+		if (suf.size() < 2)
+			suf = x + suf;
+	}
+}ans[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\input.txt", "r", stdin);
+#endif // LOCAL
+	scanf("%s", s);
+	int len = strlen(s);
+	for (int i = len - 1; i >= 0; i--)
+	{
+		if (s[i] != s[i + 1])
+		{
+			ans[i] = ans[i + 1];
+			ans[i].insert(s[i]);
+		}
+		else
+		{
+			ans[i] = ans[i + 2];
+			if (i + 2 < len && ((s[i] < ans[i].pre[0]) || (s[i] == ans[i].pre[0] && ans[i].flag)))
+				ans[i].insert(s[i]), ans[i].insert(s[i]); //不删除
+		}
+	}
+	for (int i = 0; i < len; i++)
+	{
+		if (ans[i].len <= 10)
+		{
+			cout << ans[i].len << ' ' << ans[i].pre << endl;
+			continue;
+		}
+		cout << ans[i].len << " " << ans[i].pre.substr(0, 5) << "..." << ans[i].suf << endl;
+	}
+	return 0;
+}

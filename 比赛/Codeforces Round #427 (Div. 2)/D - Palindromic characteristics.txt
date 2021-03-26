@@ -1,0 +1,107 @@
+回文自动机
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 3e5 + 10;
+typedef unsigned long long ull;
+typedef long long ll;
+char s[N];
+int record[N];
+struct Palindrome_tree{
+	int nxt[N][26];
+	int fail[N]; // 当前节点最长回文后缀的节点
+	int len[N]; // 当前节点表示的回文串的长度
+	int cnt[N]; // 当前节点回文串的个数， 在getcnt后可得到全部
+	int sed[N]; // 以当前节点为后缀的回文串的个数
+	int tot; // 节点个数
+	int last; // 上一个节点
+	void init()
+	{
+		tot = 0;
+		memset(fail, 0, sizeof fail);
+		memset(cnt, 0, sizeof cnt);
+		memset(sed, 0, sizeof sed);
+		memset(len, 0, sizeof len);
+		memset(nxt, 0, sizeof nxt);
+	}
+	void build()
+	{
+		len[0] = 0, len[1] = -1; // 0为偶数长度根， 1为奇数长度根
+		tot = 1, last = 0;
+		fail[0] = 1;
+	}
+	int getfail(char *s, int x, int n)
+	{
+		while (s[n - len[x] - 1] != s[n]) // 比较x节点回文串新建两端是否相等
+			x = fail[x]; // 若不同， 再比较x后缀回文串两端
+		return x;
+	}
+	void insert(char* s, int n)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			int c = s[i] - 'a';
+			int p = getfail(s, last, i);// 得到第i个字符可以加到哪个节点的两端形成回文串 
+			if (!nxt[p][c])
+			{
+				tot++;
+				len[tot] = len[p] + 2;  // 在p节点两端添加两个字符
+				fail[tot] = nxt[getfail(s, fail[p], i)][c]; //tot点的后缀回文，可以由上一个节点的后缀回文尝试得到  
+				sed[tot] = sed[fail[tot]] + 1; // 以当前节点为结尾的回文串个数
+				nxt[p][c] = tot; // 新建节点
+			}
+			last = nxt[p][c]; // 当前节点成为上一个节点
+			cnt[last]++; //当前节点回文串++
+			record[last] = i;
+		}
+	}
+	void get_cnt()
+	{
+		for (int i = tot; i > 0; i--)
+			cnt[fail[i]] += cnt[i];
+		//fail[i] 的节点 为 i 节点的后缀回文串， 所以个数相加
+	}
+}pdt;
+string x;
+bool check(int L, int R)
+{
+	string u = x.substr(L, R - L + 1);
+	string w = u;
+	reverse(u.begin(), u.end());
+	if (u == w)
+		return true;
+	return false;
+}
+int ans[5010];
+int main(){//aba aca aba
+		scanf("%s", s);
+		x = string(s);
+		pdt.init();
+		pdt.build();
+		pdt.insert(s, strlen(s));
+		pdt.get_cnt();
+		for (int i = 2; i <= pdt.tot; i++)
+		{
+			record[i] = record[i] - pdt.len[i] + 1;
+		}
+		for (int i = 2; i <= pdt.tot; i++)
+		{
+			int idx = 1;
+			ans[idx] += pdt.cnt[i];
+			int len = pdt.len[i];
+			for (;;)
+			{
+				idx++;
+				len /= 2;
+				if (len == 0 || check(record[i], record[i] + len - 1) == 0)
+					break;
+				ans[idx] += pdt.cnt[i];
+			}
+		}
+		int lens = strlen(s);
+		for (int i = 1; i <= lens; i++)
+		{
+			cout << ans[i] << " ";
+		}
+		cout << endl;
+	return 0;
+}

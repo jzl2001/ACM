@@ -1,0 +1,61 @@
+<dp>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int a[N];
+int d1[N]; // 以i为右端点的区间为负的数目
+int d2[N]; // 以i为右端点的区间为正的数目
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+	{
+		cin >> a[i];
+		if (a[i] > 0)
+			a[i] = 1;
+		else
+			a[i] = 0;
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		if (a[i]) // 当前为正
+		{
+			d2[i] =  d2[i - 1] + 1; // 之前正的数目， 当前单个也可以组成, 所以 + 1
+			d1[i] = d1[i - 1]; // 负乘正还是负
+		}
+		else
+		{	
+			d2[i] = d1[i - 1]; // 当前正的之前负的
+			d1[i] = d2[i - 1] + 1; // 当前负的之前正的, 再 + 单个
+		}
+	}
+	ll ans1 = 0, ans2 = 0;
+	for (int i = 1; i <= n; i++) // 算的是到某个位置为右端点, 所以需要加上所有的即是答案
+	{
+		ans1 += d1[i];
+		ans2 += d2[i];
+	}
+	cout << ans1 << " " << ans2 << endl;
+	return TIME;
+}

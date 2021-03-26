@@ -1,0 +1,85 @@
+链接：https://ac.nowcoder.com/acm/contest/9643/H
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+The following rules define a kind of integer tuple - the Legend Tuple:
+ (1, k) is always a Legend Tuple, where k is an integer.
+if (n, k) is a Legend Tuple, (n + k, k) is also a Legend Tuple.
+if (n, k) is a Legend Tuple, (nk, k) is also a Legend Tuple.
+
+We want to know the number of the Legend Tuples (n, k) where 1 \le n \le N, 1 \le k \le K1≤n≤N,1≤k≤K.
+
+In order to avoid calculations of huge integers, report the answer modulo 10^9+710 
+9
+ +7 instead.
+输入描述:
+The input contains two integers N and K, 1 \le N, K \le 10^{12}1≤N,K≤10 
+12
+ .
+输出描述:
+Output the answer modulo 10^9+710 
+9
+ +7.
+示例1
+输入
+复制
+3 3
+输出
+复制
+8
+示例2
+输入
+复制
+3 9
+输出
+复制
+14
+
+题意：给出n和k，(1,1),(1,2)...(1,k)是传奇数组。
+(n + k, k)也是传奇数组，(n*k, k)也是传奇数组。
+现在要求(1≤x≤n,1≤x≤k)。
+一个n*k的表可以发现，除了最上面n=1的那一行，
+每列的收益为∑k (n/i) + ∑((n - 1) / k)。
+第一行因为第一部分就算过了，所以再算一次会重复。
+减去n，则第一列算的是n-1，最后答案再加上第一列的k。
+算的时候使用整除分块。
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const int N = 5e5 + 10;
+
+ll k;
+ll calc(ll n)
+{
+	ll ans = 0, R;
+	for (ll i = 1; i <= k; i = R + 1)
+	{
+		ll v = n / i;
+		if (v == 0)
+			break;
+		R = min(n / v, k);
+		ans = (ans + (R - i + 1) % mod * (v % mod) % mod) % mod;
+	}
+	return ans;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	ll n;
+	scanf("%lld%lld", &n, &k);
+	ll res = calc(n);
+	res = (res + calc(n - 1)) % mod;
+	res = (res - (n % mod) + mod) % mod;
+	res = (res + k) % mod;
+	cout << res << endl;
+	return 0;
+}

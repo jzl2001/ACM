@@ -1,0 +1,178 @@
+在一个n×nn×n的方块城市中，坐标为(i,j)(i,j)的位置高度为h[i,j]h[i,j]，有mm个排水井，分别位于(x_i,y_i)(x 
+i
+​	
+ ,y 
+i
+​	
+ )
+
+在一场大雨中，每个位置的水都会往相邻的积水更低的地方流动，如果无法排出将越积越高
+
+排水井处永远不会积水，水不会通过城市边缘排出（可以理解为城市边缘是无限高的墙）
+
+求每个位置的积水深度
+
+输入描述
+
+第一行输入一个整数TT，代表有TT组测试数据 对于每一组测试数据，第一行输入22个整数n,mn,m，接下来nn行每行有nn个整数h[i,j]h[i,j]表示第ii行第jj列的高度，接下来mm行每行有两个整数x_i,y_ix 
+i
+​	
+ ,y 
+i
+​	
+ ，表示第ii个排水井的位置
+
+输出描述
+
+对于每组测试数据，输出nn行，每行nn个整数，第ii行第jj列表示(i,j)(i,j)处的积水深度
+
+数据范围
+
+1≤T≤10001≤T≤1000
+
+1≤n≤5001≤n≤500
+
+1≤m≤n×n1≤m≤n×n
+
+\sum{n×n}≤6·10^5∑n×n≤6⋅10 
+5
+ 
+
+1≤h[i,j]≤10001≤h[i,j]≤1000
+
+1≤x_i,y_i≤n1≤x 
+i
+​	
+ ,y 
+i
+​	
+ ≤n
+
+输出时每行末尾的多余空格，不影响答案正确性
+
+样例输入复制
+2
+4 1
+1 2 3 4
+2 3 4 3
+3 4 3 2
+4 3 2 1
+2 2
+5 2
+2 2 3 2 2
+2 2 3 3 3
+3 3 2 2 2
+2 3 2 1 1
+2 3 2 1 1
+4 1
+3 3
+样例输出复制
+2 1 0 0
+1 0 0 1
+0 0 1 2
+0 1 2 3
+1 1 0 1 1
+1 1 0 0 0
+0 0 0 0 0
+0 0 0 1 1
+0 0 0 1 1
+样例解释
+第一组样例的解释：
+
+Image
+
+第二组样例的解释：
+
+Image
+优先队列，排水问题
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+#define cel cout << endl;
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int h[510][510];
+int now[510][510];
+int vis[510][510];
+int dir[4][2] = { 0, 1, 0, -1, 1, 0, -1, 0 };
+struct node
+{
+	int x, y, v;
+	bool operator < (const node &oth)const
+	{
+		return v > oth.v;
+	}
+};
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		scanf("%d%d", &n, &m);
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= n; j++)
+			{
+				scanf("%d", &h[i][j]);
+			}
+		}
+		priority_queue<node>pq;
+		for (int i = 1; i <= m; i++)
+		{
+			int u, v;
+			scanf("%d%d", &u, &v);
+			pq.push({ u, v, h[u][v] });
+			now[u][v] = h[u][v];
+		}
+		while (!pq.empty())
+		{
+			int x = pq.top().x;
+			int y = pq.top().y;
+			int heg = pq.top().v;
+			pq.pop();
+			vis[x][y] = 1;
+			for (int i = 0; i < 4; i++)
+			{
+				int xx = x + dir[i][0];
+				int yy = y + dir[i][1];
+				if (xx >= 1 && xx <= n && yy >= 1 && yy <= n && !vis[xx][yy])
+				{
+					vis[xx][yy] = 1;
+					now[xx][yy] = max(heg, h[xx][yy]);
+					pq.push({ xx, yy, now[xx][yy] });
+				}
+			}
+		}
+		for (int i = 1; i <= n; i++, cout << endl)
+		{
+			for (int j = 1; j <= n; j++)
+			{
+				cout << now[i][j] - h[i][j] << " ";
+				now[i][j] = h[i][j] = vis[i][j] = 0;
+			}		
+		}
+	}
+	return TIME;
+}

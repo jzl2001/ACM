@@ -1,0 +1,246 @@
+C2. Binary Table (Hard Version)
+time limit per test1 second
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+This is the hard version of the problem. The difference between the versions is in the number of possible operations that can be made. You can make hacks if and only if you solved both versions of the problem.
+
+You are given a binary table of size n×m. This table consists of symbols 0 and 1.
+
+You can make such operation: select 3 different cells that belong to one 2×2 square and change the symbols in these cells (change 0 to 1 and 1 to 0).
+
+Your task is to make all symbols in the table equal to 0. You are allowed to make at most nm operations. You don't need to minimize the number of operations.
+
+It can be proved, that it is always possible.
+
+Input
+The first line contains a single integer t (1≤t≤5000) — the number of test cases. The next lines contain descriptions of test cases.
+
+The first line of the description of each test case contains two integers n, m (2≤n,m≤100).
+
+Each of the next n lines contains a binary string of length m, describing the symbols of the next row of the table.
+
+It is guaranteed, that the sum of nm for all test cases does not exceed 20000.
+
+Output
+For each test case print the integer k (0≤k≤nm) — the number of operations.
+
+In the each of the next k lines print 6 integers x1,y1,x2,y2,x3,y3 (1≤x1,x2,x3≤n,1≤y1,y2,y3≤m) describing the next operation. This operation will be made with three cells (x1,y1), (x2,y2), (x3,y3). These three cells should be different. These three cells should belong to some 2×2 square.
+
+Example
+inputCopy
+5
+2 2
+10
+11
+3 3
+011
+101
+110
+4 4
+1111
+0110
+0110
+1111
+5 5
+01011
+11001
+00010
+11011
+10000
+2 3
+011
+101
+outputCopy
+1
+1 1 2 1 2 2
+2 
+2 1 3 1 3 2
+1 2 1 3 2 3
+4
+1 1 1 2 2 2 
+1 3 1 4 2 3
+3 2 4 1 4 2
+3 3 4 3 4 4
+4
+1 2 2 1 2 2 
+1 4 1 5 2 5 
+4 1 4 2 5 1
+4 4 4 5 3 4
+2
+1 3 2 2 2 3
+1 2 2 1 2 2
+Note
+In the first test case, it is possible to make only one operation with cells (1,1), (2,1), (2,2). After that, all symbols will be equal to 0.
+
+In the second test case:
+
+operation with cells (2,1), (3,1), (3,2). After it the table will be:
+
+011
+001
+000
+operation with cells (1,2), (1,3), (2,3). After it the table will be:
+
+000
+000
+000
+In the fifth test case:
+
+operation with cells (1,3), (2,2), (2,3). After it the table will be:
+
+010
+110
+operation with cells (1,2), (2,1), (2,2). After it the table will be:
+
+000
+000
+
+题意：给出一个n*m的01矩阵，每次选择一个2*2的小矩阵，并反转里面的三个元素。
+询问最终使得矩阵变成全0的方案，要求次数不超过n*m次。
+实际上每个2*2的块里面1的个数可以转化成下一个含多少个1的块，有个固定的个数
+转化过程。四个1的转化次数最多是4。
+奇数的过程是先把最后一行或者最后一列转化成0，然后如果是双奇就最后再处理一
+下右下角四个。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 2e5 * 31 + 10;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+int z[110][110];
+int ys[110][110];
+char tmp[110];
+struct node
+{
+	int x1, y1, x2, y2, x3, y3;
+};
+int tot;
+vector<node>ans;
+int ned[] = { 0, 2, 3, 0, 1 };
+void cao(int i, int j)
+{
+	int x1 = i, y1 = j, x2 = i, y2 = j + 1;
+	int x3 = i + 1, y3 = j, x4 = i + 1, y4 = j + 1;
+	int cnt = z[x1][y1] + z[x2][y2] + z[x3][y3] + z[x4][y4];
+	while (cnt != 0)
+	{
+		for (int sta = 0; sta <= 15; sta++)
+		{
+			int fc = 0;
+			int hs = 0;
+			int a, b, c, d;
+			a = (sta >> 3) & 1;
+			b = (sta >> 2) & 1;
+			c = (sta >> 1) & 1;
+			d = sta & 1;
+			if (a + b + c + d == ned[cnt])
+			{
+				if (z[x1][y1] != a)
+					fc++;
+				if (z[x2][y2] != b)
+					fc++;
+				if (z[x3][y3] != c)
+					fc++;
+				if (z[x4][y4] != d)
+					fc++;
+				if (fc == 3)
+				{
+					vector<int>v;
+					if (z[x1][y1] != a)
+						z[x1][y1] ^= 1, v.push_back(x1), v.push_back(y1);
+					if (z[x2][y2] != b)
+						z[x2][y2] ^= 1, v.push_back(x2), v.push_back(y2);
+					if (z[x3][y3] != c)
+						z[x3][y3] ^= 1, v.push_back(x3), v.push_back(y3);
+					if (z[x4][y4] != d)
+						z[x4][y4] ^= 1, v.push_back(x4), v.push_back(y4);
+					cnt = ned[cnt];
+					tot++;
+					ans.push_back({ v[0], v[1], v[2], v[3], v[4], v[5] });
+					break;
+				}
+			}
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		cin >> n >> m;
+		tot = 0;
+		ans.clear();
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%s", tmp + 1);
+			for (int j = 1; j <= m; j++)
+				z[i][j] = tmp[j] - '0';
+		}
+		if (n & 1)
+		{
+			int ed = m;
+			if (m & 1)
+				ed--;
+			for (int j = 1; j <= ed; j += 2)
+			{
+				vector<int>v;
+				int cnt = 3;
+				if (z[n][j])
+					cnt--, z[n][j] = 0, v.push_back(n), v.push_back(j);
+				if (z[n][j + 1])
+					cnt--, z[n][j + 1] = 0, v.push_back(n), v.push_back(j + 1);
+				if (cnt == 1)
+					z[n - 1][j] ^= 1, v.push_back(n - 1), v.push_back(j);
+				else
+					if (cnt == 2)
+						z[n - 1][j] ^= 1, z[n - 1][j + 1] ^= 1, v.push_back(n - 1), v.push_back(j), v.push_back(n - 1), v.push_back(j + 1);
+					else
+						continue;
+				tot++;
+				ans.push_back({ v[0], v[1], v[2], v[3], v[4], v[5] });
+			}
+		}
+		if (m & 1)
+		{
+			int ed = n;
+			if (n & 1)
+				ed--;
+			for (int j = 1; j <= ed; j += 2)
+			{
+				vector<int>v;
+				int cnt = 3;
+				if (z[j][m])
+					cnt--, z[j][m] = 0, v.push_back(j), v.push_back(m);
+				if (z[j + 1][m])
+					cnt--, z[j + 1][m] = 0, v.push_back(j + 1), v.push_back(m);
+				if (cnt == 1)
+					z[j][m - 1] ^= 1, v.push_back(j), v.push_back(m - 1);
+				else
+					if (cnt == 2)
+						z[j][m - 1] ^= 1, z[j + 1][m - 1] ^= 1, v.push_back(j), v.push_back(m - 1), v.push_back(j + 1), v.push_back(m - 1);
+					else
+						continue;
+				tot++;
+				ans.push_back({ v[0], v[1], v[2], v[3], v[4], v[5] });
+			}
+		}
+		int rn = n - n % 2;
+		int rm = m - m % 2;
+		for (int i = 1; i <= rn; i += 2)
+			for (int j = 1; j <= rm; j += 2)
+				cao(i, j);
+		if (n & 1 && m & 1)
+			cao(n - 1, m - 1);
+		cout << tot << endl;
+		for (auto &i : ans)
+			cout << i.x1 << " " << i.y1 << " " << i.x2 << " " << i.y2 << " " << i.x3 << " " << i.y3 << endl;
+	}
+	return 0;
+}

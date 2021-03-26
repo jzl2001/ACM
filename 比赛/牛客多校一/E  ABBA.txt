@@ -1,0 +1,57 @@
+Bobo has a string of length 2(n + m) which consists of characters `A` and `B`. The string also has a fascinating property: it can be decomposed into (n + m) subsequences of length 2, and among the (n + m) subsequences n of them are `AB` while other m of them are `BA`.
+
+Given n and m, find the number of possible strings modulo?.
+
+
+样例1 2时 13种情况
+
+
+ABABAB ABABBA ABBAAB ABBABA ABBBAA BAABAB BAABBA BABAAB BABABA BABBAA BBAAAB BBAABA BBABAA
+
+思路: 设d[i][j] 表示当前i个A，j个B的合法方案数。 从上面13种情况可以发现， 放的过程种合法的方案都是 cntA - cntB ≤ n, cntB - cntA ≤ m。 A优先用于AB的A， 剩余的B?= cntB?- cntA， 只能组成BA， 但是数目要≤m， B优先用于BA的B， 剩余的A = cntA?- cntB个A只能组成AB， 数目要求≤n。去除非法状态， 每种状态就由A - 1, B - 1两个状态转移。
+--------------------- 
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#define sz(a) ((int)(a).size())
+typedef long long ll;
+bool cmp(int a, int b) { return a > b; }
+#define me(a, b) (memset(a, b, sizeof a))
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+const double PI = acos(-1);
+const int N = 2e4 + 10;
+template<typename S, typename T> inline bool Min(S &a, const T &b){ return a > b ? a = b, true : false; }
+template<typename S, typename T> inline bool Max(S &a, const T &b){ return a < b ? a = b, true : false; }
+template<typename S, typename T> inline void Adm(S &a, const T &b){ a = (a + b) % mod; if (a < 0) a += mod; }
+template<typename S, typename T> inline void Mum(S &a, const T &b){ a = 1LL * a * b % mod; }
+template<typename T> inline T gcd(T a, T b){ while (b){ T t = b; b = a % b; a = t; }return a; }
+template<typename T> inline int bcnt(T x){ int cnt = 0; while (x)++cnt, x &= x - 1; return cnt; }
+inline ll fpow(ll a, ll b, ll mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+#define bo bool operator < (const node &oth)const
+#define AC return 0;
+ 
+int a[N];
+int d[N][N];
+int main(){
+	int n, m;
+	while (cin >> n >> m)
+	{
+		for (int i = 0; i <= n + m; i++)
+			for (int j = 0; j <= n + m; j++)
+				d[i][j] = 0;
+		d[0][0] = 1;
+		for (int i = 0; i <= (n + m); i++)
+		{
+			for (int j = 0; j <= (n + m); j++)
+			{
+			
+				if (i - j > n || j - i > m)
+					continue;
+				Adm(d[i][j], d[i - 1][j] + d[i][j - 1]);
+			}
+		}
+		cout << d[n + m][n + m] << endl;
+	}
+	AC
+}

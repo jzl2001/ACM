@@ -1,0 +1,146 @@
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Monocarp has got two strings s and t having equal length. Both strings consist of lowercase Latin letters "a" and "b".
+
+Monocarp wants to make these two strings s and t equal to each other. He can do the following operation any number of times: choose an index pos1 in the string s, choose an index pos2 in the string t, and swap spos1 with tpos2.
+
+You have to determine the minimum number of operations Monocarp has to perform to make s and t equal, and print any optimal sequence of operations — or say that it is impossible to make these strings equal.
+
+Input
+The first line contains one integer n (1≤n≤2⋅105) — the length of s and t.
+
+The second line contains one string s consisting of n characters "a" and "b".
+
+The third line contains one string t consisting of n characters "a" and "b".
+
+Output
+If it is impossible to make these strings equal, print −1.
+
+Otherwise, in the first line print k — the minimum number of operations required to make the strings equal. In each of the next k lines print two integers — the index in the string s and the index in the string t that should be used in the corresponding swap operation.
+
+Examples
+inputCopy
+4
+abab
+aabb
+outputCopy
+2
+3 3
+3 2
+inputCopy
+1
+a
+b
+outputCopy
+-1
+inputCopy
+8
+babbaabb
+abababaa
+outputCopy
+3
+2 6
+1 3
+7 8
+Note
+In the first example two operations are enough. For example, you can swap the third letter in s with the third letter in t. Then s= "abbb", t= "aaab". Then swap the third letter in s and the second letter in t. Then both s and t are equal to "abab".
+
+In the second example it's impossible to make two strings equal.
+
+
+<思维>
+对于a, b组合
+只有
+aa    ab
+bb 	  ba
+第一种只需要换一下, 第二种需要换两下, 所以先处理第一种, 再处理第二种
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+char a[N];
+char b[N];
+int n;
+vector<int>ab, ba;
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n, numa = 0, numb = 0;
+	cin >> n;
+	scanf("%s", a + 1);
+	scanf("%s", b + 1);
+	for (int i = 1; i <= n; i++)
+	{
+		if (a[i] == 'a')
+			numa++;
+		else
+			numb++;
+	}
+	for (int i = 1; i <= n; i++)
+	{
+		if (b[i] == 'a')
+			numa++;
+		else
+			numb++;
+	}
+	if (numa % 2 != 0 || numb % 2 != 0)
+		cout << -1 << endl;
+	else
+	{
+		vector<pair<int, int>>ans;
+		int cnt = 0;
+		int num = 0;
+		for (int i = 1; i <= n; i++)
+		{
+			if (a[i] == 'a' && b[i] == 'b')
+				ab.push_back(i);
+			else
+				if (a[i] == 'b' && b[i] == 'a')
+					ba.push_back(i);
+		}
+		//处理ab
+		while (ab.size() >= 2)
+		{
+			ans.push_back({ ab[ab.size() - 1], ab[ab.size() - 2] });
+			ab.pop_back();
+			ab.pop_back();
+		}//ba
+		while (ba.size() >= 2)
+		{
+			ans.push_back({ ba[ba.size() - 1], ba[ba.size() - 2] });
+			ba.pop_back();
+			ba.pop_back();
+		}
+		if (ab.size() && ba.size())
+		{
+			ans.push_back({ ab[0], ab[0] });
+			ans.push_back({ ab[0], ba[0] });
+		}
+		cout << ans.size() << endl;
+		for (auto &i : ans)
+		{
+			cout << i.first << " " << i.second << endl;
+		}
+	}
+	return TIME;
+}

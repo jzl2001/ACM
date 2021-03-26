@@ -1,0 +1,33 @@
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <queue>
+#include <time.h>
+#include <algorithm>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+const int N = 1e6 + 10;
+const int mod = 1e9 + 7;
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll n;
+		cin >> n;
+		cout << n - 1 << endl;
+	}
+	return TIME;
+}

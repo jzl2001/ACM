@@ -1,0 +1,135 @@
+链接：https://ac.nowcoder.com/acm/contest/889/D
+来源：牛客网
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+Amy asks Mr. B  problem D. Please help Mr. B to solve the following problem.
+
+Amy wants to crack Merkle–Hellman knapsack cryptosystem. Please help it.
+
+Given an array {ai} with length n, and the sum s. 
+Please find a subset of {ai}, such that the sum of the subset is s. 
+
+For more details about Merkle–Hellman knapsack cryptosystem Please read 
+https://en.wikipedia.org/wiki/Merkle%E2%80%93Hellman_knapsack_cryptosystem 
+https://blog.nowcoder.net/n/66ec16042de7421ea87619a72683f807
+Because of some reason, you might not be able to open Wikipedia.
+Whether you read it or not, this problem is solvable.
+输入描述:
+The first line contains two integers, which are n(1 <= n <= 36) and s(0 <= s < 9 * 1018)
+The second line contains n integers, which are {ai}(0 < ai < 2 * 1017).
+
+{ai} is generated like in the Merkle–Hellman knapsack cryptosystem, so there exists a solution and the solution is unique.
+Also, according to the algorithm,  for any subset sum s, if there exists a solution, then the solution is unique.
+输出描述:
+Output a 01 sequence.
+
+If the i-th digit is 1, then ai is in the subset.
+If the i-th digit is 0, then ai is not in the subset.
+示例1 
+输入
+复制 
+8 1129
+295 592 301 14 28 353 120 236
+输出
+复制 
+01100001
+说明
+This is the example in Wikipedia.
+示例2 
+输入
+复制 
+36 68719476735
+1 2 4 8 16 32 64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152 4194304 8388608 16777216 33554432 67108864 134217728 268435456 536870912 1073741824 2147483648 4294967296 8589934592 17179869184 34359738368
+输出
+复制 
+111111111111111111111111111111111111
+思路: 折半搜索
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 3e5 + 10;
+int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+int a[50];
+ll b[50];
+int record[N][20];
+ll s;
+int n;
+int flag;
+unordered_map<ll, vector<int>>mp;
+void dfs1(int d, ll sum)
+{
+    if (sum == 262143)
+        cout << "Y" << endl;
+    if (d == n / 2 + 1)
+    {
+        if (mp.find(sum) != mp.end())
+            return;
+        for (int i = 1; i <= n / 2; i++)
+            mp[sum].push_back(a[i]);
+        return ;   
+    }
+    else
+        for (int i = 0; i < 2; i++) 
+        {  
+            a[d] = i;
+            if (i == 1)
+                dfs1(d + 1, sum + b[d]);
+            else
+                dfs1(d + 1, sum);
+            a[d] = 0;
+        }
+}
+void dfs2(int d, ll sum)
+{
+    if (flag || d > n + 1)
+        return;
+    if (mp.find(s - sum) != mp.end()) // 如果找到了
+    {
+        ll x = s - sum;
+        int len = mp[x].size();
+        for (auto &i : mp[x])
+            cout << i;
+        for (int i = n / 2 + 1; i <= n; i++)
+            cout << a[i];
+        flag = 1;
+        return;
+    }
+    else
+    {
+        for (int i = 0; i < 2; i++) 
+        {  
+            a[d] = i;
+            if (i == 1)
+                dfs2(d + 1, sum + b[d]);
+            else
+                dfs2(d + 1, sum);
+            a[d] = 0;
+        }
+    }
+}
+int main(){
+#ifdef LOCAL
+    freopen("D:/input.txt", "r", stdin);
+#endif
+    ll sum = 0;
+    cin >> n >> s;
+    for (int i = 1; i <= n; i++)
+        scanf("%lld", &b[i]), sum += b[i];
+    dfs1(1, 0);
+    dfs2(n / 2 + 1, 0);
+    return TIME;
+}

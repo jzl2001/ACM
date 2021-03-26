@@ -1,0 +1,51 @@
+https://acm.ecnu.edu.cn/contest/292/problem/B/
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 1e5 + 10;
+
+int c[11][11];
+void init()
+{
+	c[0][0] = c[1][0] = c[1][1] = 1;
+	for (int i = 2; i <= 11; i++)
+	{
+		c[i][0] = 1;
+		for (int j = 1; j <= 11; j++)
+			c[i][j] = (c[i - 1][j] + c[i - 1][j - 1]);
+	}
+}
+ll z[11];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\input.txt", "r", stdin);
+#endif
+    int n;
+    cin >> n;
+    ll ans = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        char c;
+        ll x;
+        cin >> c >> x;
+        if (c == 'S')
+            ans = max(ans, x);
+        else
+        {
+            ans = max(ans, (1LL << x) - 1);
+        }
+    }
+    cout << ans << endl;
+	return TIME;
+}

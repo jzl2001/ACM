@@ -1,0 +1,57 @@
+https://ac.nowcoder.com/acm/problem/19156
+链接：https://ac.nowcoder.com/acm/problem/19156
+来源：牛客网
+
+Alice和Bob在玩游戏，他们面前有n堆石子，对于这些石子他们可以轮流进行一些操作，不能进行下去的人则输掉这局游戏。
+可以进行两种操作:
+1. 把石子数为奇数的一堆石子分为两堆正整数个石子
+2. 把两堆石子数为偶数的石子合并为一堆
+两人都足够聪明，会按照最优策略操作。现在Alice想知道自己先手，谁能最后赢得比赛。
+对称博弈，先考虑单单只有偶数的情况，一定是合了奇数次，后者跟着前者操作。
+前者拆，后者合，前者合，后者拆，使得奇偶性没变。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 1e5 + 10;
+const int mod = 998244353;
+
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    int n;
+    cin >> n;
+    int cnt = 0, js = 0;
+    for (int i = 1; i <= n; i++)
+    {
+        int num;
+        cin >> num;
+        if (num % 2 == 0)
+            cnt++;
+        else
+            if (num > 1)
+                js++;
+    }
+    if (cnt == 0)
+    {
+        if (js & 1)
+            puts("Alice");
+        else
+            puts("Bob");
+        exit(0);
+    }
+    if (cnt % 2 == 0)
+        puts("Alice");
+    else
+        puts("Bob");
+	return TIME;
+}

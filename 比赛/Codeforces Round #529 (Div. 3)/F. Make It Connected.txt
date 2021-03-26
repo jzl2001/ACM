@@ -1,0 +1,105 @@
+F. Make It Connected
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+You are given an undirected graph consisting of n vertices. A number is written on each vertex; the number on vertex i is ai. Initially there are no edges in the graph.
+
+You may add some edges to this graph, but you have to pay for them. The cost of adding an edge between vertices x and y is ax+ay coins. There are also m special offers, each of them is denoted by three numbers x, y and w, and means that you can add an edge connecting vertices x and y and pay w coins for it. You don't have to use special offers: if there is a pair of vertices x and y that has a special offer associated with it, you still may connect these two vertices paying ax+ay coins for it.
+
+What is the minimum number of coins you have to spend to make the graph connected? Recall that a graph is connected if it's possible to get from any vertex to any other vertex using only the edges belonging to this graph.
+
+Input
+The first line contains two integers n and m (1≤n≤2⋅105, 0≤m≤2⋅105) — the number of vertices in the graph and the number of special offers, respectively.
+
+The second line contains n integers a1,a2,…,an (1≤ai≤1012) — the numbers written on the vertices.
+
+Then m lines follow, each containing three integers x, y and w (1≤x,y≤n, 1≤w≤1012, x≠y) denoting a special offer: you may add an edge connecting vertex x and vertex y, and this edge will cost w coins.
+
+Output
+Print one integer — the minimum number of coins you have to pay to make the graph connected.
+
+Examples
+inputCopy
+3 2
+1 3 3
+2 3 5
+2 1 1
+outputCopy
+5
+inputCopy
+4 0
+1 3 3 7
+outputCopy
+16
+inputCopy
+5 4
+1 2 3 4 5
+1 2 8
+1 3 10
+1 4 7
+1 5 15
+outputCopy
+18
+Note
+In the first example it is possible to connect 1 to 2 using special offer 2, and then 1 to 3 without using any offers.
+
+In next two examples the optimal answer may be achieved without using special offers.
+题意：给出n个点的权值，每两个点之间建边的代价是ai+aj，再给出m条边，求最小代价使得图联通。
+思路：直接将权值最小的点跟其他点连边，然后再把m条边加进去，求最小生成树。
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const int mod = 1e9 + 7;
+typedef long long ll;
+
+int pre[N];
+int find(int x)
+{
+	return x == pre[x] ? x : pre[x] = find(pre[x]);
+}
+struct node
+{
+	int u, v;
+	ll w;
+}p[N * 2];
+struct node1
+{
+	ll x;
+	int id;
+}y[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	cin >> n >> m;
+	for (int i = 1; i <= n; i++)
+		scanf("%lld", &y[i].x), y[i].id = i;
+	for (int i = 1; i <= m; i++)
+		scanf("%d%d%lld", &p[i].u, &p[i].v, &p[i].w);
+	sort(y + 1, y + n + 1, [](node1 a, node1 b) { return a.x < b.x; });
+	for (int i = 2; i <= n; i++)
+		p[++m] = { y[1].id, y[i].id, y[1].x + y[i].x };
+	sort(p + 1, p + m + 1, [](node a, node b) { return a.w < b.w; });
+	for (int i = 1; i <= n; i++)
+		pre[i] = i;
+	ll res = 0;
+	int cnt = 0;
+	for (int i = 1; i <= m; i++)
+	{
+		int u = find(p[i].u);
+		int v = find(p[i].v);
+		if (u == v)
+			continue;
+		pre[v] = u;
+		cnt++;
+		res += p[i].w;
+		if (cnt == n - 1)
+			break;
+	}
+	cout << res << endl;
+	return 0;
+}

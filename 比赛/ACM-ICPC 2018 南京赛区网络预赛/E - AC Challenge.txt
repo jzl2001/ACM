@@ -1,0 +1,299 @@
+https://nanti.jisuanke.com/t/A1951
+Dlsj is competing in a contest with 
+n
+(
+0
+<
+n
+≤
+20
+)
+ problems. And he knows the answer of all of these problems.
+
+However, he can submit 
+i
+-th problem if and only if he has submitted (and passed, of course) 
+s
+i
+ problems, the 
+p
+i
+,
+1
+-th, 
+p
+i
+,
+2
+-th, 
+.
+.
+.
+, 
+p
+i
+,
+s
+i
+-th problem before.
+(
+0
+<
+p
+i
+,
+j
+≤
+n
+,
+0
+<
+j
+≤
+s
+i
+,
+0
+<
+i
+≤
+n
+)
+ After the submit of a problem, he has to wait for one minute, or cooling down time to submit another problem. As soon as the cooling down phase ended, he will submit his solution (and get "Accepted" of course) for the next problem he selected to solve or he will say that the contest is too easy and leave the arena.
+
+"I wonder if I can leave the contest arena when the problems are too easy for me."
+"No problem."
+—— CCF NOI Problem set
+
+If he submits and passes the 
+i
+-th problem on 
+t
+-th minute(or the 
+t
+-th problem he solve is problem 
+i
+), he can get 
+t
+×
+a
+i
++
+b
+i
+ points. 
+(
+|
+a
+i
+|
+,
+|
+b
+i
+|
+≤
+10
+9
+)
+.
+
+Your task is to calculate the maximum number of points he can get in the contest.
+
+Input
+The first line of input contains an integer, 
+n
+, which is the number of problems.
+
+Then follows 
+n
+ lines, the 
+i
+-th line contains 
+s
+i
++
+3
+ integers, 
+a
+i
+,
+b
+i
+,
+s
+i
+,
+p
+1
+,
+p
+2
+,
+.
+.
+.
+,
+p
+s
+i
+as described in the description above.
+
+Output
+Output one line with one integer, the maximum number of points he can get in the contest.
+
+Hint
+In the first sample.
+
+On the first minute, Dlsj submitted the first problem, and get 
+1
+×
+5
++
+6
+=
+11
+ points.
+
+On the second minute, Dlsj submitted the second problem, and get 
+2
+×
+4
++
+5
+=
+13
+ points.
+
+On the third minute, Dlsj submitted the third problem, and get 
+3
+×
+3
++
+4
+=
+13
+ points.
+
+On the forth minute, Dlsj submitted the forth problem, and get 
+4
+×
+2
++
+3
+=
+11
+ points.
+
+On the fifth minute, Dlsj submitted the fifth problem, and get 
+5
+×
+1
++
+2
+=
+7
+ points.
+
+So he can get 
+11
++
+13
++
+13
++
+11
++
+7
+=
+55
+ points in total.
+
+In the second sample, you should note that he doesn't have to solve all the problems.
+
+Sample Input
+5
+5 6 0
+4 5 1 1
+3 4 1 2
+2 3 1 3
+1 2 1 4
+Sample Output
+55
+Sample Input 2
+1
+-100 0 0
+Sample Output 2
+0
+状压dp，每个任务的收益是t*a + b，但是都有前驱。
+#pragma GCC optimize(2)
+#pragma GCC optimize(3)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll d[N];
+int sta[22];
+ll a[22];
+ll b[22];
+int sz[22];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	memset(d, -0x3f, sizeof d);
+	int n;
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		scanf("%lld%lld%d", &a[i], &b[i], &sz[i]);
+		for (int j = 1; j <= sz[i]; j++)
+		{
+			int num;
+			scanf("%d", &num);
+			num--;
+			sta[i] |= (1 << num);
+		}
+	}
+	d[0] = 0;
+	int mx = (1 << n);
+	for (int i = 0; i < mx; i++)
+	{
+		int cnt = 0;
+		for (int j = 0; j < 20; j++)
+		{//1101
+			if ((i >> j) & 1)
+				cnt++;
+		}
+		cnt++;
+		for (int j = 0; j < n; j++)
+		{
+			if (((sta[j] & i) == sta[j]) && ((1 << j) & i) == 0)
+			{
+				d[i | (1 << j)] = max(d[i | (1 << j)], d[i] + cnt * a[j] + b[j]);
+			}
+		}
+	}
+	d[mx - 1] = max(0LL, d[mx - 1]);
+	cout << d[mx - 1] << endl;
+	return TIME;
+}

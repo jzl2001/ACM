@@ -1,0 +1,79 @@
+<dp>
+链接：https://ac.nowcoder.com/acm/contest/1072/B
+来源：牛客网
+
+Tower of Hay
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 32768K，其他语言65536K
+64bit IO Format: %lld
+题目描述 
+Cows so hate the dark. In order to change a lightbulb at the top of the barn, Bessie must build a tower out of bales of hay to climb so that she can reach it. The N (1 <= N <= 100,000) bales of hay (conveniently numbered 1..N) enter the barn sequentially on a conveyor belt. Bale i has integer width w_iw 
+i
+?	
+ (1 <= w_iw 
+i
+?	
+  <= 10,000); all bales have depth and height of one unit.
+Bessie must use all N hay bales to build the tower and must lay them down in the order they arrive. She can lay as many bales as she wishes (tightly packed in a line, of course) to create the foundation of the tower. She can then lay some of the next bales on top of the previous level to create the next level (no level can be wider than the level beneath it). She continues this process until all the bales are used. She must stack the bales in the order they arrive, from the bottom to the top of the tower. To be clear: she must not try to sneak a bale back on the foundation after a bale is placed on the second layer.
+Bessie's goal is to create the tallest tower possible -- and she already knows how wide each every bale of hay will be as it comes into the barn on the belt. How tall a tower can she construct?
+输入描述:
+* Line 1: A single integer: N
+* Lines 2..N+1: Line i+1 contains a single integer: w_iw 
+i
+?	
+ 
+输出描述:
+* Line 1: A single integer, the height of the tallest possible tower that can be built
+示例1
+输入
+复制
+3
+1
+2
+3
+输出
+复制
+2
+说明
+Use the first bales with width 1 and 2 for the bottom row (total
+width: 3), then the next bale (width 3) for the top row.
+题意: 给出n个物品， 叠塔， 下面要大于上面, 不能不用
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int N = 1e5 + 10;
+vector<int>G[N];
+int d[N]; // 摆到某个物品的最大层数
+int f[N]; // 第i个物品上一层的宽度
+int x[N];
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif 
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &x[i]), x[i] += x[i - 1]; 
+	for (int i = n; i >= 0; i--)
+	{
+		for (int j = i + 1; j <= n; j++)
+		{
+			if (x[j] - x[i] >= f[j])   // 如果差可以 j ~ i + 1 可以来一层
+			{
+				d[i] = d[j] + 1;
+				f[i] = x[j] - x[i];    
+				break;
+			}
+		}
+	}
+	cout << d[0] << endl;
+	return TIME;
+}

@@ -1,0 +1,118 @@
+https://nanti.jisuanke.com/t/A1956
+A square-free integer is an integer which is indivisible by any square number except 11. For example, 6 = 2 \cdot 36=2⋅3 is square-free, but 12 = 2^2 \cdot 312=2 
+2
+ ⋅3 is not, because 2^22 
+2
+  is a square number. Some integers could be decomposed into product of two square-free integers, there may be more than one decomposition ways. For example, 6 = 1\cdot 6=6 \cdot 1=2\cdot 3=3\cdot 2, n=ab6=1⋅6=6⋅1=2⋅3=3⋅2,n=ab and n=ban=ba are considered different if a \not = ba 
+
+​	
+ =b. f(n)f(n) is the number of decomposition ways that n=abn=ab such that aa and bb are square-free integers. The problem is calculating \sum_{i = 1}^nf(i)∑ 
+i=1
+n
+​	
+ f(i).
+
+Input
+The first line contains an integer T(T\le 20)T(T≤20), denoting the number of test cases.
+
+For each test case, there first line has a integer n(n \le 2\cdot 10^7)n(n≤2⋅10 
+7
+ ).
+
+Output
+For each test case, print the answer \sum_{i = 1}^n f(i)∑ 
+i=1
+n
+​	
+ f(i).
+
+Hint
+\sum_{i = 1}^8 f(i)=f(1)+ \cdots +f(8)∑ 
+i=1
+8
+​	
+ f(i)=f(1)+⋯+f(8)
+=1+2+2+1+2+4+2+0=14=1+2+2+1+2+4+2+0=14.
+
+样例输入复制
+2
+5
+8
+样例输出复制
+8
+14
+题目来源
+ACM-ICPC 2018 南京赛区网络预赛
+求1到n的f[i],f[i]表示i由两个非平方数倍数相乘
+欧拉筛 思维
+#pragma GCC optimize(2)
+#pragma GCC optimize(3)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e7 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll f[N];
+int vis[N];
+int prime[N];
+void Euler()
+{
+    for (int i = 2; i < N; i++)
+    {
+        if (!vis[i])
+            prime[++prime[0]] = i, f[i] = 2;//素数肯定是2
+        for (int j = 1; j <= prime[0] && i * prime[j] < N; j++)
+        {
+            int num = i * prime[j];
+            vis[num] = 1;
+            if (i % prime[j]) // 只含有一个
+                f[num] = f[i] * 2; //乘到哪边都可以
+            else
+                if (i % (prime[j] * prime[j]) == 0) //含有3个或者以上，肯定是0
+                    f[num] = 0;
+                else //否则是含有两个，肯定是一边一个，所以方案不变。
+                {
+                    f[num] = f[num / (prime[j] * prime[j])];
+                    break;
+                }
+        }
+    }
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+    f[1] = 1;
+    int n;
+    Euler();
+    for (int i = 1; i <= N - 10; i++)
+    {
+        f[i] += f[i - 1];
+    }
+    cin >> n;
+    while (n--)
+    {
+        int num;
+        scanf("%d", &num);
+        printf("%lld\n", f[num]);
+    }
+	return TIME;
+}

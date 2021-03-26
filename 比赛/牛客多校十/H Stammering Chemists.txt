@@ -1,0 +1,50 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+const int maxn = 2e5 + 10;
+int mod = 998244353;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+map<string, string>mp;
+int d[10];
+int use[10];
+vector<int>G[10];
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	mp["223344"] = "n-hexane";
+	mp["233345"] = "2-methylpentane";
+	mp["223445"] = "3-methylpentane";
+	mp["333355"] = "2,3-dimethylbutane";
+	mp["244455"] = "2,2-dimethylbutane";
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(d, 0, sizeof d);
+		memset(use, 0, sizeof use);
+		int a, b;
+		for (int i = 1; i <= 5; i++)
+			cin >> a >> b, d[a]++, d[b]++, G[a].push_back(b), G[b].push_back(a);
+		for (int i = 1; i <= 6; i++)
+			for (auto &j : G[i])
+				use[i] += d[j];
+		sort(use + 1, use + 7);
+		string s;
+		for (int i = 1; i <= 6; i++)
+			G[i].clear(), s.push_back('0' + use[i]);
+		cout << mp[s] << endl;
+	}
+	return 0;
+}

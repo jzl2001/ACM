@@ -1,0 +1,80 @@
+给出x，y求0~x，0~y并且不同是等于0的且i&j = 0,算log2(i + j) + 1
+思路：数位dp，d表示满足前面那些条件不带权值的数目，然后每次
+再乘上权值，有一维记录之前有没有1。
+https://ac.nowcoder.com/acm/contest/9925/C
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf;  int x = false;  char ch = gc;  bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int N = 1e6 + 10;
+
+int d[31][2][2][2];
+int a[31], b[31];
+ll res;
+int dfs(int x, int lim1, int lim2, int have)
+{
+	if (x == -1)
+		return have;
+	if (~d[x][lim1][lim2][have])
+		return d[x][lim1][lim2][have];
+	int up1 = lim1 ? a[x] : 1;
+	int up2 = lim2 ? b[x] : 1;
+	int sum = 0;
+	for (int i = 0; i <= up1; i++)
+		for (int j = 0; j <= up2; j++)
+		{
+			if (i == 1 && j == 1)
+				continue;
+			int now = dfs(x - 1, lim1 && i == up1, lim2 && j == up2, i || j || have);
+			if ((i || j) && !have)
+				res = (res + 1LL * now * (x + 1) % mod) % mod;
+			sum = (sum + now) % mod;
+		}
+	return d[x][lim1][lim2][have] = sum;
+}
+int calc(int x, int y)
+{
+	memset(a, 0, sizeof a);
+	memset(b, 0, sizeof b);
+	memset(d, -1, sizeof d);
+	res = 0;
+	int cnt1 = -1, cnt2 = -1;
+	while (x)
+		a[++cnt1] = x & 1, x >>= 1;
+	while (y)
+		b[++cnt2] = y & 1, y >>= 1;
+	int c = dfs(max(cnt1, cnt2), 1, 1, 0);
+	return res;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int x, y;
+		scanf("%d%d", &x, &y);
+		printf("%d\n", calc(x, y));
+	}
+	return TIME;
+}

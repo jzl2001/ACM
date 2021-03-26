@@ -1,0 +1,91 @@
+<贪心><思维>
+题意:
+
+给出一个行的权值Ai 列的权值Bj， 每个位的权值之和为Ai + Bj
+
+多次询问， 每次给出x1，y1，x2，y2
+
+问有没有那么一条路径从(x1, y1)到(x2, y2)且路径上的权值都为偶数
+
+思路:
+
+我们考虑先对每一个点的奇偶性处理，每一个点有一个行的奇偶性a[i], 列的奇偶性b[i]
+
+然后对行列都做个前缀和
+
+分情况讨论:
+
+①若起点或者终点权值为奇数肯定输出NO
+
+或者起点跟终点横纵的奇偶性不同， 例如起点权值(a[i] = 1, b[i] = 1)， 终点(a[i] = 2, b[i] = 2)
+
+奇数走到偶数后肯定是奇数， 那么肯定不行
+
+②再考虑两种， 到目前起点肯定是(偶， 偶) 或者 (奇， 奇)
+
+对于偶数如果向右或者向下移动，下一行或者下一列的属性一定是偶数
+
+那么每次移动都要求是行列偶数， 一行都是偶数， 一列也都是偶数， 那么
+
+区域内都是偶数，其实就是起点跟终点横纵坐标构成的区域，若满足条件可
+
+以任意走， 我们只需要前缀和判一下x1 到 x2之间有没有奇数即可。
+
+同理对于奇数， 我们只需要判断x1跟x2之间有没有偶数即可。
+
+对于列也这样处理y1跟y2
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 100;
+int r[N]; // 行
+int c[N]; // 列
+int a[N];
+int b[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n, k;
+	scanf("%d%d", &n, &k);
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &a[i]), a[i] &= 1, r[i] = r[i - 1] + a[i];
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &b[i]), b[i] &= 1, c[i] = c[i - 1] + b[i]; 
+	for (int i = 1; i <= k; i++)
+	{
+		int x1, y1, x2, y2;
+		scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
+		if ((a[x1] + b[y1]) % 2 || (a[x2] + b[y2]) % 2 || (a[x1] + b[y1]) != (a[x2] + b[y2]))
+			puts("NO");
+		else
+		{
+			if (x1 > x2)
+				swap(x1, x2);
+			if (y1 > y2)
+				swap(y1, y2);
+			if (a[x1] && r[x2] - r[x1 - 1] != x2 - x1 + 1 || !a[x1] && r[x2] - r[x1 - 1] != 0)
+				puts("NO");
+			else
+				if (b[y1] && c[y2] - c[y1 - 1] != y2 - y1 + 1 || !b[y2] && c[y2] - c[y1 - 1] != 0)
+					puts("NO");
+				else
+					puts("YES");
+		}
+	}
+	return TIME;
+}

@@ -1,0 +1,57 @@
+#include<stdio.h>
+#include<iostream>
+#include<string.h>
+using namespace std;
+struct node{
+	int x, y, r;
+}a[1110];
+double ans = 0;
+int n;
+int b, e;
+bool vis[1110];
+bool check(node a, node b)
+{
+	if ((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y) == (a.r + b.r)*(a.r + b.r))
+		return 1;
+	return 0;
+}
+void dfs(int k, double r, double all)
+{
+	vis[k] = 1;
+	if (k == e)
+	{
+		ans = all;
+		return;
+	}
+	else
+	{
+		for (int i = 1; i <= n; i++)
+		{
+			if (!vis[i] && check(a[k], a[i]))
+				dfs(i, r*(1.0*a[k].r / a[i].r), all + r*(1.0*a[k].r / a[i].r));
+		}
+	}
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ans = 0;
+		memset(vis, 0, sizeof vis);
+		int xt, yt;
+		cin >> n >> xt >> yt;
+		for (int i = 1; i <= n; i++)
+		{
+			cin >> a[i].x >> a[i].y >> a[i].r;
+			if (a[i].x == xt&&a[i].y == yt)
+				e = i;
+			if (a[i].x == 0 && a[i].y == 0)
+				b = i;
+		}
+		vis[b] = 1;
+		dfs(b, 10000, 10000);
+		printf("%d\n", int(ans));
+	}
+	return 0;
+}

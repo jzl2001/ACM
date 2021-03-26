@@ -1,0 +1,159 @@
+D. Returning Home
+time limit per test2 seconds
+memory limit per test256 megabytes
+inputstandard input
+outputstandard output
+Yura has been walking for some time already and is planning to return home. He needs to get home as fast as possible. To do this, Yura can use the instant-movement locations around the city.
+
+Let's represent the city as an area of n×n square blocks. Yura needs to move from the block with coordinates (sx,sy) to the block with coordinates (fx,fy). In one minute Yura can move to any neighboring by side block; in other words, he can move in four directions. Also, there are m instant-movement locations in the city. Their coordinates are known to you and Yura. Yura can move to an instant-movement location in no time if he is located in a block with the same coordinate x or with the same coordinate y as the location.
+
+Help Yura to find the smallest time needed to get home.
+
+Input
+The first line contains two integers n and m — the size of the city and the number of instant-movement locations (1≤n≤109, 0≤m≤105).
+
+The next line contains four integers sx sy fx fy — the coordinates of Yura's initial position and the coordinates of his home (1≤sx,sy,fx,fy≤n).
+
+Each of the next m lines contains two integers xi yi — coordinates of the i-th instant-movement location (1≤xi,yi≤n).
+
+Output
+In the only line print the minimum time required to get home.
+
+Examples
+inputCopy
+5 3
+1 1 5 5
+1 2
+4 1
+3 3
+outputCopy
+5
+inputCopy
+84 5
+67 59 41 2
+39 56
+7 2
+15 3
+74 18
+22 7
+outputCopy
+42
+Note
+In the first example Yura needs to reach (5,5) from (1,1). He can do that in 5 minutes by first using the second instant-movement location (because its y coordinate is equal to Yura's y coordinate), and then walking (4,1)→(4,2)→(4,3)→(5,3)→(5,4)→(5,5).
+
+题意：一个n*n的地图，从起点到终点求最小代价，有m个传送门，只要x跟y与某个传送门的x，y相同则可以
+传送代价为0，否则就是曼哈顿距离。
+思路：按x和按y排序，建边然后跑最短路。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+struct node1
+{
+	int x, y, id;
+}p[N];
+bool cmp1(node1 a, node1 b)
+{
+	if (a.x == b.x)
+		return a.y < b.y;
+	return a.x < b.x;
+}
+bool cmp2(node1 a, node1 b)
+{
+	if (a.y == b.y)
+		return a.x < b.x;
+	return a.y < b.y;
+}
+vector<pair<int, int>>G[N];
+int st, ed;
+ll dis[N];
+int vis[N];
+struct node
+{
+	int x;
+	ll w;
+	bool operator < (const node &oth)const
+	{
+		return w > oth.w;
+	}
+};
+void dijkstra()
+{
+	priority_queue<node>pq;
+	memset(dis, LINF, sizeof dis);
+	pq.push({ st, 0 });
+	dis[st] = 0;
+	while (!pq.empty())
+	{
+		int f = pq.top().x;
+		ll w = pq.top().w;
+		pq.pop();
+		if (vis[f])
+			continue;
+		vis[f] = 1;
+		for (auto &i : G[f])
+		{
+			if (dis[i.first] > w + i.second)
+				dis[i.first] = w + i.second, pq.push({ i.first, dis[i.first] });
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	scanf("%d%d", &n, &m);
+	int sx, sy, ex, ey;
+	cin >> sx >> sy >> ex >> ey;
+	int cnt = 0;
+	for (int i = 1; i <= m; i++)
+	{
+		scanf("%d%d", &p[i].x, &p[i].y);
+		p[i].id = i;
+		if (p[i].x == sx || p[i].y == sy)
+			G[m + 1].push_back({ i, 0 });
+		else
+			G[m + 1].push_back({ i, min(abs(sx - p[i].x), abs(sy - p[i].y)) });
+		G[i].push_back({ m + 2, abs(ex - p[i].x) + abs(ey - p[i].y) });
+	}
+	G[m + 1].push_back({ m + 2, abs(sx - ex) + abs(sy - ey) });
+	G[m + 2].push_back({ m + 1, abs(sx - ex) + abs(sy - ey) });
+	sort(p + 1, p + m + 1, cmp1);
+	for (int i = 2; i <= m; i++)
+	{
+		int cost = min(abs(p[i - 1].x - p[i].x), abs(p[i - 1].y - p[i].y));
+		G[p[i].id].push_back({ p[i - 1].id, cost }), G[p[i - 1].id].push_back({ p[i].id, cost });
+	}
+	sort(p + 1, p + m + 1, cmp2);
+	for (int i = 2; i <= m; i++)
+	{
+		int cost = min(abs(p[i - 1].x - p[i].x), abs(p[i - 1].y - p[i].y));
+		G[p[i].id].push_back({ p[i - 1].id, cost }), G[p[i - 1].id].push_back({ p[i].id, cost });
+	}
+	st = m + 1, ed = m + 2;
+	dijkstra();
+	cout << dis[ed] << endl;
+	return TIME;
+}
+ 

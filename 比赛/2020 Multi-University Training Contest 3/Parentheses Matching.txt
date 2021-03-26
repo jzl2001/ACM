@@ -1,0 +1,172 @@
+Time Limit: 2000/2000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 759    Accepted Submission(s): 327
+
+
+Problem Description
+Given a string P consisting of only parentheses and asterisk characters (i.e. "(", ")" and "*"), you are asked to replace all the asterisk characters in order to get a balanced parenthesis string with the shortest possible length, where you can replace each "*" by one "(", or one ")", or an empty string "".
+
+A parenthesis string S is a string consisting of only parentheses (i.e. "(" and ")"), and is considered balanced if and only if:
+
+    ● S is an empty string, or
+    ● there exist two balanced parenthesis strings A and B such that S=AB, or
+    ● there exists a balanced parenthesis string C such that S=(C).
+
+For instance, "", "()", "(())", "()()", "()(())" are balanced parenthesis strings.
+
+Due to some notorious technical inability, if there are several solutions with the shortest possible length, then you have to report the smallest possible one in lexicographical order.
+
+For every two different strings A and B of the same length n, we say A is smaller than B in lexicographical order if and only if there exists some integer k such that:
+
+    ● 1≤k≤n, and
+    ● the first (k−1) characters of A and that of B are exactly the same, and
+    ● the k-th character of A is smaller than that of B.
+
+For instance, "()(())" is smaller than "()()()", and in this case, k=4.
+ 
+
+Input
+There are several test cases.
+
+The first line contains an integer T (1≤T≤105), denoting the number of test cases. Then follow all the test cases.
+
+For each test case, the only line contains a string of length n (1≤n≤105), denoting the string P that consists of only parentheses and asterisk characters.
+
+It is guaranteed that the sum of n in all test cases is no larger than 5×106.
+ 
+
+Output
+For each test case, output in one line "No solution!" (without quotes) if no solution exists, or otherwise the smallest possible solution in lexicographical order. Note that the output characters are case-sensitive.
+ 
+
+Sample Input
+5
+*))*)
+*(*)*
+*)*(*
+******
+((***)()((**
+ 
+
+Sample Output
+No solution!
+()
+()()
+
+(())()(())
+ 
+
+Source
+2020 Multi-University Training Contest 3
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6813 6812 6811 6810 6809 
+ 
+
+Statistic | Submit | Discuss | Note
+题意：给出一个字符串只含有*()，*可以变成(或者)，问最小字典序的合法括号。
+用队列来存储*，不满足的时候用掉队首，因为至少要补，'('字典序小，所以用掉最前面的最好。
+倒着来同理。
+(*)*)
+答案是(()),如果用栈会是()()
+<贪心>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 1e5 + 100;
+const int M = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+char s[N];
+int stk[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int flag = 1;
+		scanf("%s", s + 1);
+		int len = strlen(s + 1);
+		int sum = 0;
+		queue<int>q;
+		for (int i = 1; i <= len; i++)
+		{
+			if (s[i] == '*')
+				q.push(i);
+			else
+				if (s[i] == '(')
+					sum++;
+				else
+					sum--;
+			if (sum < 0)
+			{
+				if (q.empty())
+				{
+					flag = 0;
+					break;
+				}
+				else
+					sum = 0, s[q.front()] = '(', q.pop();
+			}
+		}
+		if (!flag)
+		{
+			puts("No solution!");
+			continue;
+		}
+		else
+		{
+			while (!q.empty())
+				q.pop();
+			sum = 0;
+			for (int i = len; i >= 1; i--)
+			{
+				if (s[i] == '*')
+					q.push(i);
+				else
+					if (s[i] == ')')
+						sum++;
+					else
+						sum--;
+				if (sum < 0)
+				{
+					if (q.empty())
+					{
+						flag = 0;
+						break;
+					}
+					else
+						sum = 0, s[q.front()] = ')', q.pop();
+				}
+			}
+			if (!flag)
+			{		
+				puts("No solution!");
+				continue;
+			}
+			else
+			{
+				for (int i = 1; i <= len; i++)
+				{
+					if (s[i] != '*')
+						putchar(s[i]);
+				}
+				putchar('\n');
+			}
+		}
+	}
+	return TIME;
+}

@@ -1,0 +1,69 @@
+#include<iostream>
+#include<string.h>
+#include<queue>
+using namespace std;
+const int INF = 0x3f;
+int a[20], vis[110];
+int bx, ex;
+struct node{
+	int x, t;
+};
+int bfs(int x, int t)
+{
+	queue<node>q;
+	q.push({ x, t });
+	while (!q.empty())
+	{
+		int x = q.front().x, t = q.front().t;
+		q.pop();
+		if (vis[x])
+			continue;
+		vis[x] = 1;
+		if (x == ex)
+			return t;
+		if (a[10])
+			q.push({ (x + 1) % 100, t + 1 });
+		if (a[11])
+		{
+			if (x - 1 < 0)
+				q.push({ 99, t + 1 });
+			else
+				q.push({ x - 1, t + 1 });
+		}
+		if (a[12])
+		{
+			for (int i = 1; i <= 9; i++)
+				for (int j = 1; j <= 9; j++)
+				{
+					if (a[i] && a[j])
+						q.push({ i * 10 + j, t + 3 });
+				}
+		}
+		for (int i = 1; i <= 9; i++)
+			if (a[i])
+				q.push({ i, t + 1 });
+	}
+	return -1;
+}
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		memset(vis, 0, sizeof vis);
+		memset(a, 0, sizeof a);
+		for (int i = 1; i <= 3; i++)
+			cin >> a[i];
+		cin >> a[10];
+		for (int i = 4; i <= 6; i++)
+			cin >> a[i];
+		cin >> a[11];
+		for (int i = 7; i <= 9; i++)
+			cin >> a[i];
+		cin >> a[12]>>a[0];
+		cin >> bx >> ex;
+		int ans = bfs(bx, 0);
+		cout << ans << endl;
+	}
+	return 0;
+}

@@ -1,0 +1,71 @@
+/*
+cout输出浮点的时候，虽然是整数但是会输出e
+*/
+#pragma GCC optimize(2)
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+char s[N];
+int get(string s)
+{
+    int sum = 0;
+    for (int i = 0; i < s.size(); i++)
+    {
+        sum = sum * 10 + s[i] - '0';
+    }
+    return sum;
+}
+double solve(int x, int y)
+{
+    int sum = 0;
+    for (int i = 1; i <= y; i++)
+    {
+        sum += i;
+    }
+    return x * 1.0 * sum / y;
+}
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    string s;
+    cin >> s;
+    int last = -1;
+    double tot = 0;
+    s.push_back('+');
+    for (int i = 0; i < s.size(); i++)
+    {
+        if (s[i] == '+')
+        {
+            string u = s.substr(last + 1, i - last - 1);
+            int f = u.find('d');
+            if (f == -1)
+                tot += get(u);
+            else
+            {
+                int x = get(u.substr(0, f));
+                int y = get(u.substr(f + 1, u.size() - f));
+                tot += solve(x, y);
+            }
+            last = i;
+        }
+    }
+    if (int(tot) == tot)
+        cout << int(tot) << endl;
+    else
+        printf("%.1f\n", tot);
+    return TIME;
+}

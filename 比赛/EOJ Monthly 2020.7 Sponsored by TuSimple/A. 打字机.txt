@@ -1,0 +1,55 @@
+//https://acm.ecnu.edu.cn/contest/292/problem/A/
+//贪心，思维，注意题意，询问是某个位置，而不是总体由某种得到。aabba是happy
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 1e6 + 10;
+
+char s[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	while (n--)
+	{
+		scanf("%s", s + 1);
+		int len = strlen(s + 1);
+		int flagb = 0, flaga = 0, flag = 1, flag1 = 1;
+		int cntb = 0, cnta = 0;
+		for (int i = 1; i <= len; i++)
+		{
+			s[i] == 'a' ? cnta++ : cntb++;
+			if (i >= 3 && s[i] == 'b' && s[i - 1] == 'a' && s[i - 2] == 'a')
+				flag1 = 0;
+			if (cntb > cnta)
+				flag = 0;
+			if (cntb == cnta)
+				flag1 = 1;
+		}
+		if (flag == 0)
+		{
+			puts("Dead Fang");
+			continue;
+		}
+		if (flag1 == 0)
+		{
+			puts("Sad Fang");
+			continue;
+		}
+		puts("Happy Fang");
+	}
+	return TIME;
+}

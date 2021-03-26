@@ -1,0 +1,78 @@
+/*
+给出s，t问你用s的字符组成的串，字典序大于s小于t的方案。
+类似于数位dp，算每一位，如果小于，那我后面任意排列，要么相同继续下一位
+最后要除以相同数字的阶乘，因为他们算一种
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+ll d[N];
+ll cnt[26];
+ll fac[N];
+char s[N];
+int len;
+ll num[N];
+ll calc(int x)
+{
+	ll tot = 0;
+	for (int i = 0; i < x; i++)
+		tot += cnt[i];
+	return tot;
+}
+ll dfs(int d)
+{
+	if (d == len + 1)
+		return 0;
+	ll tot = calc(s[d] - 'a') * fac[len - d] % mod; // 取小
+	if (cnt[s[d] - 'a'])
+	{
+		cnt[s[d] - 'a']--;
+		ll u = dfs(d + 1);
+		cnt[s[d] - 'a']++;
+		tot = (tot + cnt[s[d] - 'a'] * u % mod) % mod;
+	}
+	return tot;
+}
+int main(){
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	fac[0] = 1;
+	for (ll i = 1; i < N; i++)
+	{
+		fac[i] = (fac[i - 1] * i) % mod;
+	}
+	scanf("%s", s + 1);
+	len = strlen(s + 1);
+	for (int i = 1; i <= len; i++)
+		cnt[s[i] - 'a']++;
+	ll ans = dfs(1);
+	scanf("%s", s + 1);
+	ans = (dfs(1) - ans + mod) % mod;
+	for (int i = 0; i < 26; i++)
+	{
+		if (cnt[i] >= 1)
+			ans = ans * fpow(fac[cnt[i]], mod - 2, mod) % mod;
+	}
+	cout << ans - 1 << endl;
+	return TIME;
+}

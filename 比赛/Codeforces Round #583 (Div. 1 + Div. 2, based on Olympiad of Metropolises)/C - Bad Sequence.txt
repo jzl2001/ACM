@@ -1,0 +1,48 @@
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+ 
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int N = 1e5 + 10;
+const int mod = 998244353;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+int main(){
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	string s;
+	cin >> s;
+	int len = s.size();
+	int cnt1 = 0, cnt2 = 0;
+	if (len % 2 != 0)
+		cout << "No" << endl, exit(0);
+	for (int i = 0; i < len; i++)
+	{
+		if (s[i] == '(')
+			cnt1++;
+		else
+		{
+			cnt2++;
+			if (cnt1 != 0)
+				cnt1--, cnt2--;
+		}
+	}   // 消到最后, 剩余的cnt1, cnt2个数最多相等且为1
+	if ((!cnt1 && !cnt2) || (cnt1 == cnt2 && cnt1 == 1))
+		cout << "Yes" << endl;
+	else
+		cout << "No" << endl;
+	return TIME;
+}

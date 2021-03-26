@@ -1,0 +1,132 @@
+链接：https://ac.nowcoder.com/acm/contest/8100/K
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+A sequence is called kk-bag, if and only if it is put in order by some (maybe one) permutations of 11 to kk. For example, 1,2,3,2,1,3,3,2,11,2,3,2,1,3,3,2,1 is a valid 33-bag sequence.
+Roundgod is not satisfied with kk-bag, so she put forward part-kk-bag, which is a  contiguous subsequence of kk-bag.
+Wcy wants to know if the sequence of length nn is a part-kk-bag sequence.
+输入描述:
+The first line contains one integer T\ (1\le T\le 20)T (1≤T≤20), denoting the number of test cases. Then TT test cases follow.
+The first line of each test case contains two integers n,k\ (1\le n \le 5 \cdot 10^5,1\le k \le 10^9)n,k (1≤n≤5⋅10 
+5
+ ,1≤k≤10 
+9
+ ).
+The second line of each test case contains nn integers indicate the sequence.
+It is guaranteed that \sum n \le 2\cdot 10^6∑n≤2⋅10 
+6
+ , the values of the sequence are between 11 and 10^910 
+9
+ .
+输出描述:
+One line of each test case, if the sequence is a part-kk-bag sequence, print "YES", otherwise print "NO".
+示例1
+输入
+复制
+1
+8 3
+2 3 2 1 3 3 2 1
+输出
+复制
+YES
+
+
+思路：给出一个长度为n的序列，问n是不是由部分多个k的全排列拼接而成。
+尺取，求出每个位置前面能到的最长没有重复数字的地方。
+n > k时候然后枚举前k个，后面k个k个取看看每个位置终点是不是都能到达长度k。
+n <= k时，看看有没有哪个位置能前面的数字都不同并且后面的数字都不同。
+#include <bits/stdc++.h>
+#include <unordered_map>
+
+using namespace std;
+typedef long long ll;
+const int N = 5e5 + 10;
+
+char s[N];
+unordered_map<int, int> vis;
+int a[N];
+int b[N];
+int c[N];
+int d[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\input.txt", "r", stdin);
+#endif // LOCAL
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		vis.clear();
+		int n, k;
+		scanf("%d%d", &n, &k);
+		int flag = 0;
+		int can = 1;
+		int L = 1, R = 1;
+		for (int i = 1; i <= n; i++)
+		{
+			d[i] = b[i] = c[i] = 0;
+			scanf("%d", a + i);
+			if (a[i] > k)
+				can = 0;
+		}
+		if (!can)
+			goto brk;
+		while (L <= R)
+		{
+			while (!vis[a[R]] && R <= n)
+				vis[a[R]]++, c[R] = L, ++R;
+			if (R - L == k)
+				b[L] = 1;
+			vis[a[L]]--, L++;
+		}
+		if (n > k)
+		{
+			for (int j = 0; j <= k; j++)
+			{
+				if (j != 0 && c[j] != 1)
+					break;
+				int f = 1;
+				int i;
+				for (i = j + k; i <= n; i += k)
+				{
+					if (c[i] != i - k + 1)
+					{
+						f = 0;
+						break;
+					}
+				}
+				if (i != n)
+				{
+					if (c[n] > i - k + 1)
+						f = 0;
+				}
+				if (f)
+				{
+					flag = 1;
+					goto brk;
+				}
+			}
+		}
+		else
+		{
+			int f = 0;
+			int R = 0, num = 0;
+			for (int i = 1; i <= n; i++)
+			{
+				if (c[i] == 1 && c[n] <= i + 1)
+				{
+					flag = 1;
+					goto brk;
+				}
+			}
+		}
+	brk:
+		printf("%s\n", flag ? "YES" : "NO");
+	}
+
+	return 0;
+}

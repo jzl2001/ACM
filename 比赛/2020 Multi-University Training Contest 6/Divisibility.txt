@@ -1,0 +1,69 @@
+Time Limit: 2000/1000 MS (Java/Others)    Memory Limit: 65536/65536 K (Java/Others)
+Total Submission(s): 521    Accepted Submission(s): 366
+
+
+Problem Description
+You are given two 10-based integers b and x, and you are required to determine the following proposition is true or false:
+
+For arbitrary b-based positive integer y=c1c2⋯cn¯¯¯¯¯¯¯¯¯¯¯¯¯ (ci is the i-th dight from left of y), define f(y)=∑i=1nci, if f(f(⋯f(y)⋯))∞ can be divided by x, then y can be divided by x, otherwise y can't be divided by x.
+ 
+
+Input
+The first line contains a 10-based integer t (1≤t≤105) — the number of test cases.
+
+For each test case, there is a single line containing two 10-based integers b and x (2≤b,x≤1018).
+ 
+
+Output
+For each test case, if the proposition is true, print "T", otherwise print "F" (without quotes).
+ 
+
+Sample Input
+1
+10 3
+ 
+
+Sample Output
+T
+ 
+
+Source
+2020 Multi-University Training Contest 6
+ 
+
+Recommend
+IceyWang   |   We have carefully selected several similar problems for you:  6900 6899 6898 6897 6896 
+ 
+
+Statistic | Submit | Discuss | Note
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 2e5 + 10;
+const int mod = 1e9 + 7;
+
+int main()
+{
+#ifdef LOCAL
+    freopen("E:/input.txt", "r", stdin);
+#endif
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        ll a, b;
+        cin >> a >> b;
+        if ((a - 1) % b == 0)
+            puts("T");
+        else
+            puts("F");
+    }
+    return TIM

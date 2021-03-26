@@ -1,0 +1,124 @@
+构造，规律题
+https://acm.ecnu.edu.cn/contest/292/problem/E/
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+typedef long long ll;
+const int N = 1e6 + 10;
+
+char s[N];
+int p[N], k[N];
+int a[40010][15];
+ll fpow(ll a, ll b)
+{
+	ll res = 1;
+	while (b)
+	{
+		if (b & 1)
+			res *= a;
+		b >>= 1;
+		a *= a;
+	}
+	return res;
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	ll m = 1;
+	for (int i = 1; i <= n; i++)
+	{
+		scanf("%d%d", &p[i], &k[i]);
+		m *= (k[i] + 1);
+	}
+	int len = 1, dange;
+	for (int j = 1; j <= n; j++)
+	{
+		dange = len;
+		len *= (k[j] + 1);
+		int num = 0;
+		int cnt = 0, id = 0, flag = 1;
+		for (;;)
+		{
+			if (flag)
+			{
+				for (int k = 1; k <= dange; k++)
+					a[++id][j] = num, cnt++;
+				if (num == k[j])
+					flag = 0, --num;
+				++num;
+			}
+			else
+			{
+				for (int k = 1; k <= dange; k++)
+					a[++id][j] = num, cnt++;
+				if (num == 0)
+					flag = 1, ++num;
+				--num;
+			}
+			if (cnt == m)
+				break;
+		}
+	}
+	for (int j = 1; j <= m; j++)
+	{
+		ll res = 1;
+		for (int i = 1; i <= n; i++)
+			res *= fpow(p[i], a[j][i]);
+		printf("%lld\n", res);
+	}
+	return TIME;
+}
+Cuber QQ 沉迷数学研究，最近他在研究数的因数，并发明了因数串。
+
+因数的概念是，如果整数  除以整数  的商正好是整数而没有余数，我们就说  是  的因数。
+
+因数串，指的是由正整数  所有因数所构成的一个数列，需要满足从数列的第  个数开始，每个数都必须由其前一个数乘以某个质数或除以某个质数得出的。
+
+因数串需要保证正整数  所有因数都会出现且只出现一次。现在 Cuber QQ 会告诉你正整数  ，你需要给出任意一个因数串。
+
+输入格式
+输入数据第一行包含一个正整数  () ，表示  的质因数个数。
+
+接下来  行，每行两个整数 
+ (
+) ，其中 
+ 一定是质数，且两两都不相同。
+
+其中正整数 
+ ，输入数据保证  且 
+ 。
+
+输出格式
+输出数据包含若干行，每行一个整数，按照顺序依次输出正整数  的因数串。
+
+样例
+input
+2
+2 3
+3 2
+output
+1
+2
+4
+8
+24
+12
+6
+3
+9
+18
+36
+72

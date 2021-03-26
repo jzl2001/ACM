@@ -1,0 +1,89 @@
+<博弈> <思维>
+考虑一个人操作, 另一个人可以在对称操作, 
+所以cnt1, cnt2都先减个min
+对于剩余的操作次数, 在小于的时候, 后手可以加9
+先手自然不会加(加了, 就补成9 - i), 如果最后相等
+就可以组成, 大于时同理
+若相等时候, 若两边操作次数不相等, 则导致一半补完了, 另一半咋选都不相等了
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+ll fpow(ll a, ll b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+char s[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("D:/input.txt", "r", stdin);
+#endif
+	int n;
+	cin >> n;
+	scanf("%s", s + 1);
+	int sum1 = 0, cnt1 = 0, sum2 = 0, cnt2 = 0;
+	for (int i = 1; i <= n / 2; i++)
+	{
+		if (s[i] != '?')
+			sum1 += s[i] - '0';
+		else
+			cnt1++;
+	}
+	for (int i = n / 2 + 1; i <= n;i ++)
+	{
+		if (s[i] != '?')
+			sum2 += s[i] - '0';
+		else
+			cnt2++;
+	}
+	int u = cnt1, v = cnt2;
+	int MI = min(cnt1, cnt2);
+	cnt1 -= MI;
+	cnt2 -= MI;
+	if (cnt1 == 0 && cnt2 == 0)
+	{
+		if (sum1 == sum2)
+			cout << "Bicarp" << endl;
+		else
+			cout << "Monocarp" << endl;
+		return 0;
+	}
+	if (sum1 > sum2)
+	{
+		if (sum2 + cnt2 / 2 * 9 == sum1)
+			cout << "Bicarp" << endl;
+		else
+			cout << "Monocarp" << endl;
+		return 0;
+	}
+	else
+		if (sum1 < sum2)
+		{
+			if (sum1 + cnt1 / 2 * 9 == sum2)
+				cout << "Bicarp" << endl;
+			else
+				cout << "Monocarp" << endl;
+			return 0;
+		}
+		else
+		{
+			if (u != v)
+				cout << "Monocarp" << endl;
+			else
+				cout << "Bicarp" << endl;
+		}
+	return TIME;
+}

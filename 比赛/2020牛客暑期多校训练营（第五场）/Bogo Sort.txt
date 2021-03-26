@@ -1,0 +1,115 @@
+链接：https://ac.nowcoder.com/acm/contest/8075/E
+来源：牛客网
+
+时间限制：C/C++ 1秒，其他语言2秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+Today Tonnnny the monkey learned a new algorithm called Bogo Sort. The teacher gave Tonnnny the code of Bogo sort:
+bool is_sorted(int a[], int n) {
+    for (int i = 1; i < n; i++) {
+        if (a[i] < a[i - 1]) {
+            return false;
+        }
+    }
+    return true;
+}
+void bogo_sort(int a[], int n) {
+    while (!is_sorted(a, n)) {
+        shuffle(a, a + n);
+    }
+} 
+
+The teacher said the shuffle function is to uniformly randomly permute the array  with length , and the algorithm's expectation complexity is O(n \cdot n!)O(n⋅n!).
+However, Tonnnny is a determined boy — he doesn't like randomness at all! So Tonnnny improved Bogo Sort. He had chosen one favourite permutation with length , and he replaced the random shuffle with shuffle of , so the improved algorithm, Tonnnny Sort, can solve sorting problems for length array — at least Tonnnny thinks so.
+
+int p[N] = {....}; // Tonnnny's favorite permutation of n
+void shuffle(int a[], int n) {
+    int b[n];
+    for (int i = 0; i < n; i++) {
+        b[i] = a[i]
+    }
+    for (int i = 0; i < n; i++) {
+        a[i] = b[p[i]];
+    }
+}
+
+void tonnnny_sort(int a[], int n) {
+    assert (n == N); // Tonnnny appointed!
+    while (!is_sorted(a, n)) {
+        shuffle(a, a + n);
+    }
+}
+
+Tonnnny was satsified with the new algorithm, and decided to let you give him a different array of length every day to sort it with Tonnnny Sort.
+
+You are the best friend of Tonnnny. Even though you had found the algorithm is somehow wrong, you want to make Tonnnny happy as long as possible. You're given N,\ pN, p, and you need to calculate the maximum number of days that Tonnnny will be happy, since after that you can't give Tonnnny an array that can be sorted with Tonnnny Sort and didn't appeared before.
+
+The answer may be very large. Tonnnny only like numbers with at most digits, so please output answer mod 10^N10 
+N
+  instead.
+
+输入描述:
+The first line contains one integer N (1 \leq N \leq 10^5)N(1≤N≤10 
+5
+ ).
+The second line contains integer indicating , which forms a permutation of 1, 2, \cdots, N1,2,⋯,N.
+输出描述:
+The maximum number of days that Tonnnny will be happy, module 10 ^ N10 
+N
+ .
+示例1
+输入
+复制
+5
+1 2 3 4 5
+输出
+复制
+1
+示例2
+输入
+复制
+6
+2 3 4 5 6 1
+输出
+复制
+6
+题意：给出一个置换数组p，问有多少个1到n个排列使得置换后能有序，求出所有的环，然后求所有环长度的LCM。
+大数、置换、模拟。
+import java.math.BigInteger;
+import java.util.Scanner;
+import java.util.Vector;
+
+public class Main
+{
+    public static void main(String[] args)
+    {
+        Scanner cin = new Scanner(System.in);
+        int n = cin.nextInt();
+        Vector<Integer> v = new Vector<Integer>();
+        boolean[] vis = new boolean[n + 1];
+        int[] p = new int[n + 1];
+        for (int i = 1; i <= n; i++)
+            p[i] = cin.nextInt();
+        for (int i = 1; i <= n; i++)
+        {
+            int now = i;
+            int len = 0;
+            while (!vis[now])
+            {
+                len++;
+                vis[now] = true;
+                now = p[now];
+            }
+            if (len > 0)
+                 v.add(len);
+        }
+        BigInteger ans = BigInteger.ONE;
+        for (int i : v)
+        {
+            BigInteger g = ans.gcd(BigInteger.valueOf(i));
+            ans = ans.multiply(BigInteger.valueOf(i)).divide(g);
+        }
+        System.out.println(ans);
+    }
+}

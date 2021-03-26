@@ -1,0 +1,20 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#define continue(x) { x; continue; }
+#define break(x) { x; break; }
+int main(){
+	int len1;
+	string p;
+	cin >> len1>> p;
+	int len2 = p.size();
+	if (len1 < len2)
+		cout << "T_T" << endl;
+	else
+	{
+		cout << p;
+		for (int i = 1; i <= len1 - len2; i++)
+			cout << "0";
+	}
+	return 0;
+}

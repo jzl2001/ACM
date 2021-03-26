@@ -1,0 +1,149 @@
+https://acm.ecnu.edu.cn/contest/270/problem/D/
+On the magical land Byteland, there is an ancient kingdom called Fibonacci Kingdom.
+
+There are  cities in the kingdom(numbered from  to ), and  residents in the -th city.
+
+ denotes the -th number of Fibonacci sequence, such that each number is the sum of the two preceding ones, starting from  and . That is,  and  for . The beginning of the sequence is thus: .
+
+Unfortunately, one day, an earthquake occurred.
+
+The earthquake destroyed the whole kingdom’s transportation system.
+
+To deliver disaster relief supplies, the king decided to reconstruct the road.
+
+ plans have been proposed, and the -th plan is to reconstruct the bidirectional road linking  and , denoted as .
+
+The magic is that it takes exactly  bitcoins to reconstruct the road .
+
+The king wants to choose some plans to implement, but the rules below must be followed:
+
+After the reconstruction, the cities are mutually reachable (i.e., there is at least one path connecting any two cities).
+Minimize the bitcoin consumption.
+In the premise of the least bitcoin consumption, the largest degree  among all the cities should be minimized(suppose  is the degree of -th city,  	 ), because the residents of the kingdom are not good at looking for ways. The definition of the degree of a city is the number of roads directly connected to the city.
+Setsuna, the savior of the kingdom, has easily calculated the minimum consumption of bitcoin, but she desperately wants to know the minimum  she can get after reconstruction.
+
+It’s guaranteed that the answer always exists.
+
+输入格式
+The first line contains two integers 
+ 
+.
+
+The -th of the next  lines contains two integers .
+
+输出格式
+Output one integer which indicates the minimum  Setsuna can get.
+
+样例
+input
+5 6
+2 1
+2 4
+1 3
+3 4
+4 5
+1 5
+output
+3
+提示
+The graph of the sample is as follows.
+
+T9_p1
+
+In this situation, bitcoin consumption is . The degree of city  is ; the degree of city  is ; the degree of city  is .
+
+It can be proved that such solution is the best, so the answer is .
+题意：给出一个图，边权为Fib(u) + Fib(v)
+求使图联通，且代价最小，问此时度数最大的点度数是多少
+思路：对边排序，MST
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 998244353;
+const int N = 1e6 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+int pre[N];
+int n, m;
+int find(int x)
+{
+	return x == pre[x] ? x : pre[x] = find(pre[x]);
+}
+struct node
+{
+	int u, v;
+	bool operator < (const node &oth)const
+	{
+		if (v == oth.v)
+			return u < oth.u;
+		else
+			return v < oth.v;
+	}
+}a[N];
+int deg[N];
+void kruskal()
+{
+	int num = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		pre[i] = i;
+	}
+	for (int i = 1; i <= m; i++)
+	{
+		int u = a[i].u, v = a[i].v;
+		u = find(u), v = find(v);
+		if (find(u) == find(v))
+		{
+			continue;
+		}
+		deg[a[i].u]++;
+		deg[a[i].v]++;
+		pre[u] = v;
+		++num;
+		if (num == n - 1)
+		{
+			break;
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	cin >> n >> m;
+	for (int i = 1; i <= m; i++)
+	{
+		int u, v;
+		scanf("%d%d", &u, &v);
+		if (u > v)
+		{
+			swap(u, v);
+		}
+		a[i] = { u, v };
+	}
+	sort(a + 1, a + m + 1);
+	kruskal();
+	int mx = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		mx = max(mx, deg[i]);
+	}
+	cout << mx << endl;
+	return TIME;
+}

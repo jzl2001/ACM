@@ -1,0 +1,53 @@
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <string.h>
+#include <vector>
+using namespace std;
+typedef long long ll;
+const int N = 1e5 + 10;
+struct node{
+	ll x, cnt;
+	bool operator<(const node b)const
+	{
+		return x > b.x;
+	}
+};
+int main(){
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		ll n;
+		cin >> n;
+		priority_queue<node, vector<node>, less<node>>pq;
+		pq.push({ 1, n });
+		ll ans = 0;
+		while (!pq.empty())
+		{
+			node a = pq.top();
+			pq.pop();
+			if (a.x == n)
+				break;
+			if (a.cnt % 2 == 0)
+				pq.push({ a.x * 2, a.cnt / 2 });
+			else
+				if (a.cnt >= 3)
+				{
+					pq.push({ a.x * 2, a.cnt / 2 });
+					pq.push({ a.x, 1 });
+				}
+				else
+				{
+					node b = pq.top();
+					pq.pop();
+					ans += abs(b.x - a.x);
+					pq.push({ a.x + b.x, 1 });
+					if (b.cnt - 1 != 0)
+						pq.push({ b.x, b.cnt - 1 });
+				}
+		}
+		cout << ans << endl;
+	}
+	return 0;
+}

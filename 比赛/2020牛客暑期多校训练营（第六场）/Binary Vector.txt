@@ -1,0 +1,122 @@
+链接：https://ac.nowcoder.com/acm/contest/8100/B
+来源：牛客网
+
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 524288K，其他语言1048576K
+64bit IO Format: %lld
+题目描述 
+Roundgod is obsessive about linear algebra. Let A=\{0,1\}A={0,1}, everyday she will generate a binary vector randomly in A^nA 
+n
+ . Now she wonders the probability of generating nn linearly independent vectors in the next nn days modulo 10^9+710 
+9
+ +7. Formally, it can be proved that the answer has the form of \frac{P}{Q} 
+Q
+P
+​	
+ , where PP and QQ are coprime and QQ is not a multiple of 10^9+710 
+9
+ +7. The answer modulo 10^9+710 
+9
+ +7 thus means P \cdot Q^{-1} (\textrm{mod}\ 10^9+7 )P⋅Q 
+−1
+ (mod 10 
+9
+ +7), where Q^{-1}Q 
+−1
+  is the multiplicative inverse of 10^9+710 
+9
+ +7.
+
+Wcy thinks the problem too easy. Let the answer of nn be f_nf 
+n
+​	
+ , she wants to know f_1\oplus f_2\oplus ...\oplus f_Nf 
+1
+​	
+ ⊕f 
+2
+​	
+ ⊕...⊕f 
+N
+​	
+ , where \oplus⊕ denotes bitwise exclusive or operation.
+
+Note that when adding up two vectors, the components are modulo 22.
+输入描述:
+The input contains multiple test cases. The first line of input contains one integer T\ (1\le T\le 1000 )T (1≤T≤1000), denoting the number of test cases.
+
+In the following TT lines, each line contains an integer N\ (1\le N\le 2*10^7 )N (1≤N≤2∗10 
+7
+ ) describing one test case.
+输出描述:
+For each test case, output one integer indicating the answer.
+示例1
+输入
+复制
+3
+1
+2
+3
+输出
+复制
+500000004
+194473671
+861464136
+说明
+f[1] = 1 / 2
+f[2] = 3 / 8
+f[3] = 21 / 64
+猜规律，每次乘以2的i次方-1 / 2的i次方。
+求结果的异或和。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+#define Continue(x) { x; continue; }
+#define Break(x) { x; break; }
+const int mod = 1e9 + 7;
+const int N = 2e7 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+
+ll res[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	res[1] = 500000004;
+	ll base = fpow(2LL, mod - 2, mod);
+	ll last = 500000004;
+	ll fm = fpow(2LL, mod - 2, mod);
+	ll two = 2;
+	for (int i = 2; i <= 20000000; i++)
+	{
+		two = two * 2 % mod;
+		base = base * fm % mod;
+		last = last * (two - 1) % mod * base % mod;
+		res[i] = last ^ res[i - 1];
+	}
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n;
+		cin >> n;
+		printf("%lld\n", res[n]);
+	}
+	return TIME;
+}
+​	

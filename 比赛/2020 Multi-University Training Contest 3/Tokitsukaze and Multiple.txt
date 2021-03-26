@@ -1,0 +1,97 @@
+Time Limit: 2000/1000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 1061    Accepted Submission(s): 473
+
+
+Problem Description
+Tokitsukaze has a sequence of length n, denoted by a.
+
+Tokitsukaze can merge two consecutive elements of a as many times as she wants. After each operation, a new element that equals to the sum of the two old elements will replace them, and thus the length of a will be reduced by 1.
+
+Tokitsukaze wants to know the maximum possible number of elements that are multiples of p she can get after doing some operations (or doing nothing) on the sequence a.
+ 
+
+Input
+There are several test cases.
+
+The first line contains an integer T (1≤T≤20), denoting the number of test cases. Then follow all the test cases.
+
+For each test case, the first line contains two integers n and p (1≤n,p≤105), denoting the length of the sequence and the special number, respectively.
+
+The second line contains n integers, where the i-th integer ai (1≤ai≤105) is the i-th element of a.
+
+It is guaranteed that the sum of n in all test cases is no larger than 106.
+ 
+
+Output
+For each test case, output in one line the maximum possible number of elements that are multiples of p after doing some operations.
+ 
+
+Sample Input
+2
+5 3
+2 1 3 2 1
+3 1
+123 456 789
+ 
+
+Sample Output
+3
+3
+ 
+
+Source
+2020 Multi-University Training Contest 3
+ 
+
+Recommend
+liuyiding   |   We have carefully selected several similar problems for you:  6813 6812 6811 6810 6809 
+ 
+
+Statistic | Submit | Discuss | Note
+题意：每次可以合并相邻两个数字，问最后能有多少个数字是m的倍数， 直接map存储前缀和即可，因为是相邻的合并，所以直接取最优。
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 1e5 + 100;
+const int M = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int a[N];
+int b[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	//freopen("E:\\output.txt", "w", stdout);
+#endif
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int n, m;
+		cin >> n >> m;
+		int sum = 0;
+		int ans = 0;
+		map<int, int>mp;
+		mp.insert({ 0, 0 });
+		for (int i = 1; i <= n; i++)
+		{
+			scanf("%d", &a[i]);
+			sum = (sum + a[i]) % m;
+			if (mp.find(sum) != mp.end())
+				ans++, mp.clear(), mp.insert({ 0, 0 }), sum = 0;
+			else
+				mp.insert({ sum, 0 });
+		}
+		cout << ans << endl;
+	}
+	return TIME;
+}

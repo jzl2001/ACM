@@ -1,0 +1,110 @@
+/*
+链接：https://ac.nowcoder.com/acm/contest/6290/E
+来源：牛客网
+
+时间限制：C/C++ 2秒，其他语言4秒
+空间限制：C/C++ 262144K，其他语言524288K
+64bit IO Format: %lld
+题目描述 
+给定  个整数  。保证  。
+对于每个  ，求出 。为了避免过量输出，你只需要将所有的 m 个结果异或起来输出。
+输入描述:
+第一行两个整数  。
+第二行  个整数，第  个表示  。
+输出描述:
+一行一个整数，表示所有结果异或起来的结果。
+示例1
+输入
+复制
+2 2
+1 2
+输出
+复制
+0
+说明
+当  时，结果为  。
+
+当 时，结果为   。
+
+所以输出  。
+示例2
+输入
+复制
+10 10
+1 3 5 5 2 5 9 3 1 10
+输出
+复制
+60
+备注:
+*/
+/*
+题意：给出n，m。
+对于每个1~m的数字，求∑(i=1，n) (ai / x + x / ai)的结果异或起来的值。
+思路对于求x / ai，对于x / ai = k，x = ai * k 跟 x = (ai * (k + 1)) - 1之间都是k。
+则枚举倍数，在每个倍数点加上cnt[ai],再求完前缀和，即是答案。
+对于ai / x = k，对于 k * x到 ai = (x * (k + 1)) - 1的答案都是k，我们第一维枚举x然后
+第二维枚举x的倍数，k = j / x，可以用前缀和计算出j~j+i-1的个数再乘以j/i。
+*/
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+
+#ifdef LOCAL
+#define debug(x) cout << "[" __FUNCTION__ ": " #x " = " << (x) << "]\n"
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+#define hash_ 1000000009
+const int mod = 1e9 + 7;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+#define gc p1 == p2 && (p2 = (p1 = buf) + fread(buf, 1, 1000000, stdin), p1 == p2) ? EOF : *p1++;
+inline int read(){ static char buf[1000000], *p1 = buf, *p2 = buf; register int x = false; register char ch = gc; register bool sgn = false; while (ch != '-' && (ch < '0' || ch > '9')) ch = gc; if (ch == '-') sgn = true, ch = gc; while (ch >= '0'&& ch <= '9') x = (x << 1) + (x << 3) + (ch ^ 48), ch = gc; return sgn ? -x : x; }
+template<class T> T gcd(T a, T b) { return b == 0 ? a : gcd(b, a % b); };
+ll fpow(ll a, int b, int mod) { ll res = 1; for (; b > 0; b >>= 1) { if (b & 1) res = res * a % mod; a = a * a % mod; } return res; }
+const int N = 2e6 + 10;
+
+ll a[N]; 
+ll b[N];
+int main()
+{
+#ifdef LOCAL
+	freopen("E:/input.txt", "r", stdin);
+#endif
+	int n, m;
+	cin >> n >> m;
+	for (int i = 1; i <= n; i++)
+	{
+		int num;
+		scanf("%d", &num);
+		++a[num];
+	}
+	for (int i = 1; i <= m; i++)
+	{
+		if (!a[i])
+			continue;
+		for (int j = i; j <= m; j += i)
+			b[j] += a[i];
+	}
+	for (int i = 1; i <= m; i++)
+		a[i] += a[i - 1], b[i] += b[i - 1];
+	ll ans = 0;
+	for (int i = 1; i <= m; i++)
+	{
+		ll sum = b[i];
+		for (int j = i; j <= m; j += i)
+		{
+			int R = min(m, i + j - 1);
+			sum += (a[R] - a[j - 1]) * (j / i);
+		}
+		ans ^= sum;
+	}
+	cout << ans << endl;
+	return TIME;
+}
+
+
+ 

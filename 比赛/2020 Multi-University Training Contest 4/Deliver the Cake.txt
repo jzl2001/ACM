@@ -1,0 +1,187 @@
+Deliver the Cake
+Time Limit: 4000/2000 MS (Java/Others)    Memory Limit: 524288/524288 K (Java/Others)
+Total Submission(s): 1733    Accepted Submission(s): 429
+
+
+Problem Description
+It is Zhang3's birthday! Zhang3 has bought a birthday cake and now it's time to take it home.
+
+There are n villages, labeled 1,2,…,n. There are m bidirectional roads, the ith of which connects village ai, bi and it is di meter(s) long.
+
+The bakery locates at village s and Zhang3's home locates at village t. So Zhang3 wants to carry the cake from s to t. She can carry the cake either with her left hand or with her right hand. She can switch to the other hand during the trip, which takes extra x second(s) each time (when she's performing this action, she must stay in her place). Switching is allowed at any place, including the middle of the roads. She can do this as many times as she like, or don't do it at all.
+
+Some villages are LEFT. When Zhang3 is at a LEFT village, she must carry the cake with her left hand at the moment. In the same way, some other villages are RIGHT, she must carry with her right hand when she's at these villages. The rest villages are called MIDDLE. There's no special rules at MIDDLE villages.
+
+Zhang3 can start and finish with any hand carrying the cake. However, if s or t is not MIDDLE, their special rules must be followed.
+
+Please help Zhang3 find a way to take the cake home, with the minimum amount of spent time.
+ 
+
+Input
+The first line of the input gives the number of test cases, T(1≤T≤100). T test cases follow.
+
+For each test case, the first line contains five integers n,m,s,t,x(1≤n≤105,1≤m≤2×105,1≤x≤109), representing the number of villages, the number of roads, the bakery's location, home's location, and the time spent for each switching.
+
+The next line contains a string of length n, describing the type of each village. The ith character is either L representing village i is LEFT, or M representing MIDDLE, or R representing RIGHT.
+
+Finally, m lines follow, the ith of which contains three integers ai,bi,di(1≤di≤109), denoting a road connecting village ai and bi of length di.
+
+It is guaranteed that t can be reached from s.
+
+The sum of n in all test cases doesn't exceed 2×105. The sum of m doesn't exceed 4×105.
+ 
+
+Output
+For each test case, print a line with an integer, representing the minimum amount of spent time (in seconds).
+ 
+
+Sample Input
+1
+3 3 1 3 100
+LRM
+1 2 10
+2 3 10
+1 3 100
+ 
+
+Sample Output
+100
+ 
+
+Source
+2020 Multi-University Training Contest 4
+题意：n个城市，有LRM,到某个城市必须符合对应字符，M可以任意L、R。
+<分层图最短路>
+#include <bits/stdc++.h>
+#include <unordered_map>
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+const int N = 1e5 + 100;
+const int M = 1e5 + 10;
+const int INF = 0x3f3f3f3f;
+const ll LINF = 0x3f3f3f3f3f3f3f3f;
+const int mod = 1e9 + 7;
+#ifdef LOCAL
+#define TIME cout << "RuningTime: " << clock() << "ms\n", 0
+#else
+#define TIME 0
+#endif
+int n, ch;
+char str[N];
+ll d[N][3];//0L 1M 2R
+int id[N];
+int vis[N][3];
+struct node
+{
+	int to;
+	int h;
+	ll w;
+	bool operator < (const node &oth)const
+	{
+		return w > oth.w;
+	}
+};
+vector<pair<int, int>>G[N];
+void dijkstra(int s, int e)
+{
+	priority_queue<node>pq;
+	memset(vis, 0, sizeof vis);
+	memset(d, 0x3f, sizeof d);
+	if (id[s] == 1)
+		d[s][0] = 0, pq.push({ s, 0, 0 }), d[s][2] = 0, pq.push({ s, 2, 0 });
+	else
+		d[s][id[s]] = 0, pq.push({ s, id[s], 0 });
+	while (!pq.empty())
+	{
+		int x = pq.top().to;
+		int h = pq.top().h;
+		ll dis = pq.top().w;
+		pq.pop();
+		if (vis[x][h])
+			continue;
+		vis[x][h] = 1;
+		for (auto &i : G[x])
+		{
+			int to = i.first;
+			int w = i.second;
+			if (id[to] == 0)
+			{
+				if (h == 0 && dis + w < d[to][0])
+					d[to][0] = dis + w, pq.push({ to, 0, d[to][0] });
+				if (h == 2 && dis + w + ch < d[to][0])
+					d[to][0] = dis + w + ch, pq.push({ to, 0, d[to][0] });
+			}
+			else
+				if (id[to] == 2)
+				{
+					if (h == 2 && dis + w < d[to][2])
+						d[to][2] = dis + w, pq.push({ to, 2, d[to][2] });
+					if (h == 0 && dis + w + ch < d[to][2])
+						d[to][2] = dis + w + ch, pq.push({ to, 2, d[to][2] });
+				}
+				else
+				{
+					if (h == 0)
+					{
+						if (dis + w < d[to][0])
+							d[to][0] = dis + w, pq.push({ to, 0, d[to][0] });
+						if (dis + w + ch < d[to][2])
+							d[to][2] = dis + w + ch, pq.push({ to, 2, d[to][2] });	
+					}
+					else
+					{
+						if (dis + w < d[to][2])
+							d[to][2] = dis + w, pq.push({ to, 2, d[to][2] });
+						if (dis + w + ch < d[to][0])						
+							d[to][0] = dis + w + ch, pq.push({ to, 0, d[to][0] });
+					}	
+				}
+		}
+	}
+}
+int main()
+{
+#ifdef LOCAL
+	freopen("E:\\input.txt", "r", stdin);
+	freopen("E:\\output.txt", "w", stdout);
+#endif
+	int test;
+	cin >> test;
+	while (test--)
+	{
+		int m, s, t;
+		cin >> n >> m >> s >> t >> ch;
+		scanf("%s", str + 1);
+		int len = strlen(str + 1);
+		for (int i = 1; i <= len; i++)
+		{
+			if (str[i] == 'L')
+				id[i] = 0;
+			else
+				if (str[i] == 'R')
+					id[i] = 2;
+				else
+					id[i] = 1;
+		}
+		for (int i = 1; i <= m; i++)
+		{
+			int u, v, w;
+			scanf("%d%d%d", &u, &v, &w);
+			G[u].push_back({ v, w });
+			G[v].push_back({ u, w });
+		}
+		dijkstra(s, t);
+		for (int i = 1; i <= n; i++)
+		{
+			G[i].clear();
+		}
+		ll ans = d[t][id[t]];
+		if (id[t] == 1)
+			ans = min(d[t][0], d[t][2]);
+		printf("%lld\n", ans);
+	}
+	return TIME;
+}
+
+
